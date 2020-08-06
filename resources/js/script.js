@@ -1,3 +1,6 @@
+/* eslint-disable no-useless-escape */
+/*global $, jQuery, io, ace, Mousetrap, ClipboardJS*/
+
 (function ($) {
     /** 
      *  @description Serialize form as json object
