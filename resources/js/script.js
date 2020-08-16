@@ -699,6 +699,19 @@ function inizializeTabContextmenu() {
                     $("[data-target='#" + tabID + "']").trigger('click'); //active last tab inserted
                 }
             },
+            Clear: {
+                name: "Clear content",
+                icon: function (opt, $itemElement, itemKey, item) {
+                    // Set the content to the menu trigger selector and add an bootstrap icon to the item.
+                    $itemElement.html('<i class="fa fa-eraser context-menu-item-icon" aria-hidden="true"></i>' + item.name);
+
+                    // Add the context-menu-icon-updated class to the item
+                    return 'context-menu-icon-updated';
+                },
+                callback: function (itemKey, opt, e) {
+                    editors[idEditor].setValue("");
+                }
+            },
             SaveTabContent: {
                 name: "Save content",
                 icon: function (opt, $itemElement, itemKey, item) {
@@ -873,7 +886,12 @@ $(document).on('shown.bs.tab', 'a[data-toggle="tab"]', function (e) {
 });
 
 $(document).on('click', '#dwn-output', function () {
-    downloadOutput()
+    downloadOutput();
+});
+
+$(document).on('click', '#clear-output', function () {
+    $('#output-model').empty();
+    $('#output-error').empty();
 });
 
 $(document).on('click', '#split', function () {
@@ -1047,78 +1065,8 @@ $(document).on('click', '.add-tab', function () { // add new tab
     }
 });
 
-$(document).on('click', '.delete-tab', function () { // delete tab
-    var r = confirm("Are you sure you want to delete this file? This cannot be undone.");
-    var ids = $(".nav-tabs").children().length - 1;
-    var t = $(this).parent().attr('data-target');
-    var currentids = $(t).find(".ace").attr("id").substr(6);
-    var parse = parseInt(currentids);
-    if (r) {
-        var prevEditor = $(this).parent().parent().prev();
-        if (prevEditor.length === 0) {
-            prevEditor = $(this).parent().parent().next();
-        }
-        var currentID = $(this).closest('a').attr('data-target');
-        $(this).parent().parent().remove();
-        var ideditor = $(currentID).find('.ace').attr("id");
-        $(currentID).remove();
-        delete editors[ideditor];
-        $("[data-target='" + prevEditor.find("a").attr("data-target") + "']").trigger('click');
-        $('.check-run-tab[value="' + ideditor + '"]').remove();
-
-        if ($(".nav-tabs").children().length === 1) { // add a new tab if we delete the last
-            let parent = $('.add-tab').parent();
-            idEditor = 'editor1';
-            ideditor = 'editor1';
-            $('<li class="nav-item"> <a data-target="#tab1" role="tab" data-toggle="tab" class="btn-tab nav-link"> <button type="button" class="btn btn-light btn-sm btn-context-tab"><i class="fa fa-ellipsis-v" aria-hidden="true"></i></button> <span class="name-tab unselectable">L P 1</span> <span class="delete-tab"> <i class="fa fa-times"></i> </span> </a> </li>').insertBefore(parent);
-            $('.tab-content').append('<div role="tabpanel" class="tab-pane fade" id="tab1"><div id="editor1" class="ace"></div></div>');
-            editors[ideditor] = new ace.edit(ideditor);
-            setUpAce(ideditor, "");
-            $('#tab-execute-new').append('<button type="button" class="list-group-item list-group-item-action check-run-tab" value="' + ideditor + '">  <div class="check-box"><i class="fa fa-check check-icon invisible" aria-hidden="true"></i></div>  <span class="check-tab-name"> L P 1 </span> </button>');
-            $("[data-target='#tab1']").trigger('click');
-
-            inizializeTabContextmenu();
-            initializeCheckTabToRun();
-            setAceMode();
-            setElementsColorMode();
-        }
-        else if (ids !== parse) { // renumber tabs if you delete the previous tab instead of the current one
-            // $('.nav-tabs').find('li:not(:last)').each(function (index) {
-            //     $(this).find('a').text('L P ' + (index + 1));
-            //     $(this).find('a').append('<span class="delete-tab"> <i class="fa fa-times"></i> </span>');
-            // });
-            $('.tab-content').find("[role='tabpanel']").each(function (index) {
-                ideditor = 'editor' + (index + 1);
-                let currentEditor = $(this).find('.ace').attr('id');
-                if (ideditor !== currentEditor) {
-                    $(this).find('.ace').attr("id", ideditor);
-                    editors[ideditor] = editors[currentEditor];
-                    delete editors[currentEditor];
-                    var currentCheck = $('.check-run-tab[value="' + currentEditor + '"]');
-                    var wasInvisible = false;
-                    if (currentCheck.find('check-icon').hasClass('invisible')) {
-                        wasInvisible = true;
-                    }
-                    currentCheck.empty();
-                    currentCheck.attr('value', ideditor);
-                    currentCheck.append('<div class="check-box"><i class="fa fa-check check-icon invisible" aria-hidden="true"></i></div>  <span class="check-tab-name">L P ' + (index + 1) + '</span>');
-                    if (!wasInvisible) {
-                        currentCheck.find('check-icon').removeClass('invisible');
-                    }
-                }
-                $('.btn-tab').each(function (index) {
-                    var thisTab = $(this);
-                    var idTabEditor = $(this).attr('data-target');
-                    var idEditorToChangeTabName = $(idTabEditor).children().attr('id');
-                    var nameValue = thisTab.children('.name-tab').text();
-                    $('.check-run-tab[value="' + idEditorToChangeTabName + '"]').find('.check-tab-name').text(nameValue);
-                });
-            });
-        }
-        if ($(".nav-tabs").children().length === 2) {
-            idEditor = "editor1";
-        }
-    }
+$(document).on('click', '.delete-tab', function (e) { // delete tab
+    deleteTab($(this), false);
 });
 
 /**
@@ -1367,7 +1315,7 @@ function isJosn(str) {
 function createTextArea(layout) {
     $("#setting-output").remove();
     $(".output-container").remove();
-    $(layout).append('<div class="output-container">  <div id="setting-output"> Output <div role="group" class="float-right"> <button type="button" id="dwn-output" class="btn btn-light btn-sm" data-toggle="tooltip" data-placement="bottom" title="Save output" data-delay=\'{"show":"700", "hide":"0"}\'><i class="fa fa-download" aria-hidden="true"></i></button> <button type="button" id="split" class="btn btn-light btn-sm" title="Split"> <i class="fa fa-chevron-down"></i> </button></div></div> <div id="output" class="output"> <div id="output-model" class="pb-2"></div><div id="output-error"></div></div> </div>');
+    $(layout).append('<div class="output-container"><div id="setting-output"> Output <div role="group" class="float-right"> <button type="button" id="dwn-output" class="btn btn-light btn-sm" data-toggle="tooltip" data-placement="bottom" title="Save output" data-delay=\'{"show":"700", "hide":"0"}\'><i class="fa fa-download" aria-hidden="true"></i></button> <button type="button" id="clear-output" class="btn btn-light btn-sm" data-toggle="tooltip" data-placement="bottom" title="Clear output" data-delay=\'{"show":"700", "hide":"0"}\'><i class="fa fa-eraser" aria-hidden="true"></i></button> <button type="button" id="split" class="btn btn-light btn-sm" title="Split"> <i class="fa fa-chevron-down" aria-hidden="true"></i> </button></div></div> <div id="output" class="output"> <div id="output-model" class="pb-2"></div><div id="output-error"></div></div> </div>');
     setLoideStyleMode();
     $('#dwn-output').tooltip();
 }
@@ -2099,6 +2047,93 @@ function inizializeToolbar() {
     $('#btn-dwn-this-lp').on('click', function () {
         downloadCurrentTabContent();
     });
+
+    $('#delete-all-tabs').on('click', function () {
+        deleteAllTabs();
+    });
+}
+
+function deleteAllTabs() {
+    var r = confirm("Are you sure you want to delete all tabs? This cannot be undone.");
+    if(r) {
+        $('.delete-tab').each(function(){
+            deleteTab($(this), true);
+        });
+    }
+}
+
+function deleteTab(tab, all) {
+    if (!all) { var r = confirm("Are you sure you want to delete this file? This cannot be undone."); }
+    var ids = $(".nav-tabs").children().length - 1;
+    var t = tab.parent().attr('data-target');
+    var currentids = $(t).find(".ace").attr("id").substr(6);
+    var parse = parseInt(currentids);
+    if (r || all) {
+        var prevEditor = tab.parent().parent().prev();
+        if (prevEditor.length === 0) {
+            prevEditor = tab.parent().parent().next();
+        }
+        var currentID = tab.closest('a').attr('data-target');
+        tab.parent().parent().remove();
+        var ideditor = $(currentID).find('.ace').attr("id");
+        $(currentID).remove();
+        delete editors[ideditor];
+        $("[data-target='" + prevEditor.find("a").attr("data-target") + "']").trigger('click');
+        $('.check-run-tab[value="' + ideditor + '"]').remove();
+
+        if ($(".nav-tabs").children().length === 1) { // add a new tab if we delete the last
+            let parent = $('.add-tab').parent();
+            idEditor = 'editor1';
+            ideditor = 'editor1';
+            $('<li class="nav-item"> <a data-target="#tab1" role="tab" data-toggle="tab" class="btn-tab nav-link"> <button type="button" class="btn btn-light btn-sm btn-context-tab"><i class="fa fa-ellipsis-v" aria-hidden="true"></i></button> <span class="name-tab unselectable">L P 1</span> <span class="delete-tab"> <i class="fa fa-times"></i> </span> </a> </li>').insertBefore(parent);
+            $('.tab-content').append('<div role="tabpanel" class="tab-pane fade" id="tab1"><div id="editor1" class="ace"></div></div>');
+            editors[ideditor] = new ace.edit(ideditor);
+            setUpAce(ideditor, "");
+            $('#tab-execute-new').append('<button type="button" class="list-group-item list-group-item-action check-run-tab" value="' + ideditor + '">  <div class="check-box"><i class="fa fa-check check-icon invisible" aria-hidden="true"></i></div>  <span class="check-tab-name"> L P 1 </span> </button>');
+            $("[data-target='#tab1']").trigger('click');
+
+            inizializeTabContextmenu();
+            initializeCheckTabToRun();
+            setAceMode();
+            setElementsColorMode();
+        }
+        else if (ids !== parse) { // renumber tabs if you delete the previous tab instead of the current one
+            // $('.nav-tabs').find('li:not(:last)').each(function (index) {
+            //     tab.find('a').text('L P ' + (index + 1));
+            //     tab.find('a').append('<span class="delete-tab"> <i class="fa fa-times"></i> </span>');
+            // });
+            $('.tab-content').find("[role='tabpanel']").each(function (index) {
+                ideditor = 'editor' + (index + 1);
+                let currentEditor = tab.find('.ace').attr('id');
+                if (ideditor !== currentEditor) {
+                    tab.find('.ace').attr("id", ideditor);
+                    editors[ideditor] = editors[currentEditor];
+                    delete editors[currentEditor];
+                    var currentCheck = $('.check-run-tab[value="' + currentEditor + '"]');
+                    var wasInvisible = false;
+                    if (currentCheck.find('check-icon').hasClass('invisible')) {
+                        wasInvisible = true;
+                    }
+                    currentCheck.empty();
+                    currentCheck.attr('value', ideditor);
+                    currentCheck.append('<div class="check-box"><i class="fa fa-check check-icon invisible" aria-hidden="true"></i></div>  <span class="check-tab-name">L P ' + (index + 1) + '</span>');
+                    if (!wasInvisible) {
+                        currentCheck.find('check-icon').removeClass('invisible');
+                    }
+                }
+                $('.btn-tab').each(function (index) {
+                    var thisTab = tab;
+                    var idTabEditor = tab.attr('data-target');
+                    var idEditorToChangeTabName = $(idTabEditor).children().attr('id');
+                    var nameValue = thisTab.children('.name-tab').text();
+                    $('.check-run-tab[value="' + idEditorToChangeTabName + '"]').find('.check-tab-name').text(nameValue);
+                });
+            });
+        }
+        if ($(".nav-tabs").children().length === 2) {
+            idEditor = "editor1";
+        }
+    }
 }
 
 function downloadCurrentTabContent() {

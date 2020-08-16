@@ -4,8 +4,15 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LoIDE</title>
+    <!-- SEO info -->
+    <meta property="og:title" content="LoIDE" />
+    <meta property="og:locale" content="en_US" />
+    <meta name="description" content="LoIDE is a web-based IDE for Logic Programming" />
+    <meta property="og:description" content="LoIDE is a web-based IDE for Logic Programming" />
+    <meta property="og:site_name" content="LoIDE" />
+    <meta property="og:image" content="img/logo_LoIDE.png" />
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
     <link href="css/layout-default-latest.css" rel="stylesheet" type="text/css">
@@ -224,6 +231,7 @@
                             </ul>
                             <!-- Toolbar  -->
                             <div class="col-xs-12 ml-auto text-center toolbar">
+                                <button id="delete-all-tabs" type="button" class="btn btn-light" data-toggle="tooltip" data-placement="bottom" title="Delete all the tabs" data-delay='{"show":"700", "hide":"0"}'><i class="fa fa-window-close-o" aria-hidden="true"></i></button>
                                 <button id="btn-dwn-this-lp" type="button" class="btn btn-light" data-toggle="tooltip" data-placement="bottom" title="Save content" data-delay='{"show":"700", "hide":"0"}'><i class="fa fa-download" aria-hidden="true"></i></button>
                                 <div class="undo-redo btn-group" role="group">
                                     <button id="btn-cut" type="button" class="btn btn-light" data-toggle="tooltip" data-placement="bottom" title="Cut" data-delay='{"show":"700", "hide":"0"}'><i class="fa fa-scissors" aria-hidden="true"></i></button>
@@ -252,8 +260,11 @@
                                 <button type="button" id="dwn-output" class="btn btn-light btn-sm">
                                     <i class="fa fa-download" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="Save output" data-delay='{"show":"700", "hide":"0"}'></i>
                                 </button>
+                                <button type="button" id="clear-output" class="btn btn-light btn-sm" data-toggle="tooltip" data-placement="bottom" title="Clear output" data-delay='{"show":"700", "hide":"0"}'>
+                                    <i class="fa fa-eraser" aria-hidden="true"></i>
+                                </button>
                                 <button type="button" id="split" class="btn btn-light btn-sm">
-                                    <i class="fa fa-chevron-down"></i>
+                                    <i class="fa fa-chevron-down" aria-hidden="true"></i>
                                 </button>
                             </div>
                         </div>
@@ -270,7 +281,7 @@
         </form>
     </div>
     <div class="modal fade" id="modal-about" role="dialog" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog" role="document">
+        <div class="modal-dialog modal-dialog-scrollable" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h4 class="modal-title"> <i class="fa fa-info" aria-hidden="true"></i> About LoIDE</h4>
@@ -286,20 +297,20 @@
                             </em>
                         </p>
                     </div>
-                    <p>
-                        <em>LoIDE is a web-based IDE for Logic Programming.</em>
+                    <p class="text-center">
+                        <em>LoIDE is a web-based IDE for Logic Programming</em>
                         <br>
                     </p>
 
-                    <p>Checkout the LoIDE project website: <a href="https://demacs-unical.github.io/LoIDE/" rel="noopener" target="_blank"> demacs-unical.github.io/LoIDE/</a></p>
+                    <p class="text-justify"> Checkout the LoIDE project website: <br> <a href="https://demacs-unical.github.io/LoIDE/" rel="noopener" target="_blank"> demacs-unical.github.io/LoIDE</a></p>
                     <p>LoIDE is an Open Source project available on <a href="https://github.com/DeMaCS-UNICAL/LoIDE" rel="noopener" target="_blank">Github <i class="fa fa-github"></i></a></p>
-                    <p>It's released under <a href="https://github.com/DeMaCS-UNICAL/LoIDE/blob/master/LICENSE" rel="noopener" target="_blank">MIT License</a>.</p>
+                    <p class="text-justify">It's released under <a href="https://github.com/DeMaCS-UNICAL/LoIDE/blob/master/LICENSE" rel="noopener" target="_blank">MIT License</a></p>
 
-                    <p>If you have any questions or suggestions, please write an e-mail to: <em>loide<span style="display: none;">ABC</span>@mat.unical.it </em></p>
+                    <p class="text-justify">If you have any questions or suggestions, please write an e-mail to <em>loide<span style="display: none;">ABC</span>@mat.unical.it </em></p>
 
-                    <p><strong>Use of all solvers and systems is provided under the respective licenses; we refrain from taking any responsibility for any use that goes out of the scopes of such licenses.</strong></p>
+                    <p class="text-justify"><strong>Use of all solvers and systems is provided under the respective licenses; we refrain from taking any responsibility for any use that goes out of the scopes of such licenses.</strong></p>
 
-                    <p><strong>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. </strong></p>
+                    <p class="text-justify">THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -395,55 +406,63 @@
               </button>
             </div>
             <div class="modal-body">
-                <div class="shortcut-container mb-2 d-flex justify-content-between">
-                    <div class="shortcut-title">
-                        <span> Open Project/Files </span> 
+                <div class="loide-shortcut">
+                    <div class="shortcut-container mb-2 d-flex justify-content-between">
+                        <div class="shortcut-title">
+                            <span> Open Project/Files </span> 
+                        </div>
+                        <div>
+                            <div class="keybox d-inline badge badge-secondary">Ctrl/⌘</div>
+                            <div class="keybox d-inline badge badge-secondary">O</div>
+                        </div>
                     </div>
-                    <div>
-                        <div class="keybox d-inline badge badge-secondary">Ctrl/Command</div>
-                        <div class="keybox d-inline badge badge-secondary">O</div>
+                    <hr>
+                    <div class="shortcut-container mt-2 mb-2 d-flex justify-content-between">
+                        <div class="shortcut-title">
+                            <span> Save Project </span> 
+                        </div>
+                        <div>
+                            <div class="keybox d-inline badge badge-secondary">Ctrl/⌘</div>
+                            <div class="keybox d-inline badge badge-secondary">S</div>
+                        </div>
                     </div>
+                    <hr>
+                    <div class="shortcut-container mt-2 mb-2 d-flex justify-content-between">
+                        <div class="shortcut-title">
+                            <span> Share </span> 
+                        </div>
+                        <div>
+                            <div class="keybox d-inline badge badge-secondary">Ctrl/⌘</div>
+                            <div class="keybox d-inline badge badge-secondary">Shift</div>
+                            <div class="keybox d-inline badge badge-secondary">S</div>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="shortcut-container mt-2 mb-2 d-flex justify-content-between">
+                        <div class="shortcut-title">
+                            <span> Open/Close Run Options </span> 
+                        </div>
+                        <div>
+                            <div class="keybox d-inline badge badge-secondary">Ctrl/⌘</div>
+                            <div class="keybox d-inline badge badge-secondary">Shift</div>
+                            <div class="keybox d-inline badge badge-secondary">O</div>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="shortcut-container mt-2 mb-2 d-flex justify-content-between">
+                        <div class="shortcut-title">
+                            <span> Run Project </span> 
+                        </div>
+                        <div>
+                            <div class="keybox d-inline badge badge-secondary">Ctrl/⌘</div>
+                            <div class="keybox d-inline badge badge-secondary">Enter</div>
+                        </div>
+                    </div>
+                    <hr>
                 </div>
-                <hr>
-                <div class="shortcut-container mt-2 mb-2 d-flex justify-content-between">
-                    <div class="shortcut-title">
-                        <span> Save Project </span> 
-                    </div>
+                <div class="editor-shortcut">
                     <div>
-                        <div class="keybox d-inline badge badge-secondary">Ctrl/Command</div>
-                        <div class="keybox d-inline badge badge-secondary">S</div>
-                    </div>
-                </div>
-                <hr>
-                <div class="shortcut-container mt-2 mb-2 d-flex justify-content-between">
-                    <div class="shortcut-title">
-                        <span> Share </span> 
-                    </div>
-                    <div>
-                        <div class="keybox d-inline badge badge-secondary">Ctrl/Command</div>
-                        <div class="keybox d-inline badge badge-secondary">Shift</div>
-                        <div class="keybox d-inline badge badge-secondary">S</div>
-                    </div>
-                </div>
-                <hr>
-                <div class="shortcut-container mt-2 mb-2 d-flex justify-content-between">
-                    <div class="shortcut-title">
-                        <span> Open/Close Run Options </span> 
-                    </div>
-                    <div>
-                        <div class="keybox d-inline badge badge-secondary">Ctrl/Command</div>
-                        <div class="keybox d-inline badge badge-secondary">Shift</div>
-                        <div class="keybox d-inline badge badge-secondary">O</div>
-                    </div>
-                </div>
-                <hr>
-                <div class="shortcut-container mt-2 mb-2 d-flex justify-content-between">
-                    <div class="shortcut-title">
-                        <span> Run Project </span> 
-                    </div>
-                    <div>
-                        <div class="keybox d-inline badge badge-secondary">Ctrl/Command</div>
-                        <div class="keybox d-inline badge badge-secondary">Enter</div>
+                        <p> For editor shortcuts see the editor <a href="https://github.com/ajaxorg/ace/wiki/Default-Keyboard-Shortcuts" rel="noopener" target="_blank"> official page </a> </p>
                     </div>
                 </div>
             </div>

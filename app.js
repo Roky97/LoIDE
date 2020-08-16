@@ -62,8 +62,10 @@ if (key.length !== 0 && cert.length !== 0) {
 }
 
 // Sets "Strict-Transport-Security, by default maxAge is set 1 year in seconds
-app.use(helmet.hsts({
-    maxAge: maxAge
+app.use(helmet({
+    hsts: {
+        maxAge: maxAge
+    }
 }));
 
 app.use(compression());
@@ -112,9 +114,6 @@ io.sockets.on('connection', function (socket) { // Wait for the incoming connect
         
         client.onerror = function (error) {
             print_log('WebSocket problem:\n' + JSON.stringify(error, null, '\t'));
-            socket.emit('problem', {
-                reason: error
-            });
             socket.emit('problem', {
                 reason: 'Execution error, please try again later!'
             });
