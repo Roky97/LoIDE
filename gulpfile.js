@@ -3,7 +3,6 @@ const csso = require('gulp-csso');
 const clean = require('gulp-clean');
 const autoprefixer = require('gulp-autoprefixer');
 const uglify = require('gulp-uglify-es').default;
-const imagemin = require('gulp-imagemin');
 const nodemon = require('gulp-nodemon')
 var browserSync = require('browser-sync').create();
 var babel = require("gulp-babel");
@@ -38,7 +37,6 @@ function css() {
 
 function faviconImage() {
     return src(path.src + 'favicon/*.{png,svg}')
-    .pipe(imagemin())
     .pipe(dest(path.dist + 'favicon/'))
 }
 
@@ -49,7 +47,6 @@ function faviconFiles() {
 
 function img() {
     return src(path.src + 'img/*.*')
-    .pipe(imagemin())
     .pipe(dest(path.dist + 'img/'))
 }
 
