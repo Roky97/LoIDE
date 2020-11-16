@@ -2,10 +2,13 @@
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/DeMaCS-UNICAL/LoIDE/master/LICENSE)
 [![GitHub release](https://img.shields.io/github/release/DeMaCS-UNICAL/LoIDE.svg)](https://github.com/DeMaCS-UNICAL/LoIDE/releases/latest)
 [![GitHub issues](https://img.shields.io/github/issues/DeMaCS-UNICAL/LoIDE.svg)](https://github.com/DeMaCS-UNICAL/LoIDE/issues)
+![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/DeMaCS-UNICAL/LoIDE)
+![Lines of code](https://img.shields.io/tokei/lines/github/DeMaCS-UNICAL/LoIDE)
 [![David](https://img.shields.io/david/DeMaCS-UNICAL/LoIDE)](https://david-dm.org/DeMaCS-UNICAL/LoIDE)
+
 [![Online Demo](https://img.shields.io/website-up-down-green-red/https/www.mat.unical.it/calimeri/projects/loide.svg?label=online-demo)](https://loide.demacs.unical.it)
 [![LoIDE website](https://img.shields.io/website-up-down-green-red/https/www.mat.unical.it/calimeri/projects/loide.svg?label=LoIDE-website)](https://demacs-unical.github.io/LoIDE)
-[![Twitter](https://img.shields.io/twitter/url/https/github.com/DeMaCS-UNICAL/LoIDE.svg?style=social)](https://twitter.com/intent/tweet?text=Wow:&url=%5Bobject%20Object%5D)
+[![Twitter](https://img.shields.io/twitter/url/https/github.com/DeMaCS-UNICAL/LoIDE.svg?style=social)](https://twitter.com/intent/tweet?text=LoIDE%20-%20A%20web-based%20IDE%20for%20Logic%20Programming%0A&url=https%3A%2F%2Fdemacs-unical.github.io%2FLoIDE)
 
 
 <!-- # LoIDE -->
@@ -29,17 +32,17 @@ Tell your friends! | [![Twitter](https://img.shields.io/twitter/url/https/github
 ___ -->
 
 
-## IMPORTANT NOTE
+<!-- ## IMPORTANT NOTE
 
-__*LoIDE started as an undergraduate student's work of thesis, and is still at the early stages of development.*__
+<!-- __*LoIDE started as an undergraduate student's work of thesis, and is still at the early stages of development.*__ -->
 
-__*It currently supports only Answer Set Programming; we encourage any feedback, but we do NOT recommend it for production yet.*__
+<!-- __*It currently supports only Answer Set Programming; we encourage any feedback, but we do NOT recommend it for production yet.*__ -->
 
 
-## Online Beta
-Find a live beta version at www.mat.unical.it/calimeri/projects/loide
+## Online Demo
+Find a live demo at www.mat.unical.it/calimeri/projects/loide
 
-This online version uses the [EmbASPServerExecutor](https://github.com/DeMaCS-UNICAL/EmbASPServerExecutor) to run the solvers
+<!-- This online version uses the [EmbASPServerExecutor](https://github.com/DeMaCS-UNICAL/EmbASPServerExecutor) to run the solvers -->
 
 
 ## Purpose
@@ -63,9 +66,16 @@ Further information can be found in the [Wiki](https://github.com/DeMaCS-UNICAL/
 These instructions will get you a copy of the project up and running on your local machine.
 
 ### Prerequisites
-It requires only [Node.js&reg;](https://nodejs.org)
+It only requires [Node.js&reg;](https://nodejs.org)
 
-### Installing
+### Download
+You can find the latest version of LoIDE [here](https://github.com/DeMaCS-UNICAL/LoIDE/releases/latest).
+
+Otherwise you can clone this repository.
+
+Remember that you can always see all the releases of LoIDE [here](https://github.com/DeMaCS-UNICAL/LoIDE/releases). 
+
+### Install
 Install dependencies:
  ```
  npm install
@@ -73,7 +83,7 @@ Install dependencies:
 
 Now you can run LoIDE in development or in production mode.
 
-### Running in production mode
+### Run in production mode
 In this mode, LoIDE will be optimized for production.
 
 Start the server:
@@ -86,7 +96,7 @@ Use _LoIDE_ in a browser at:
 http://localhost:8084
 ```
 
-### Running in development mode
+### Run in development mode
 Run LoIDE in development mode only for development and testing purposes.
 
 Start the server:
@@ -137,11 +147,11 @@ We use [Semantic Versioning](http://semver.org) for versioning. For the versions
 
 
 ## Credits
- - Stefano Germano
+ - Stefano Germano (_Founder/Maintainer_)
  - Eliana Palermiti
  - Rocco Palermiti
  - Alexander Karaulshchikov
- - Francesco Calimeri
+ - Francesco Calimeri (_Scientific Supervisor_)
 
 From the [Department of Mathematics and Computer Science](https://www.mat.unical.it) of the [University of Calabria](http://unical.it)
 
