@@ -1,8 +1,8 @@
 {
     "port"  	:
     {
-        "http"		: 8084,
-        "https"		: 8085
+        "http"		: 3000,
+        "https"		: 3001
     },
     "path"		:
     {

@@ -3,7 +3,7 @@
      *  @description Serialize form as json object
      */
     $.fn.serializeFormJSON = function () {
-        var self = this,
+        let self = this,
             json = {},
             push_counters = {},
             patterns = {
@@ -34,7 +34,7 @@
                 return;
             }
 
-            var k,
+            let k,
                 keys = this.name.match(patterns.key),
                 merge = this.value,
                 reverse_key = this.name;
@@ -74,7 +74,7 @@
  */
 function copyStringToClipboard(str) {
     // Create new element
-    var el = document.createElement('textarea');
+    let el = document.createElement('textarea');
     // Set value (string to be copied)
     el.value = str;
     // Set non-editable to avoid focus and move outside of view
@@ -184,10 +184,10 @@ $(window).resize(function () {
 });
 
 function resizeWindow() {
-    var fontSizeO = localStorage.getItem("fontSizeO");
+    let fontSizeO = localStorage.getItem("fontSizeO");
     fontSizeO = fontSizeO !== "" ? fontSizeO : defaultFontSize;
 
-    var outputPos = localStorage.getItem("outputPos");
+    let outputPos = localStorage.getItem("outputPos");
     outputPos = outputPos !== null ? outputPos : "east";
 
     if (window.innerWidth > display.medium.size) {
@@ -224,7 +224,7 @@ function resizeWindow() {
         }
     }
     setHeightComponents();
-    var length = $(".nav-tabs").children().length;
+    let length = $(".nav-tabs").children().length;
     for (let index = 1; index <= length - 1; index++) {
         let idE = "editor" + index;
         editors[idE].resize();
@@ -232,7 +232,7 @@ function resizeWindow() {
 }
 
 function setSizePanes(){
-    var outputPos = localStorage.getItem("outputPos");
+    let outputPos = localStorage.getItem("outputPos");
     outputPos = outputPos !== null ? outputPos : "east";
 
     if(display.small.isActive){
@@ -263,7 +263,7 @@ function setSizePanes(){
 
 function saveOptions() {
     $("#run-dot").attr("name", "runAuto");
-    var form = $('#input').serializeFormJSON();
+    let form = $('#input').serializeFormJSON();
     form.tab = [];
 
     $('.check-run-tab.checked').each(function (index, element) {
@@ -274,14 +274,14 @@ function saveOptions() {
         delete form.tab;
     }
 
-    var stringify = JSON.stringify(form);
+    let stringify = JSON.stringify(form);
     if (!saveOption("solverOptions", stringify)) {
         alert("Sorry, this options will not save in your browser");
     }
     $("#run-dot").removeAttr("name");
 }
 
-$(document).ready(function () {
+function initializeLoide(){
     checkScreenType();
 
     setNotifications();
@@ -306,7 +306,7 @@ $(document).ready(function () {
 
     layout = $('body > .container > form > .layout').layout({
         onresize_end: function () {
-            var length = $(".nav-tabs").children().length;
+            let length = $(".nav-tabs").children().length;
             for (let index = 1; index <= length - 1; index++) {
                 let idE = "editor" + index;
                 editors[idE].resize();
@@ -353,7 +353,7 @@ $(document).ready(function () {
     });
 
     $('#btn-upload').on('click', function () {
-        var expandend = $('#btn-upload').attr('aria-expanded');
+        let expandend = $('#btn-upload').attr('aria-expanded');
         setHeightComponents(expandend, true);
     });
 
@@ -361,7 +361,7 @@ $(document).ready(function () {
      * @global
      * @description id of the clicked button 'submit'
      */
-    var clkBtn = "";
+    let clkBtn = "";
 
     $('button[type="submit"]').click(function (evt) {
         clkBtn = evt.target.id;
@@ -438,6 +438,75 @@ $(document).ready(function () {
         $('.splashscreen').addClass('display-none');
 
     },500 )
+}
+
+$(document).ready(function () {
+
+    API.createSocket((problem)=>{
+        operation_alert(problem);
+        $('#output-model').text("");
+        $('#output-error').text(problem.reason);
+    });
+
+    API.setGetLanguagesListener((data) =>{
+        let servicesContainer = $('#servicesContainer');
+        servicesContainer.empty();
+        for(let lang of data){
+            let langOption = $(`<option value="${lang.value}">${lang.name}</option>`);
+            servicesContainer.append(langOption);
+            let langDiv = $(`<div name="solvers" value="${lang.value}">`)
+            servicesContainer.append(langDiv);
+
+            for(let solver of lang.solvers){
+                let solverOption = $(`<option value="${solver.value}">${solver.name}</option>`);
+                let solverDiv = $(`<div name="executors" value="${solver.value}">`)
+                langDiv.append(solverOption);
+                langDiv.append(solverDiv);
+
+                for(let executor of solver.executors){
+                    let executorOption = $(`<option value="${executor.value}">${executor.name}</option>`);
+                    solverDiv.append(executorOption);
+                }
+
+                let optionDiv = $(`<div name="options" value="${solver.value}">`)
+                langDiv.append(optionDiv);
+
+                for(let option of solver.options){
+                    let optionOption = $(`<option value="${option.value}" word_argument="${option.word_argument}" title="${option.description}">${option.name}</option>`);
+                    optionDiv.append(optionOption);
+                }
+            }
+        }
+        loadLanguages();
+    });
+
+    API.setRunProjectListener((response) =>{
+        if (response.error == "") {
+            $('#output-model').text(response.model); // append the response in the container
+            let outputPos = localStorage.getItem("outputPos");
+            outputPos = outputPos !== null ? outputPos : "east";
+            
+            if(outputPos == "east"){
+                layout.open("east");
+            }
+            else{
+                layout.open("south");
+            }
+        } else {
+            $('#output-model').text(response.model);
+            $('#output-error').text(response.error);
+        }
+    },
+    ((response) =>{
+        operation_alert(response)
+        $('#output-error').text(response.reason); // append the response in the container
+        $('#output-model').text(""); // append the response in the container
+    })
+    );
+
+    API.emitGetLanguages();
+
+    initializeLoide();
 });
 
 function checkScreenType(){
@@ -461,7 +530,7 @@ function checkScreenType(){
 function inizializeAppareaceSettings(){
 
     $('#font-output').change(function (e) {
-        var size = $(this).val();
+        let size = $(this).val();
         if (size.length == 0) {
             $(this).val(defaultFontSize);
         }
@@ -472,7 +541,7 @@ function inizializeAppareaceSettings(){
     });
 
     $('#font-editor').change(function (e) {
-        var size = $(this).val();
+        let size = $(this).val();
         if (size.length == 0) {
             $(this).val(defaultFontSize);
         }
@@ -483,14 +552,14 @@ function inizializeAppareaceSettings(){
     });
 
     $('#theme').change(function (e) {
-        var theme = $(this).val();
+        let theme = $(this).val();
         setTheme(theme);
         if (!saveOption("theme", theme)) {
             alert("Sorry, this options will not save in your browser");
         }
     });
 
-    var size = $('#font-editor').val();
+    let size = $('#font-editor').val();
     if (size.length == 0) {
         $('#font-editor').val(defaultFontSize);
     }
@@ -500,7 +569,7 @@ function inizializeAppareaceSettings(){
         $('#font-output').val(defaultFontSize);
     }
 
-    var actualTheme = localStorage.getItem("theme") == null ? "" : localStorage.getItem("theme");
+    let actualTheme = localStorage.getItem("theme") == null ? "" : localStorage.getItem("theme");
     if( actualTheme.length == 0){
         if (localStorage.getItem('mode') === 'dark')
             setThemeEditors(defaultDarkTheme);
@@ -537,7 +606,7 @@ function initializeCheckTabToRun() {
 }
 
 function checkEmptyTabSelected() {
-    var tot = $('.check-run-tab.checked:not(.check-auto-run-tab)').length;
+    let tot = $('.check-run-tab.checked:not(.check-auto-run-tab)').length;
     if (tot === 0) {
         $('.check-auto-run-tab').find('.check-icon').removeClass('invisible');
         $('.check-auto-run-tab').addClass('checked');
@@ -560,37 +629,13 @@ function callSocketServer(onlyActiveTab) {
         let text = editors[idEditor].getValue();
         $('#program').val(text); // insert the content of text editor in a hidden input text to serailize
     }
-    var form = $('#input').serializeFormJSON();
+    let form = $('#input').serializeFormJSON();
     if (form.option == null) {
         form.option = [{ name: "" }];
     }
     destroyPrograms();
-    var socket = io.connect();
-    socket.emit('run', JSON.stringify(form));
-    socket.on('problem', function (response) {
-        operation_alert(response);
-        console.log(response); // debug string
-    });
-    socket.on('output', function (response) {
-        if (response.error == "") {
-            console.log(response.model); // debug string
-            $('#output-model').text(response.model); // append the response in the container
 
-            let outputPos = localStorage.getItem("outputPos");
-            outputPos = outputPos !== null ? outputPos : "east";
-            
-            if(outputPos == "east"){
-                layout.open("east");
-            }
-            else{
-                layout.open("south");
-            }
-
-        } else {
-            $('#output-model').text(response.model);
-            $('#output-error').text(response.error);
-        }
-    });
+    API.emitRunProject(form);
 }
 
 /**
@@ -606,15 +651,15 @@ function intervalRun() {
  */
 
 function createFileToDownload(text, where, name, type) {
-    var textFileAsBlob = new Blob([text], {
+    let textFileAsBlob = new Blob([text], {
 
         type: 'application/' + type
     });
     /**
      * specify the name of the file to be saved
      */
-    var fileNameToSaveAs = name + "." + type;
-    var downloadLink = document.createElement("a");
+    let fileNameToSaveAs = name + "." + type;
+    let downloadLink = document.createElement("a");
 
     /**
      * supply the name of the file
@@ -638,7 +683,7 @@ function createFileToDownload(text, where, name, type) {
     }
     else if (where == "dropbox") {
         // console.log(downloadLink.href);
-        // var options = { error: function (errorMessage) { alert(errorMessage);}};
+        // let options = { error: function (errorMessage) { alert(errorMessage);}};
         // Dropbox.save(downloadLink.href, fileNameToSaveAs, options);
     }
 }
@@ -651,7 +696,7 @@ function destroyClickedElement(event) {
 }
 
 function inizializeDropzone() {
-    var dropZone = document.getElementById('drop_zone');
+    let dropZone = document.getElementById('drop_zone');
     dropZone.addEventListener('dragover', handleDragOver, false);
     dropZone.addEventListener('drop', handleFileSelect, false);
     document.getElementById('files').addEventListener('change', handleFileSelect, false);
@@ -699,8 +744,8 @@ function inizializeTabContextmenu() {
                     return 'context-menu-icon-updated';
                 },
                 callback: function (itemKey, opt, e) {
-                    var textToDuplicate = editors[idEditor].getValue();
-                    var tabID = addTab(null, textToDuplicate);
+                    let textToDuplicate = editors[idEditor].getValue();
+                    let tabID = addTab(null, textToDuplicate);
                     $("[data-target='#" + tabID + "']").trigger('click'); //active last tab inserted
                 }
             },
@@ -764,7 +809,7 @@ function inizializeTabContextmenu() {
     });
 
     $("html").on("mouseup", function (e) {
-        var l = $(e.target);
+        let l = $(e.target);
         if (l[0].className.indexOf("popover") == -1) {
             $(".popover").each(function () {
                 $(this).popover("hide");
@@ -773,7 +818,7 @@ function inizializeTabContextmenu() {
     });
 
     $("html").on("contextmenu", function (e) {
-        var l = $(e.target);
+        let l = $(e.target);
         if (l[0].className.indexOf("popover") == -1) {
             $(".popover").each(function () {
                 $(this).popover("hide");
@@ -797,13 +842,13 @@ function inizializeTabContextmenu() {
             $('#change-name-tab').addClass('btn-light');
         }
         $('#change-name-tab-textbox').focus();
-        var thisTab = $(this);
-        var idTabEditor = $(this).attr('data-target');
-        var idEditorToChangeTabName = $(idTabEditor).children().attr('id');
+        let thisTab = $(this);
+        let idTabEditor = $(this).attr('data-target');
+        let idEditorToChangeTabName = $(idTabEditor).children().attr('id');
         $('#change-name-tab').prop('disabled', true);
 
         $('#change-name-tab-textbox').on('input', function () {
-            var nameValue = $('#change-name-tab-textbox').val().trim();
+            let nameValue = $('#change-name-tab-textbox').val().trim();
             if (nameValue.length === 0) {
                 $('#change-name-tab').prop('disabled', true);
             }
@@ -813,7 +858,7 @@ function inizializeTabContextmenu() {
         });
 
         $('#change-name-tab').on('click', function () {
-            var nameValue = $('#change-name-tab-textbox').val().trim();
+            let nameValue = $('#change-name-tab-textbox').val().trim();
             if (nameValue.length !== 0) {
                 $('.check-run-tab[value="' + idEditorToChangeTabName + '"]').find('.check-tab-name').text(nameValue);
                 thisTab.children('.name-tab').text(nameValue);
@@ -857,19 +902,19 @@ $(document).on('click', '.btn-add', function () {
 
 $(document).on('mouseup', '#output-model', function () {
     $("#output-model").unmark();
-    var start, end;
-    var text = $("#output-model").text();
-    var mainDiv = document.getElementById("output-model");
-    var sel = getSelectionCharOffsetsWithin(mainDiv);
+    let start, end;
+    let text = $("#output-model").text();
+    let mainDiv = document.getElementById("output-model");
+    let sel = getSelectionCharOffsetsWithin(mainDiv);
     start = sel.start;
     end = sel.end;
 
-    var preChart = text.slice(start - 1, start);
-    var postChart = text.slice(end, end + 1);
-    var selected = text.slice(start, end);
-    var isPreChartCompliance = preChart.match(/[\{\s\,]/g);
-    var isPostChartCompliance = postChart.match(/[\(\s\,]/g);
-    var isSelectedWordCompliance = !selected.match(/[\s\(\)\,]/g);
+    let preChart = text.slice(start - 1, start);
+    let postChart = text.slice(end, end + 1);
+    let selected = text.slice(start, end);
+    let isPreChartCompliance = preChart.match(/[\{\s\,]/g);
+    let isPostChartCompliance = postChart.match(/[\(\s\,]/g);
+    let isSelectedWordCompliance = !selected.match(/[\s\(\)\,]/g);
     if (isPreChartCompliance && isPostChartCompliance && isSelectedWordCompliance) {
         let regex = new RegExp('([\\s\\{\\,])(' + selected + ')([\\(\\,\\s])', 'g');
         text = text.replace(regex, '$1<mark>$2</mark>$3');
@@ -881,11 +926,11 @@ $(document).on('mouseup', '#output-model', function () {
 });
 
 $(document).on('shown.bs.tab', 'a[data-toggle="tab"]', function (e) {
-    var currentTab = e.target;
+    let currentTab = e.target;
     if ($(this).hasClass('add-tab')) {
         return;
     }
-    var idTab = $(currentTab).attr('data-target');
+    let idTab = $(currentTab).attr('data-target');
     idEditor = $(idTab).find('.ace').attr("id");
     editors[idEditor].focus();
 });
@@ -929,7 +974,7 @@ $(document).on('change', '#inputengine', function (event) {
  * @description - Load the languages
  */
 function loadLanguages() {
-    var inputLanguage = $('#inputLanguage');
+    let inputLanguage = $('#inputLanguage');
 
     inputLanguage.empty();
     inputLanguage.append(getLanguages());
@@ -947,8 +992,8 @@ function getLanguages() {
  * @description - Load the solvers for a specific language
  */
 function loadLanguageSolvers() {
-    var language = $('#inputLanguage').val();
-    var inputSolver = $('#inputengine');
+    let language = $('#inputLanguage').val();
+    let inputSolver = $('#inputengine');
 
     // Check that the value is not empty
     if (language !== '') {
@@ -976,12 +1021,12 @@ function getLanguageSolvers(language) {
  * @description - Load the executors for a specific solver
  */
 function loadSolverExecutors() {
-    var inputLanguage = $('#inputLanguage');
-    var inputSolver = $('#inputengine');
-    var inputExecutor = $('#inputExecutor');
+    let inputLanguage = $('#inputLanguage');
+    let inputSolver = $('#inputengine');
+    let inputExecutor = $('#inputExecutor');
 
-    var language = inputLanguage.val();
-    var solver = inputSolver.val();
+    let language = inputLanguage.val();
+    let solver = inputSolver.val();
 
     // Check that the value is not empty
     if (language !== '' && solver !== '') {
@@ -1008,11 +1053,11 @@ function getSolverExecutors(language, solver) {
  * @description - Load the options for a specific solver
  */
 function loadSolverOptions() {
-    var inputLanguage = $('#inputLanguage');
-    var inputSolver = $('#inputengine');
+    let inputLanguage = $('#inputLanguage');
+    let inputSolver = $('#inputengine');
 
-    var language = inputLanguage.val();
-    var solver = inputSolver.val();
+    let language = inputLanguage.val();
+    let solver = inputSolver.val();
 
     // Check that the value is not empty
     if (language !== '' && solver !== '') {
@@ -1037,7 +1082,7 @@ function getSolverOptions(language, solver) {
 
 // Add or remove the 'input type value' based on the option
 $(document).on('change', '.form-control-option', function () {
-    var val = $(this).val();
+    let val = $(this).val();
 
     if ($(this).find("[value='" + val + "']").attr('word_argument') == 'true') {
         if (($(this).closest('.row-option').find('.option-values').find('.option-value').length) <= 0) {
@@ -1054,10 +1099,10 @@ $(document).on('change', '.form-control-option', function () {
 });
 
 $(document).on('click', '.add-tab', function () { // add new tab
-    var tabID = addTab($(this), "");
+    let tabID = addTab($(this), "");
     $("[data-target='#" + tabID + "']").trigger('click'); //active last tab inserted
 
-    var actualTheme = localStorage.getItem("theme") == null ? "" : localStorage.getItem("theme");
+    let actualTheme = localStorage.getItem("theme") == null ? "" : localStorage.getItem("theme");
     if(actualTheme.length == 0){
         if (localStorage.getItem('mode') === 'dark')
             setThemeEditors(defaultDarkTheme);
@@ -1080,12 +1125,12 @@ $(document).on('click', '.delete-tab', function (e) { // delete tab
 function addEastLayout(layout) {
     layout.removePane("south");
     saveOption("outputPos", "east");
-    var currentValModel = $('#output-model').text();
-    var currentValError = $('#output-error').text();
+    let currentValModel = $('#output-model').text();
+    let currentValError = $('#output-error').text();
     $("#split-up").parent().empty();
     layout.addPane("east");
     createTextArea($('.ui-layout-east'));
-    var fontSizeO = $('#font-output').val();
+    let fontSizeO = $('#font-output').val();
     fontSizeO = fontSizeO !== "" ? fontSizeO : defaultFontSize;
     $("#font-output").val(fontSizeO);
     $('#output').css('font-size', fontSizeO + "px");
@@ -1099,12 +1144,12 @@ function addEastLayout(layout) {
 function addSouthLayout(layout) {
     layout.removePane("east");
     saveOption("outputPos", "south");
-    var currentValModel = $('#output-model').text();
-    var currentValError = $('#output-error').text();
+    let currentValModel = $('#output-model').text();
+    let currentValError = $('#output-error').text();
     $("#split").parent().empty();
     layout.addPane("south");
     createTextArea($('.ui-layout-south'));
-    var fontSizeO = $('#font-output').val();
+    let fontSizeO = $('#font-output').val();
     fontSizeO = fontSizeO !== "" ? fontSizeO : defaultFontSize;
     $("#font-output").val(fontSizeO);
     $('#output').css('font-size', fontSizeO + "px");
@@ -1119,9 +1164,9 @@ function addSouthLayout(layout) {
  * @description Returns the start and the end position of the selected string in the output container
  */
 function getSelectionCharOffsetsWithin(element) {
-    var start = 0,
+    let start = 0,
         end = 0;
-    var sel, range, priorRange;
+    let sel, range, priorRange;
     if (typeof window.getSelection != "undefined") {
         range = window.getSelection().getRangeAt(0);
         priorRange = range.cloneRange();
@@ -1149,7 +1194,7 @@ function getSelectionCharOffsetsWithin(element) {
  * @description Delete from the DOM an option block and iterates all of the form options to change their 'name' for a correct json format (if present, included input value)
  */
 function delOptionDOM(optionClassBtn) {
-    var row = $(optionClassBtn).closest('.row-option');
+    let row = $(optionClassBtn).closest('.row-option');
     row.fadeOut(300, function () {
         $(this).remove();
         renameSelectOptionsAndBadge();
@@ -1160,7 +1205,7 @@ function delOptionDOM(optionClassBtn) {
  * @description Create a new DOM element for the solver's options
  */
 function addOptionDOM() {
-    var solverOptions = $('#solver-options');
+    let solverOptions = $('#solver-options');
 
     // Append the DOM element containing the solver's options
     solverOptions.append(getSolverOptionDOMElement());
@@ -1174,7 +1219,7 @@ function addOptionDOM() {
  * @description Delete input value to the DOM and if the lenght of the class is equal to one, append the button to add input value
  */
 function deleteInputValue(inputClass) {
-    var inputValue = $(inputClass).closest('.row-option');
+    let inputValue = $(inputClass).closest('.row-option');
     if (inputValue.find('.option-value').length > 1) {
         inputClass.parent().remove();
     }
@@ -1188,12 +1233,12 @@ function deleteInputValue(inputClass) {
  * @description Add the input type to a correct class parent
  */
 function addInputValue(inputClass) {
-    var currentName = $(inputClass).closest('.row-option').find('.form-control-option').attr('name');
+    let currentName = $(inputClass).closest('.row-option').find('.form-control-option').attr('name');
     /**
      * replace 'name' in 'value' for correct json format
      * @example currentName=option[0][name] , replaceName=option[0][value][]
      */
-    var replaceName = currentName.replace('name', 'value');
+    let replaceName = currentName.replace('name', 'value');
     replaceName += '[]';
     inputClass.closest('.row-option').find('.option-values').append('<div class="input-group"><input type="text" class="form-control form-control-value option-value" name=' + replaceName + '><span class="btn-del-value"><i class="fa fa-trash"></i></span></div>');
     $(inputClass).siblings('.option-values').after('<button type="button" class="btn btn-light btn-add btn-block"> <i class="fa fa-plus"></i> Add value</button>');
@@ -1208,13 +1253,13 @@ function setJSONInput(config) {
     if ({}.hasOwnProperty.call(config,'language') || {}.hasOwnProperty.call(config,'engine') || {}.hasOwnProperty.call(config,'executor') || {}.hasOwnProperty.call(config,'option')
         || {}.hasOwnProperty.call(config,'program') || {}.hasOwnProperty.call(config,'output_model') || {}.hasOwnProperty.call(config,'output_error') || {}.hasOwnProperty.call(config,'tabname')) {
         $('.nav-tabs li:not(:last)').each(function (index, element) {
-            var id = $(this).find("a").attr("data-target");
+            let id = $(this).find("a").attr("data-target");
             $(this).remove();
             $(id).remove();
             // console.log('remove', (index + 1));
             $('.check-run-tab[value="editor' + (index + 1) + '"]').remove();
         });
-        var tabID;
+        let tabID;
         $(config.program).each(function (index, element) {
             tabID = addTab($(".add-tab"), config.program[index]);
         });
@@ -1253,7 +1298,7 @@ function setJSONInput(config) {
  */
 function addOption(option) {
     $('#btn-add-option').trigger('click');
-    var lastOption = $('.row-option').last();
+    let lastOption = $('.row-option').last();
     lastOption.find('.form-control-option').val(option.name).change();
     if (option.value != null) {
         option.value.forEach(function (item, index) {
@@ -1273,14 +1318,14 @@ function addOption(option) {
  * @description set the height of the components with the height of your browser
  */
 function setHeightComponents(expanded, open) {
-    var height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight; // cross-browser solution
-    var navbarHeight = $('.navbar').outerHeight(true);
-    var tabpanel = $(".nav-tabs").outerHeight(true);
+    let height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight; // cross-browser solution
+    let navbarHeight = $('.navbar').outerHeight(true);
+    let tabpanel = $(".nav-tabs").outerHeight(true);
 
     $('.ace').css('height', height - navbarHeight - tabpanel);
 
     if (expanded !== undefined || open == true) {
-        var containerUpload = $('#upload-container').outerHeight(true);
+        let containerUpload = $('#upload-container').outerHeight(true);
         containerUpload += 22;
         $('.left-panel').css('height', height - (navbarHeight + containerUpload));
         $('.layout').css('height', height - (navbarHeight + containerUpload));
@@ -1329,7 +1374,7 @@ function handleFileSelect(evt) {
     evt.stopPropagation();
     evt.preventDefault();
 
-    var files = document.getElementById("files").files;
+    let files = document.getElementById("files").files;
 
     if (files.length === 0) {
         files = evt.dataTransfer.files;
@@ -1338,9 +1383,9 @@ function handleFileSelect(evt) {
     if (files.length == 1) {
         let reader = new FileReader();
         reader.onload = function (event) {
-            var text = event.target.result;
+            let text = event.target.result;
             if (isJosn(text)) {
-                var jsontext = JSON.parse(text); // takes content of the file in the response
+                let jsontext = JSON.parse(text); // takes content of the file in the response
                 if (!setJSONInput(jsontext)) {
                     editors[idEditor].setValue(JSON.stringify(text)); // set value of the file in text editor
                 }
@@ -1363,8 +1408,8 @@ function handleFileSelect(evt) {
 }
 
 function getValidFileList(files, callback) {
-    var count = files.length;              // total number of files
-    var data = {
+    let count = files.length;              // total number of files
+    let data = {
         names: [],
         texts: []
     };                     // accepted files
@@ -1375,9 +1420,9 @@ function getValidFileList(files, callback) {
     }
 
     function checkFile(file) {
-        var reader = new FileReader();
+        let reader = new FileReader();
         reader.onload = function (event) {
-            var text = this.result;
+            let text = this.result;
             // Here I parse and check the data and if valid append it to texts
             data.texts.push(text);        // or the original `file` blob..
             data.names.push(file.name);
@@ -1389,9 +1434,9 @@ function getValidFileList(files, callback) {
 }
 
 function onDone(data) {
-    var tabOpened = $('.btn-tab').length;
-    var tabID;
-    var openOnFirst = false;
+    let tabOpened = $('.btn-tab').length;
+    let tabID;
+    let openOnFirst = false;
     for (let index = 0; index < data.texts.length; index++) {
         if (tabOpened == 1) {
             if (index == 0) {
@@ -1455,7 +1500,7 @@ function setUpAce(ideditor, text) {
     ace.config.set("modePath", "js/ace/mode");
     editors[ideditor].jumpToMatching();
 
-    var actualTheme = localStorage.getItem("theme") == null ? "" : localStorage.getItem("theme");
+    let actualTheme = localStorage.getItem("theme") == null ? "" : localStorage.getItem("theme");
     if(actualTheme.length == 0){
         if (localStorage.getItem('mode') === 'dark')
             editors[ideditor].setTheme(defaultDarkTheme);
@@ -1598,11 +1643,11 @@ function inizializeShortcuts() {
  * @description add the programs into the input type hidden to serialize
  */
 function addMorePrograms() {
-    var check = false;
+    let check = false;
 
     $('.check-run-tab.checked:not(.check-auto-run-tab)').each(function (index, element) {
         check = true;
-        var p = editors[$(this).val()].getValue();
+        let p = editors[$(this).val()].getValue();
         $('.layout').prepend("<input type='hidden' name='program[" + index + "]' id='program" + $(this).val() + "' value='" + p + "' class='programs'>");
     });
 
@@ -1618,8 +1663,8 @@ function addMorePrograms() {
 function addProgramsToDownload() {
     $('#program').remove();
     $('.tab-pane').each(function (index, element) {
-        var id = $(this).find('.ace').attr("id");
-        var value = editors[id].getValue();
+        let id = $(this).find('.ace').attr("id");
+        let value = editors[id].getValue();
         $('.layout').prepend("<input type='hidden' name='program[" + index + "]' id='program" + index + "' value='" + value + "' class='programs'>");
     });
 }
@@ -1638,8 +1683,8 @@ function destroyPrograms() {
  *@description generate unique id for the tabs
  */
 function generateIDTab() {
-    var id = $(".nav-tabs").children().length;
-    var tabid = "tab" + id;
+    let id = $(".nav-tabs").children().length;
+    let tabid = "tab" + id;
 
     while ($("#" + tabid).length !== 0) {
         id += 1;
@@ -1653,7 +1698,7 @@ function generateIDTab() {
  * @description Sets the theme to all the editors
  */
 function setTheme(theme) {
-    var length = $(".nav-tabs").children().length;
+    let length = $(".nav-tabs").children().length;
     for (let index = 1; index <= length - 1; index++) {
         let idE = "editor" + index;
         editors[idE].setTheme(theme);
@@ -1665,7 +1710,7 @@ function setTheme(theme) {
  * @description Sets the font's size to all the editors
  */
 function setFontSizeEditors(size) {
-    var length = $(".nav-tabs").children().length;
+    let length = $(".nav-tabs").children().length;
     for (let index = 1; index <= length - 1; index++) {
         let idE = "editor" + index;
         editors[idE].setFontSize(size + "px");
@@ -1677,7 +1722,7 @@ function setFontSizeEditors(size) {
  * @description Sets the theme to all the editors
  */
 function setThemeEditors(theme) {
-    var length = $(".nav-tabs").children().length;
+    let length = $(".nav-tabs").children().length;
     for (let index = 1; index <= length - 1; index++) {
         let idE = "editor" + index;
         editors[idE].setTheme(theme);
@@ -1717,27 +1762,27 @@ function restoreOptions() {
     if (!supportLocalStorage) {
         return false;
     }
-    var theme = localStorage.getItem("theme");
+    let theme = localStorage.getItem("theme");
     theme = theme !== null ? theme : defaultTheme;
     $('#theme').val(theme);
     setTheme(theme);
 
-    var fontSizeE = localStorage.getItem("fontSizeE");
+    let fontSizeE = localStorage.getItem("fontSizeE");
     fontSizeE = fontSizeE !== "" ? fontSizeE : defaultFontSize;
     $('#font-editor').val(fontSizeE);
     setFontSizeEditors(fontSizeE);
 
-    var fontSizeO = localStorage.getItem("fontSizeO");
+    let fontSizeO = localStorage.getItem("fontSizeO");
     fontSizeO = fontSizeO !== "" ? fontSizeO : defaultFontSize;
     $("#font-output").val(fontSizeO);
     $('#output').css('font-size', fontSizeO + "px");
 
-    var outputSize = localStorage.getItem("outputSize");
+    let outputSize = localStorage.getItem("outputSize");
     if (outputSize !== null) {
         $('#output').parent().css("width", outputSize);
     }
 
-    var layoutPos = localStorage.getItem("outputPos");
+    let layoutPos = localStorage.getItem("outputPos");
     layoutPos = layoutPos !== null ? layoutPos : "east";
     if (layoutPos === "east") {
         addEastLayout(layout);
@@ -1766,10 +1811,10 @@ function setOptions(obj) {
  * @description Adds tab to the DOM
  */
 function addTab(obj, text, name) {
-    var id = $(".nav-tabs").children().length;
-    var tabId = generateIDTab();
-    var editorId = "editor" + id;
-    var tabName = name == null ? 'L P ' + id : name;
+    let id = $(".nav-tabs").children().length;
+    let tabId = generateIDTab();
+    let editorId = "editor" + id;
+    let tabName = name == null ? 'L P ' + id : name;
     $('<li class="nav-item"><a data-target="#' + tabId + '" role="tab" data-toggle="tab" class="btn-tab nav-link"> <button type="button" class="btn btn-light btn-sm btn-context-tab"><i class="fa fa-ellipsis-v" aria-hidden="true"></i></button> <span class="name-tab unselectable">' + tabName + '</span> <span class="delete-tab"> <i class="fa fa-times"></i> </span> </a> </li>').insertBefore($('.add-tab').parent());
     $('.tab-content').append('<div role="tabpanel" class="tab-pane fade" id="' + tabId + '"><div id="' + editorId + '" class="ace"></div></div>');
     setUpAce(editorId, text);
@@ -1781,7 +1826,7 @@ function addTab(obj, text, name) {
     setAceMode();
     setElementsColorMode();
     
-    var currentFontSize = $('#font-editor').val();
+    let currentFontSize = $('#font-editor').val();
     if (currentFontSize.length == 0) {
         editors[editorId].setFontSize(currentFontSize + "px");
     }
@@ -1905,7 +1950,7 @@ function inizializePopovers() {
             /* if($('#only-output').is(":checked")){
                 $('#program').removeAttr('name', 'program[0]');
                 $('#output-form').attr('name', 'output');
-                var text = $("#output").text();
+                let text = $("#output").text();
                 $('#output-form').val(text);
                 form = $('#input').serializeFormJSON();
                 stringify = JSON.stringify(form);
@@ -1988,14 +2033,14 @@ function inizializePopovers() {
 function inizializeToolbar() {
 
     $('#btn-undo').on('click', function () {
-        var undoManager = editors[idEditor].session.getUndoManager();
+        let undoManager = editors[idEditor].session.getUndoManager();
         if (undoManager.hasUndo()) {
             undoManager.undo();
         }
     });
 
     $('#btn-redo').on('click', function () {
-        var undoManager = editors[idEditor].session.getUndoManager();
+        let undoManager = editors[idEditor].session.getUndoManager();
         if (undoManager.hasRedo()) {
             undoManager.redo();
         }
@@ -2004,7 +2049,7 @@ function inizializeToolbar() {
 
     $('#btn-search').on('click', function () {
 
-        var searchPanel = $('#' + idEditor).find('.ace_search');
+        let searchPanel = $('#' + idEditor).find('.ace_search');
 
         if (searchPanel.length == 0) {
             editors[idEditor].execCommand("find");
@@ -2031,7 +2076,7 @@ function inizializeToolbar() {
         editors[idEditor].focus();
     });
 
-    var clipboardSupport = typeof(navigator.clipboard.readText)=='undefined' ? false : true;
+    let clipboardSupport = typeof(navigator.clipboard.readText)=='undefined' ? false : true;
 
     if (clipboardSupport) {
         $('#btn-paste').on('click', function () {
@@ -2061,7 +2106,7 @@ function inizializeToolbar() {
 }
 
 function deleteAllTabs() {
-    var r = confirm("Are you sure you want to delete all tabs? This cannot be undone.");
+    let r = confirm("Are you sure you want to delete all tabs? This cannot be undone.");
     if(r) {
         $('.delete-tab').each(function(){
             deleteTab($(this), true);
@@ -2070,19 +2115,19 @@ function deleteAllTabs() {
 }
 
 function deleteTab(tab, all) {
-    if (!all) { var r = confirm("Are you sure you want to delete this file? This cannot be undone."); }
-    var ids = $(".nav-tabs").children().length - 1;
-    var t = tab.parent().attr('data-target');
-    var currentids = $(t).find(".ace").attr("id").substr(6);
-    var parse = parseInt(currentids);
+    if (!all) { let r = confirm("Are you sure you want to delete this file? This cannot be undone."); }
+    let ids = $(".nav-tabs").children().length - 1;
+    let t = tab.parent().attr('data-target');
+    let currentids = $(t).find(".ace").attr("id").substr(6);
+    let parse = parseInt(currentids);
     if (r || all) {
-        var prevEditor = tab.parent().parent().prev();
+        let prevEditor = tab.parent().parent().prev();
         if (prevEditor.length === 0) {
             prevEditor = tab.parent().parent().next();
         }
-        var currentID = tab.closest('a').attr('data-target');
+        let currentID = tab.closest('a').attr('data-target');
         tab.parent().parent().remove();
-        var ideditor = $(currentID).find('.ace').attr("id");
+        let ideditor = $(currentID).find('.ace').attr("id");
         $(currentID).remove();
         delete editors[ideditor];
         $("[data-target='" + prevEditor.find("a").attr("data-target") + "']").trigger('click');
@@ -2116,8 +2161,8 @@ function deleteTab(tab, all) {
                     tab.find('.ace').attr("id", ideditor);
                     editors[ideditor] = editors[currentEditor];
                     delete editors[currentEditor];
-                    var currentCheck = $('.check-run-tab[value="' + currentEditor + '"]');
-                    var wasInvisible = false;
+                    let currentCheck = $('.check-run-tab[value="' + currentEditor + '"]');
+                    let wasInvisible = false;
                     if (currentCheck.find('check-icon').hasClass('invisible')) {
                         wasInvisible = true;
                     }
@@ -2129,10 +2174,10 @@ function deleteTab(tab, all) {
                     }
                 }
                 $('.btn-tab').each(function (index) {
-                    var thisTab = tab;
-                    var idTabEditor = tab.attr('data-target');
-                    var idEditorToChangeTabName = $(idTabEditor).children().attr('id');
-                    var nameValue = thisTab.children('.name-tab').text();
+                    let thisTab = tab;
+                    let idTabEditor = tab.attr('data-target');
+                    let idEditorToChangeTabName = $(idTabEditor).children().attr('id');
+                    let nameValue = thisTab.children('.name-tab').text();
                     $('.check-run-tab[value="' + idEditorToChangeTabName + '"]').find('.check-tab-name').text(nameValue);
                 });
             });
@@ -2144,10 +2189,10 @@ function deleteTab(tab, all) {
 }
 
 function downloadCurrentTabContent() {
-    var text = editors[idEditor].getValue();
-    var TabToDownload = $('#' + idEditor).parent().attr('id');
-    var nameTab = $(".btn-tab[data-target='#" + TabToDownload + "']");
-    var string = nameTab.text().replace(/\s/g, '');
+    let text = editors[idEditor].getValue();
+    let TabToDownload = $('#' + idEditor).parent().attr('id');
+    let nameTab = $(".btn-tab[data-target='#" + TabToDownload + "']");
+    let string = nameTab.text().replace(/\s/g, '');
     createFileToDownload(text, "local", "LogicProgram_" + string, "txt");
 }
 
@@ -2159,15 +2204,15 @@ function runCurrentTab() {
 }
 
 function inizializeSnippets() {
-    var languageChosen = $('#inputLanguage').val();
-    var solverChosen = $('#inputengine').val();
+    let languageChosen = $('#inputLanguage').val();
+    let solverChosen = $('#inputengine').val();
 
-    var langTools = ace.require('ace/ext/language_tools');
+    let langTools = ace.require('ace/ext/language_tools');
 
     langTools.setCompleters([]); // reset completers.
 
     // completer that include snippets and some keywords
-    var completer;
+    let completer;
 
     switch (languageChosen) {
         case "asp":
@@ -2176,7 +2221,7 @@ function inizializeSnippets() {
                     completer = {
                         identifierRegexps: [/[a-zA-Z_0-9\#\$\-\u00A2-\uFFFF]/],
                         getCompletions: function (editor, session, pos, prefix, callback) {
-                            var completions = [
+                            let completions = [
                                 {
                                     caption: "#const",
                                     snippet: "#const ${1:namedConstant} = ${2:costant}",
@@ -2360,7 +2405,7 @@ function inizializeSnippets() {
                     completer = {
                         identifierRegexps: [/[a-zA-Z_0-9\#\$\-\u00A2-\uFFFF]/],
                         getCompletions: function (editor, session, pos, prefix, callback) {
-                            var completions = [
+                            let completions = [
                                 {
                                     caption: "#int",
                                     snippet: "#int",
@@ -2418,8 +2463,8 @@ function inizializeSnippets() {
 }
 
 function inizializeAutoComplete() {
-    var languageChosen = $('#inputLanguage').val();
-    var langTools = ace.require('ace/ext/language_tools');
+    let languageChosen = $('#inputLanguage').val();
+    let langTools = ace.require('ace/ext/language_tools');
     inizializeSnippets();
     switch (languageChosen) {
         case "asp": {
@@ -2457,9 +2502,9 @@ function inizializeAutoComplete() {
 }
 
 function giveBrackets(value) {
-    var par = "(";
-    var LETTER = "A";
-    var limit = 0;
+    let par = "(";
+    let LETTER = "A";
+    let limit = 0;
     if (value <= 26)
         limit = value;
     else
@@ -2477,9 +2522,9 @@ function giveBrackets(value) {
 }
 
 function createURL() {
-    var URL = window.location.host + "/?programs=";
-    var length = $(".nav-tabs").children().length;
-    var empty = true;
+    let URL = window.location.host + "/?programs=";
+    let length = $(".nav-tabs").children().length;
+    let empty = true;
 
     for (let index = 1; index <= length - 1; index++) {
         let idE = "editor" + index;
@@ -2558,7 +2603,7 @@ function createURL() {
 function getParameterByName(name, url) {
     if (!url) url = window.location.href;
     name = name.replace(/[\[\]]/g, '\\$&');
-    var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+    let regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
         results = regex.exec(url);
     if (!results) return null;
     if (!results[2]) return '';
@@ -2566,23 +2611,23 @@ function getParameterByName(name, url) {
 }
 
 function loadFromURL() {
-    var thisURL = window.location.href;
+    let thisURL = window.location.href;
 
     if (getParameterByName('programs', thisURL) != null) {
         // get params from url
-        var logicPr = getParameterByName('programs', thisURL).split(',');
+        let logicPr = getParameterByName('programs', thisURL).split(',');
         // console.log('LogicPrograms:', logicPr);
 
-        var tabNames = getParameterByName('tabnames', thisURL).split(',');
+        let tabNames = getParameterByName('tabnames', thisURL).split(',');
         // console.log('TabNames:', tabNames);
 
-        var language = getParameterByName('lang', thisURL);
+        let language = getParameterByName('lang', thisURL);
         // console.log('lang:', language);
 
-        var solver = getParameterByName('solver', thisURL);
+        let solver = getParameterByName('solver', thisURL);
         // console.log('solver:', solver);
 
-        var options = getParameterByName('options', thisURL);
+        let options = getParameterByName('options', thisURL);
         // console.log('options:', options);
 
         // decode params
@@ -2646,7 +2691,7 @@ function setClipboard() {
         placement: 'bottom'
     });
 
-    var clipboard = new ClipboardJS('#btn-copy-link');
+    let clipboard = new ClipboardJS('#btn-copy-link');
 
     clipboard.on('success', function (e) {
         setTooltip(e.trigger, 'Copied!');
@@ -2729,7 +2774,7 @@ function setElementsColorMode() {
 }
 
 function setLightStyleToUIElements() {
-    var length = $(".nav-tabs").children().length;
+    let length = $(".nav-tabs").children().length;
 
     $('#dark-light-mode').text("Dark");
     $('#theme').val(defaultTheme);
@@ -2750,7 +2795,7 @@ function setLightStyleToUIElements() {
 }
 
 function setDarkStyleToUIElements() {
-    var length = $(".nav-tabs").children().length;
+    let length = $(".nav-tabs").children().length;
     $('#dark-light-mode').text("Light");
     $('#theme').val(defaultDarkTheme);
     $(".btn-light").each(function () {
@@ -2771,13 +2816,13 @@ function setDarkStyleToUIElements() {
 }
 
 function saveProjectToLocalStorage() {
-    var tabsName = [];
-    var logicProgEditors = [];
+    let tabsName = [];
+    let logicProgEditors = [];
 
     $('.name-tab').each(function () {
         tabsName.push($(this).text());
     });
-    var length = $(".nav-tabs").children().length;
+    let length = $(".nav-tabs").children().length;
     for (let index = 1; index <= length - 1; index++) {
         let idE = "editor" + index;
         logicProgEditors.push(editors[idE].getValue());
@@ -2789,8 +2834,8 @@ function saveProjectToLocalStorage() {
 
 function checkProjectOnLocalStorage() {
     if (supportLocalStorage()) {
-        var tabsName = [];
-        var logicProgEditors = [];
+        let tabsName = [];
+        let logicProgEditors = [];
         if (localStorage.getItem("tabsName") != undefined && localStorage.getItem("logicProgEditors") != undefined) {
             tabsName = JSON.parse(localStorage.getItem("tabsName"));
             logicProgEditors = JSON.parse(localStorage.getItem("logicProgEditors"));
@@ -2804,8 +2849,8 @@ function checkProjectOnLocalStorage() {
 
 function loadProjectFromLocalStorage() {
     if (supportLocalStorage()) {
-        var tabsName = [];
-        var logicProgEditors = [];
+        let tabsName = [];
+        let logicProgEditors = [];
         tabsName = JSON.parse(localStorage.getItem("tabsName"));
         logicProgEditors = JSON.parse(localStorage.getItem("logicProgEditors"));
 
@@ -2825,9 +2870,9 @@ function loadProjectFromLocalStorage() {
 
         $("a[data-target='#tab1']").trigger('click');
 
-        var opt = localStorage.getItem("solverOptions");
+        let opt = localStorage.getItem("solverOptions");
         if (opt !== null) {
-            var obj = JSON.parse(opt);
+            let obj = JSON.parse(opt);
             $('#inputLanguage').val(obj.language).change();
             $('#inputengine').val(obj.engine).change();
             $('#inputExecutor').val(obj.executor).change();
@@ -2857,7 +2902,7 @@ function destroyTabsName() {
 }
 
 function setTabsName(config) {
-    var tabsName = config.tabname;
+    let tabsName = config.tabname;
     $('.name-tab').each(function (index) {
         $(this).text(tabsName[index]);
         let id = index + 1;
@@ -2870,12 +2915,12 @@ function downloadLoDIEProject() {
     addProgramsToDownload();
     addTabsNameToDownload();
 
-    var model = $("#output-model").text();
-    var errors = $("#output-error").text();
+    let model = $("#output-model").text();
+    let errors = $("#output-error").text();
 
     $("#run-dot").attr("name", "runAuto");
 
-    var form = $('#input').serializeFormJSON();
+    let form = $('#input').serializeFormJSON();
 
     form.output_model = model;
     form.output_error = errors;
@@ -2889,7 +2934,7 @@ function downloadLoDIEProject() {
         delete form.tab;
     }
 
-    var stringify = JSON.stringify(form);
+    let stringify = JSON.stringify(form);
     createFileToDownload(stringify, "local", "LoIDE_Project", "json");
     destroyPrograms();
     destroyTabsName();
@@ -2905,7 +2950,7 @@ function renameSelectOptionsAndBadge() {
     });
 
     $('.option-number').each(function (index) {
-        var i = index + 1;
+        let i = index + 1;
         $(this).text("Option " + i);
     });
 }
@@ -2925,7 +2970,7 @@ function openRunOptions() {
 }
 
 function getHTMLFromJQueryElement(jQueryElement) {
-    var DOMElement = '';
+    let DOMElement = '';
     for (let i = 0; i < jQueryElement.length; i++)
         DOMElement += jQueryElement.get(i).outerHTML;
 
@@ -2954,6 +2999,6 @@ function setAceMode() {
 }
 
 function downloadOutput() {
-    var outputText = $('#output-model').text() + "\n" + $('#output-error').text();
+    let outputText = $('#output-model').text() + "\n" + $('#output-error').text();
     createFileToDownload(outputText, 'local', 'LoIDE_output', 'txt');
 }
