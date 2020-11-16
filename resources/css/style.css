@@ -102,6 +102,15 @@
   }
 }
 
+.classic {
+  font-family: 'Dancing Script';
+  font-size: 1.5rem;
+}
+
+.classic.info {
+  font-size: 2.5rem;
+}
+
 .splashscreen {
   position: fixed;
   top:0;

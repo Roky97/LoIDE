@@ -42,6 +42,8 @@
     <meta name="msapplication-TileColor" content="#2b5797">
     <meta name="msapplication-config" content="favicon/browserconfig.xml">
     <meta name="theme-color" content="#ffffff">
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Dancing+Script&display=swap">
 </head>
 
 <body>
@@ -87,6 +89,7 @@
         <!-- Brand and toggle get grouped for better mobile display -->
         <div class="navbar-brand mr-4">
             <img  class="navbar-logo" src="img/logo_LoIDE.svg" alt="logo" onerror="this.onerror=null; this.src='img/logo_LoIDE.png'">
+            <span class="classic d-sm-none d-md-inline">Classic</span>
         </div>
 
         <ul class="navbar-nav">
@@ -299,8 +302,10 @@
                 </div>
                 <div class="modal-body">
                     <div class="text-center">
-                        <img src="img/logo_LoIDE.svg" class="about-logo" width="150" alt="LoIDE logo" style="margin-bottom: 1em;" onerror="this.onerror=null; this.src='img/logo_LoIDE.png'">
-                    
+                        <div class="d-flex justify-content-center align-items-center mb-4">
+                            <img src="img/logo_LoIDE.svg" class="about-logo" width="150" alt="LoIDE logo" onerror="this.onerror=null; this.src='img/logo_LoIDE.png'">
+                            <span class="classic info">Classic</span>
+                        </div>
                         <p>
                             <em>A web-based IDE for Logic Programming</em>
                         </p>
