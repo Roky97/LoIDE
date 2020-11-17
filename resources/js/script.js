@@ -2076,7 +2076,15 @@ function inizializeToolbar() {
         editors[idEditor].focus();
     });
 
-    let clipboardSupport = typeof(navigator.clipboard.readText)=='undefined' ? false : true;
+    let clipboardSupport = undefined;
+
+    try {
+        clipboardSupport = typeof(navigator.clipboard.readText)=='undefined' ? false : true
+    }
+    catch (error) {
+        console.error("Clipboard is not supported in this browser")
+        clipboardSupport = undefined;
+    }
 
     if (clipboardSupport) {
         $('#btn-paste').on('click', function () {
