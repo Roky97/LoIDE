@@ -1,5 +1,5 @@
 (function ($) {
-    /** 
+    /**
      *  @description Serialize form as json object
      */
     $.fn.serializeFormJSON = function () {
@@ -7,13 +7,12 @@
             json = {},
             push_counters = {},
             patterns = {
-                "validate": /^[a-zA-Z][a-zA-Z0-9_]*(?:\[(?:\d*|[a-zA-Z0-9_]+)\])*$/,
-                "key": /[a-zA-Z0-9_]+|(?=\[\])/g,
-                "push": /^$/,
-                "fixed": /^\d+$/,
-                "named": /^[a-zA-Z0-9_]+$/
+                validate: /^[a-zA-Z][a-zA-Z0-9_]*(?:\[(?:\d*|[a-zA-Z0-9_]+)\])*$/,
+                key: /[a-zA-Z0-9_]+|(?=\[\])/g,
+                push: /^$/,
+                fixed: /^\d+$/,
+                named: /^[a-zA-Z0-9_]+$/,
             };
-
 
         this.build = function (base, key, value) {
             base[key] = value;
@@ -28,7 +27,6 @@
         };
 
         $.each($(this).serializeArray(), function () {
-
             // skip invalid keys
             if (!patterns.validate.test(this.name)) {
                 return;
@@ -40,13 +38,19 @@
                 reverse_key = this.name;
 
             while ((k = keys.pop()) !== undefined) {
-
                 // adjust reverse_key
-                reverse_key = reverse_key.replace(new RegExp("\\[" + k + "\\]$"), '');
+                reverse_key = reverse_key.replace(
+                    new RegExp("\\[" + k + "\\]$"),
+                    ""
+                );
 
                 // push
                 if (k.match(patterns.push)) {
-                    merge = self.build([], self.push_counter(reverse_key), merge);
+                    merge = self.build(
+                        [],
+                        self.push_counter(reverse_key),
+                        merge
+                    );
                 }
 
                 // fixed
@@ -65,7 +69,6 @@
 
         return json;
     };
-
 })(jQuery);
 
 /**
@@ -74,28 +77,28 @@
  */
 function copyStringToClipboard(str) {
     // Create new element
-    let el = document.createElement('textarea');
+    let el = document.createElement("textarea");
     // Set value (string to be copied)
     el.value = str;
     // Set non-editable to avoid focus and move outside of view
-    el.setAttribute('readonly', '');
-    el.style = { position: 'absolute', left: '-9999px' };
+    el.setAttribute("readonly", "");
+    el.style = { position: "absolute", left: "-9999px" };
     document.body.appendChild(el);
     // Select text inside element
     el.select();
     // Copy text to clipboard
-    document.execCommand('copy');
+    document.execCommand("copy");
     // Remove temporary element
     document.body.removeChild(el);
 }
 
 /**
- * @param {json} result - description of the problem 
- * @description Open a container to display the result 
+ * @param {json} result - description of the problem
+ * @description Open a container to display the result
  */
 function operation_alert(result) {
     $("#notidication-body").html("<strong>" + result.reason + "</strong>");
-    $('#notification').toast('show');
+    $("#notification").toast("show");
 }
 
 /**
@@ -134,38 +137,42 @@ setUpAce(idEditor, "");
  * @description default screens sizes and activated status
  */
 var display = {
-    small: { size: 576, isActive: false},
-    medium: { size: 768, isActive: false},
-    large: { size: 992, isActive: true}
+    small: { size: 576, isActive: false },
+    medium: { size: 768, isActive: false },
+    large: { size: 992, isActive: true },
 };
 
 /**
  * @description - Returns the DOM element for the solver's option
  */
 function getSolverOptionDOMElement() {
-    return "" +
-        "<div class=\"row row-option\">" +
-        "<div class=\"col-sm-12 form-group\">" +
-        "<div class=\"badge-option mb-1\">" +
-        "<span class=\" text-center badge badge-info option-number\"></span>" +
-        "<span class=\" text-center badge badge-danger btn-del-option ml-1\"> <i class=\"fa fa-trash-o\"></i></span>" +
+    return (
+        "" +
+        '<div class="row row-option">' +
+        '<div class="col-sm-12 form-group">' +
+        '<div class="badge-option mb-1">' +
+        '<span class=" text-center badge badge-info option-number"></span>' +
+        '<span class=" text-center badge badge-danger btn-del-option ml-1"> <i class="fa fa-trash-o"></i></span>' +
         "</div>" +
-        "<div class=\"input-group opname\">" +
-        "<select name=\"option[0][name]\" class=\"form-control form-control-option custom-select not-alone\">" +
-        getHTMLFromJQueryElement(getSolverOptions($('#inputLanguage').val(), $('#inputengine').val())) +
+        '<div class="input-group opname">' +
+        '<select name="option[0][name]" class="form-control form-control-option custom-select not-alone">' +
+        getHTMLFromJQueryElement(
+            getSolverOptions($("#inputLanguage").val(), $("#inputengine").val())
+        ) +
         "</select>" +
         "</div>" +
-        "<div class=\"option-values\">" +
+        '<div class="option-values">' +
         "</div>" +
         "</div>" +
-        "</div>";
+        "</div>"
+    );
 }
 
 /**
  * set autofocus in modal
  */
-$('.modal').on('shown.bs.modal', function () {
-    $('#myInput').focus();
+$(".modal").on("shown.bs.modal", function () {
+    $("#myInput").focus();
 });
 
 /**
@@ -174,7 +181,7 @@ $('.modal').on('shown.bs.modal', function () {
 $('[data-toggle="tooltip"]').tooltip();
 
 window.onbeforeunload = function () {
-    $('#save-options').trigger('click');
+    $("#save-options").trigger("click");
     saveProjectToLocalStorage();
 };
 
@@ -193,32 +200,32 @@ function resizeWindow() {
     if (window.innerWidth > display.medium.size) {
         if (outputPos == "south") {
             layout.removePane("south");
-            let currentValModel = $('#output-model').text();
-            let currentValError = $('#output-error').text();
+            let currentValModel = $("#output-model").text();
+            let currentValError = $("#output-error").text();
             $(".ui-layout-south").empty();
             layout.addPane("east");
-            createTextArea($('.ui-layout-east'));
+            createTextArea($(".ui-layout-east"));
             $("#font-output").val(fontSizeO);
-            $('#output').css('font-size', fontSizeO + "px");
-            $('#output-model').text(currentValModel);
-            $('#output-error').text(currentValError);
+            $("#output").css("font-size", fontSizeO + "px");
+            $("#output-model").text(currentValModel);
+            $("#output-error").text(currentValError);
             saveOption("outputPos", "east");
             setSizePanes();
         }
     } else {
         if (outputPos == "east") {
             layout.removePane("east");
-            let currentValModel = $('#output-model').text();
-            let currentValError = $('#output-error').text();
+            let currentValModel = $("#output-model").text();
+            let currentValError = $("#output-error").text();
             $(".ui-layout-east").empty();
             layout.addPane("south");
-            createTextArea($('.ui-layout-south'));
+            createTextArea($(".ui-layout-south"));
             $("#font-output").val(fontSizeO);
-            $('#output').css('font-size', fontSizeO + "px");
-            $('#output-model').text(currentValModel);
-            $('#output-error').text(currentValError);
-            $('#split').children().attr('class', 'fa fa-chevron-up');
-            $('#split').attr('id', 'split-up');
+            $("#output").css("font-size", fontSizeO + "px");
+            $("#output-model").text(currentValModel);
+            $("#output-error").text(currentValError);
+            $("#split").children().attr("class", "fa fa-chevron-up");
+            $("#split").attr("id", "split-up");
             saveOption("outputPos", "south");
             setSizePanes();
         }
@@ -230,31 +237,26 @@ function resizeWindow() {
     }
 }
 
-function setSizePanes(){
+function setSizePanes() {
     let outputPos = localStorage.getItem("outputPos");
     outputPos = outputPos !== null ? outputPos : "east";
 
-    if(display.small.isActive){
-        if(outputPos == "east"){
+    if (display.small.isActive) {
+        if (outputPos == "east") {
             layout.sizePane("east", 100);
-        }
-        else {
+        } else {
             layout.sizePane("south", 200);
         }
-    }
-    else if(display.medium.isActive){
-        if(outputPos == "east"){
+    } else if (display.medium.isActive) {
+        if (outputPos == "east") {
             layout.sizePane("east", 200);
-        }
-        else {
+        } else {
             layout.sizePane("south", 200);
         }
-    } 
-    else {
-        if(outputPos == "east"){
+    } else {
+        if (outputPos == "east") {
             layout.sizePane("east", 250);
-        }
-        else {
+        } else {
             layout.sizePane("south", 200);
         }
     }
@@ -262,10 +264,10 @@ function setSizePanes(){
 
 function saveOptions() {
     $("#run-dot").attr("name", "runAuto");
-    let form = $('#input').serializeFormJSON();
+    let form = $("#input").serializeFormJSON();
     form.tab = [];
 
-    $('.check-run-tab.checked').each(function (index, element) {
+    $(".check-run-tab.checked").each(function (index, element) {
         form.tab.push($(this).val());
     });
 
@@ -280,7 +282,7 @@ function saveOptions() {
     $("#run-dot").removeAttr("name");
 }
 
-function initializeLoide(){
+function initializeLoide() {
     checkScreenType();
 
     setNotifications();
@@ -299,11 +301,11 @@ function initializeLoide(){
 
     initializeCheckTabToRun();
 
-    $('.navbar-logo').on('click', function (e) {
+    $(".navbar-logo").on("click", function (e) {
         location.reload();
     });
 
-    layout = $('#layout').layout({
+    layout = $("#layout").layout({
         onresize_end: function () {
             let length = $(".nav-tabs").children().length;
             for (let index = 1; index <= length - 1; index++) {
@@ -318,7 +320,7 @@ function initializeLoide(){
         slidable: true,
     });
 
-    $("[data-target='#tab1']").trigger('click'); // active the first tab
+    $("[data-target='#tab1']").trigger("click"); // active the first tab
 
     inizializeShortcuts();
 
@@ -331,15 +333,15 @@ function initializeLoide(){
     /**
      * Hidden tooltip when button is clicked
      */
-    $('[data-toggle="tooltip"]').on('click', function () {
-        $(this).tooltip('hide');
+    $('[data-toggle="tooltip"]').on("click", function () {
+        $(this).tooltip("hide");
     });
 
-    $('[rel="tooltip"]').on('click', function () {
-        $(this).tooltip('hide');
+    $('[rel="tooltip"]').on("click", function () {
+        $(this).tooltip("hide");
     });
 
-    $('[data-target="#modal-about"]').on('click', function () {
+    $('[data-target="#modal-about"]').on("click", function () {
         $.ajax({
             type: "POST",
             url: "/version",
@@ -347,12 +349,12 @@ function initializeLoide(){
             success: function (response) {
                 $("#version").empty();
                 $("#version").append(response.version);
-            }
+            },
         });
     });
 
-    $('#btn-upload').on('click', function () {
-        $(window).trigger('resize');
+    $("#btn-upload").on("click", function () {
+        $(window).trigger("resize");
     });
 
     /**
@@ -373,15 +375,14 @@ function initializeLoide(){
         callSocketServer();
     });
 
-    $('#input').submit(function (e) {
+    $("#input").submit(function (e) {
         e.preventDefault();
         if (clkBtn === "run") {
             $("#output-model").empty();
             $("#output-error").empty();
             $("#output-model").text("Sending..");
             callSocketServer(false);
-        }
-        else if (clkBtn === 'save-options') {
+        } else if (clkBtn === "save-options") {
             saveOptions();
         }
     });
@@ -402,7 +403,7 @@ function initializeLoide(){
 
     inizializeSnippets();
 
-    $('#inputLanguage').on('change', function () {
+    $("#inputLanguage").on("change", function () {
         inizializeAutoComplete();
         setAceMode();
     });
@@ -421,7 +422,7 @@ function initializeLoide(){
     loadFromURL(); // load program from url
 
     if (display.small.isActive) {
-        $('.left-panel').css('overflow-y', 'auto');
+        $(".left-panel").css("overflow-y", "auto");
     }
 
     inizializeAppareaceSettings();
@@ -429,48 +430,58 @@ function initializeLoide(){
     setSizePanes();
 
     if (display.small.isActive) {
-        $('#split').trigger('click');
+        $("#split").trigger("click");
     }
 
-    setTimeout( ()=>{
-        $('.splashscreen').addClass('display-none');
-
-    },500 )
+    setTimeout(() => {
+        $(".splashscreen").addClass("display-none");
+    }, 500);
 }
 
 $(document).ready(function () {
-
-    API.createSocket((problem)=>{
+    API.createSocket((problem) => {
         operation_alert(problem);
-        $('#output-model').text("");
-        $('#output-error').text(problem.reason);
+        $("#output-model").text("");
+        $("#output-error").text(problem.reason);
     });
 
-    API.setGetLanguagesListener((data) =>{
-        let servicesContainer = $('#servicesContainer');
+    API.setGetLanguagesListener((data) => {
+        let servicesContainer = $("#servicesContainer");
         servicesContainer.empty();
-        for(let lang of data){
-            let langOption = $(`<option value="${lang.value}">${lang.name}</option>`);
+        for (let lang of data) {
+            let langOption = $(
+                `<option value="${lang.value}">${lang.name}</option>`
+            );
             servicesContainer.append(langOption);
-            let langDiv = $(`<div name="solvers" value="${lang.value}">`)
+            let langDiv = $(`<div name="solvers" value="${lang.value}">`);
             servicesContainer.append(langDiv);
 
-            for(let solver of lang.solvers){
-                let solverOption = $(`<option value="${solver.value}">${solver.name}</option>`);
-                let solverDiv = $(`<div name="executors" value="${solver.value}">`)
+            for (let solver of lang.solvers) {
+                let solverOption = $(
+                    `<option value="${solver.value}">${solver.name}</option>`
+                );
+                let solverDiv = $(
+                    `<div name="executors" value="${solver.value}">`
+                );
                 langDiv.append(solverOption);
                 langDiv.append(solverDiv);
 
-                for(let executor of solver.executors){
-                    let executorOption = $(`<option value="${executor.value}">${executor.name}</option>`);
+                for (let executor of solver.executors) {
+                    let executorOption = $(
+                        `<option value="${executor.value}">${executor.name}</option>`
+                    );
                     solverDiv.append(executorOption);
                 }
 
-                let optionDiv = $(`<div name="options" value="${solver.value}">`)
+                let optionDiv = $(
+                    `<div name="options" value="${solver.value}">`
+                );
                 langDiv.append(optionDiv);
 
-                for(let option of solver.options){
-                    let optionOption = $(`<option value="${option.value}" word_argument="${option.word_argument}" title="${option.description}">${option.name}</option>`);
+                for (let option of solver.options) {
+                    let optionOption = $(
+                        `<option value="${option.value}" word_argument="${option.word_argument}" title="${option.description}">${option.name}</option>`
+                    );
                     optionDiv.append(optionOption);
                 }
             }
@@ -478,28 +489,28 @@ $(document).ready(function () {
         loadLanguages();
     });
 
-    API.setRunProjectListener((response) =>{
-        if (response.error == "") {
-            $('#output-model').text(response.model); // append the response in the container
-            let outputPos = localStorage.getItem("outputPos");
-            outputPos = outputPos !== null ? outputPos : "east";
-            
-            if(outputPos == "east"){
-                layout.open("east");
+    API.setRunProjectListener(
+        (response) => {
+            if (response.error == "") {
+                $("#output-model").text(response.model); // append the response in the container
+                let outputPos = localStorage.getItem("outputPos");
+                outputPos = outputPos !== null ? outputPos : "east";
+
+                if (outputPos == "east") {
+                    layout.open("east");
+                } else {
+                    layout.open("south");
+                }
+            } else {
+                $("#output-model").text(response.model);
+                $("#output-error").text(response.error);
             }
-            else{
-                layout.open("south");
-            }
-        } else {
-            $('#output-model').text(response.model);
-            $('#output-error').text(response.error);
+        },
+        (response) => {
+            operation_alert(response);
+            $("#output-error").text(response.reason); // append the response in the container
+            $("#output-model").text(""); // append the response in the container
         }
-    },
-    ((response) =>{
-        operation_alert(response)
-        $('#output-error').text(response.reason); // append the response in the container
-        $('#output-model').text(""); // append the response in the container
-    })
     );
 
     API.emitGetLanguages();
@@ -507,38 +518,35 @@ $(document).ready(function () {
     initializeLoide();
 });
 
-function checkScreenType(){
-    if($(window).width() < display.medium.size){
+function checkScreenType() {
+    if ($(window).width() < display.medium.size) {
         display.small.isActive = true;
         display.medium.isActive = false;
         display.large.isActive = false;
-    }
-    else if($(window).width() < display.large.size){
+    } else if ($(window).width() < display.large.size) {
         display.small.isActive = false;
         display.medium.isActive = true;
         display.large.isActive = false;
-    }
-    else {
+    } else {
         display.small.isActive = false;
         display.medium.isActive = false;
         display.large.isActive = true;
     }
 }
 
-function inizializeAppareaceSettings(){
-
-    $('#font-output').change(function (e) {
+function inizializeAppareaceSettings() {
+    $("#font-output").change(function (e) {
         let size = $(this).val();
         if (size.length == 0) {
             $(this).val(defaultFontSize);
         }
-        $('#output').css('font-size', size + "px");
+        $("#output").css("font-size", size + "px");
         if (!saveOption("fontSizeO", size)) {
             alert("Sorry, this options will not save in your browser");
         }
     });
 
-    $('#font-editor').change(function (e) {
+    $("#font-editor").change(function (e) {
         let size = $(this).val();
         if (size.length == 0) {
             $(this).val(defaultFontSize);
@@ -549,7 +557,7 @@ function inizializeAppareaceSettings(){
         }
     });
 
-    $('#theme').change(function (e) {
+    $("#theme").change(function (e) {
         let theme = $(this).val();
         setTheme(theme);
         if (!saveOption("theme", theme)) {
@@ -557,61 +565,62 @@ function inizializeAppareaceSettings(){
         }
     });
 
-    let size = $('#font-editor').val();
+    let size = $("#font-editor").val();
     if (size.length == 0) {
-        $('#font-editor').val(defaultFontSize);
+        $("#font-editor").val(defaultFontSize);
     }
     setFontSizeEditors(size);
-    size = $('#font-output').val();
+    size = $("#font-output").val();
     if (size.length == 0) {
-        $('#font-output').val(defaultFontSize);
+        $("#font-output").val(defaultFontSize);
     }
 
-    let actualTheme = localStorage.getItem("theme") == null ? "" : localStorage.getItem("theme");
-    if( actualTheme.length == 0){
-        if (localStorage.getItem('mode') === 'dark')
+    let actualTheme =
+        localStorage.getItem("theme") == null
+            ? ""
+            : localStorage.getItem("theme");
+    if (actualTheme.length == 0) {
+        if (localStorage.getItem("mode") === "dark")
             setThemeEditors(defaultDarkTheme);
         else {
             setThemeEditors(defaultTheme);
         }
-    }
-    else {
+    } else {
         setThemeEditors(actualTheme);
     }
 }
 
 function initializeCheckTabToRun() {
-    $('.check-run-tab:not(.check-auto-run-tab)').off();
-    $('.check-auto-run-tab').off();
+    $(".check-run-tab:not(.check-auto-run-tab)").off();
+    $(".check-auto-run-tab").off();
 
     checkEmptyTabSelected();
 
-    $('.check-run-tab:not(.check-auto-run-tab)').on('click', function (e) {
-        $(this).find('.check-icon').toggleClass('invisible');
-        $(this).toggleClass('checked');
+    $(".check-run-tab:not(.check-auto-run-tab)").on("click", function (e) {
+        $(this).find(".check-icon").toggleClass("invisible");
+        $(this).toggleClass("checked");
         checkEmptyTabSelected();
     });
 
-    $('.check-auto-run-tab').on('click', function (e) {
-        $('.check-run-tab.checked:not(.check-auto-run-tab)').each(function () {
-            $(this).removeClass('checked');
-            $(this).find('.check-icon').toggleClass('invisible');
-        })
-        $(this).find('.check-icon').removeClass('invisible');
-        $(this).addClass('checked');
+    $(".check-auto-run-tab").on("click", function (e) {
+        $(".check-run-tab.checked:not(.check-auto-run-tab)").each(function () {
+            $(this).removeClass("checked");
+            $(this).find(".check-icon").toggleClass("invisible");
+        });
+        $(this).find(".check-icon").removeClass("invisible");
+        $(this).addClass("checked");
         checkEmptyTabSelected();
     });
 }
 
 function checkEmptyTabSelected() {
-    let tot = $('.check-run-tab.checked:not(.check-auto-run-tab)').length;
+    let tot = $(".check-run-tab.checked:not(.check-auto-run-tab)").length;
     if (tot === 0) {
-        $('.check-auto-run-tab').find('.check-icon').removeClass('invisible');
-        $('.check-auto-run-tab').addClass('checked');
-    }
-    else {
-        $('.check-auto-run-tab').find('.check-icon').addClass('invisible');
-        $('.check-auto-run-tab').removeClass('checked');
+        $(".check-auto-run-tab").find(".check-icon").removeClass("invisible");
+        $(".check-auto-run-tab").addClass("checked");
+    } else {
+        $(".check-auto-run-tab").find(".check-icon").addClass("invisible");
+        $(".check-auto-run-tab").removeClass("checked");
     }
 }
 
@@ -619,15 +628,15 @@ function checkEmptyTabSelected() {
  * @description Serialize form and send it to socket server and waits for the response
  */
 function callSocketServer(onlyActiveTab) {
-    $('.tab-pane').each(function (index, element) {
-        let id = $(this).find('.ace').attr("id");
-        editors[id].replaceAll("", { "needle": "'" });
+    $(".tab-pane").each(function (index, element) {
+        let id = $(this).find(".ace").attr("id");
+        editors[id].replaceAll("", { needle: "'" });
     });
     if (onlyActiveTab || !addMorePrograms()) {
         let text = editors[idEditor].getValue();
-        $('#program').val(text); // insert the content of text editor in a hidden input text to serailize
+        $("#program").val(text); // insert the content of text editor in a hidden input text to serailize
     }
-    let form = $('#input').serializeFormJSON();
+    let form = $("#input").serializeFormJSON();
     if (form.option == null) {
         form.option = [{ name: "" }];
     }
@@ -640,7 +649,7 @@ function callSocketServer(onlyActiveTab) {
  * @description Trigger a 'run' button to execute the program
  */
 function intervalRun() {
-    $('#run').trigger('click');
+    $("#run").trigger("click");
 }
 
 /**
@@ -650,8 +659,7 @@ function intervalRun() {
 
 function createFileToDownload(text, where, name, type) {
     let textFileAsBlob = new Blob([text], {
-
-        type: 'application/' + type
+        type: "application/" + type,
     });
     /**
      * specify the name of the file to be saved
@@ -678,8 +686,7 @@ function createFileToDownload(text, where, name, type) {
     document.body.appendChild(downloadLink);
     if (where == "local") {
         downloadLink.click();
-    }
-    else if (where == "dropbox") {
+    } else if (where == "dropbox") {
         // console.log(downloadLink.href);
         // let options = { error: function (errorMessage) { alert(errorMessage);}};
         // Dropbox.save(downloadLink.href, fileNameToSaveAs, options);
@@ -694,124 +701,143 @@ function destroyClickedElement(event) {
 }
 
 function inizializeDropzone() {
-    $('#upload-container').on('shown.bs.collapse', function(){
-        $(window).trigger('resize');
-    })
+    $("#upload-container").on("shown.bs.collapse", function () {
+        $(window).trigger("resize");
+    });
 
-    $('#upload-container').on('hidden.bs.collapse', function(){
-        $(window).trigger('resize');
-    })
-    
-    let dropZone = document.getElementById('drop_zone');
-    dropZone.addEventListener('dragover', handleDragOver, false);
-    dropZone.addEventListener('drop', handleFileSelect, false);
-    document.getElementById('files').addEventListener('change', handleFileSelect, false);
+    $("#upload-container").on("hidden.bs.collapse", function () {
+        $(window).trigger("resize");
+    });
+
+    let dropZone = document.getElementById("drop_zone");
+    dropZone.addEventListener("dragover", handleDragOver, false);
+    dropZone.addEventListener("drop", handleFileSelect, false);
+    document
+        .getElementById("files")
+        .addEventListener("change", handleFileSelect, false);
 }
 
 function inizializeTabContextmenu() {
-
     $.contextMenu({
-        selector: '.btn-context-tab',
+        selector: ".btn-context-tab",
         items: {
             RunThisTab: {
                 name: "Run",
                 icon: function (opt, $itemElement, itemKey, item) {
                     // Set the content to the menu trigger selector and add an bootstrap icon to the item.
-                    $itemElement.html('<i class="fa fa-play context-menu-item-icon" aria-hidden="true"></i>' + item.name);
+                    $itemElement.html(
+                        '<i class="fa fa-play context-menu-item-icon" aria-hidden="true"></i>' +
+                            item.name
+                    );
 
                     // Add the context-menu-icon-updated class to the item
-                    return 'context-menu-icon-updated';
+                    return "context-menu-icon-updated";
                 },
                 callback: function (itemKey, opt, e) {
                     runCurrentTab();
-                }
+                },
             },
             Rename: {
                 name: "Rename",
                 icon: function (opt, $itemElement, itemKey, item) {
                     // Set the content to the menu trigger selector and add an bootstrap icon to the item.
-                    $itemElement.html('<i class="fa fa-pencil context-menu-item-icon" aria-hidden="true"></i>' + item.name);
+                    $itemElement.html(
+                        '<i class="fa fa-pencil context-menu-item-icon" aria-hidden="true"></i>' +
+                            item.name
+                    );
 
                     // Add the context-menu-icon-updated class to the item
-                    return 'context-menu-icon-updated';
+                    return "context-menu-icon-updated";
                 },
                 callback: function (itemKey, opt, e) {
                     closeAllPopovers();
-                    opt.$trigger.parent().popover('show');
-                }
+                    opt.$trigger.parent().popover("show");
+                },
             },
             Duplicate: {
                 name: "Duplicate",
                 icon: function (opt, $itemElement, itemKey, item) {
                     // Set the content to the menu trigger selector and add an bootstrap icon to the item.
-                    $itemElement.html('<i class="fa fa-clone context-menu-item-icon" aria-hidden="true"></i>' + item.name);
+                    $itemElement.html(
+                        '<i class="fa fa-clone context-menu-item-icon" aria-hidden="true"></i>' +
+                            item.name
+                    );
 
                     // Add the context-menu-icon-updated class to the item
-                    return 'context-menu-icon-updated';
+                    return "context-menu-icon-updated";
                 },
                 callback: function (itemKey, opt, e) {
                     let textToDuplicate = editors[idEditor].getValue();
                     let tabID = addTab(null, textToDuplicate);
-                    $("[data-target='#" + tabID + "']").trigger('click'); //active last tab inserted
-                }
+                    $("[data-target='#" + tabID + "']").trigger("click"); //active last tab inserted
+                },
             },
             Clear: {
                 name: "Clear content",
                 icon: function (opt, $itemElement, itemKey, item) {
                     // Set the content to the menu trigger selector and add an bootstrap icon to the item.
-                    $itemElement.html('<i class="fa fa-eraser context-menu-item-icon" aria-hidden="true"></i>' + item.name);
+                    $itemElement.html(
+                        '<i class="fa fa-eraser context-menu-item-icon" aria-hidden="true"></i>' +
+                            item.name
+                    );
 
                     // Add the context-menu-icon-updated class to the item
-                    return 'context-menu-icon-updated';
+                    return "context-menu-icon-updated";
                 },
                 callback: function (itemKey, opt, e) {
                     editors[idEditor].setValue("");
-                }
+                },
             },
             SaveTabContent: {
                 name: "Save content",
                 icon: function (opt, $itemElement, itemKey, item) {
                     // Set the content to the menu trigger selector and add an bootstrap icon to the item.
-                    $itemElement.html('<i class="fa fa-download context-menu-item-icon" aria-hidden="true"></i>' + item.name);
+                    $itemElement.html(
+                        '<i class="fa fa-download context-menu-item-icon" aria-hidden="true"></i>' +
+                            item.name
+                    );
 
                     // Add the context-menu-icon-updated class to the item
-                    return 'context-menu-icon-updated';
+                    return "context-menu-icon-updated";
                 },
                 callback: function (itemKey, opt, e) {
                     downloadCurrentTabContent();
-                }
+                },
             },
             Delete: {
                 name: "Delete",
                 icon: function (opt, $itemElement, itemKey, item) {
                     // Set the content to the menu trigger selector and add an bootstrap icon to the item.
-                    $itemElement.html('<i class="fa fa-times context-menu-item-icon" aria-hidden="true"></i>' + item.name);
+                    $itemElement.html(
+                        '<i class="fa fa-times context-menu-item-icon" aria-hidden="true"></i>' +
+                            item.name
+                    );
 
                     // Add the context-menu-icon-updated class to the item
-                    return 'context-menu-icon-updated';
+                    return "context-menu-icon-updated";
                 },
                 callback: function (itemKey, opt, e) {
-                    opt.$trigger.parent().find('.delete-tab').trigger('click');
-                }
-            }
+                    opt.$trigger.parent().find(".delete-tab").trigger("click");
+                },
+            },
         },
         events: {
             show: function (e) {
-                $(this).parent().trigger('click');
-            }
-        }
+                $(this).parent().trigger("click");
+            },
+        },
     });
 
-    $(".btn-context-tab").on('click', function (e) {
-        $(this).trigger('contextmenu');
+    $(".btn-context-tab").on("click", function (e) {
+        $(this).trigger("contextmenu");
     });
 
     $(".btn-tab").popover({
-        title: 'Rename',
-        container: 'body',
-        trigger: 'manual',
+        title: "Rename",
+        container: "body",
+        trigger: "manual",
         html: true,
-        placement: 'bottom'
+        placement: "bottom",
     });
 
     $("html").on("mouseup", function (e) {
@@ -832,81 +858,85 @@ function inizializeTabContextmenu() {
         }
     });
 
-    $('.btn-tab').on('inserted.bs.popover', function () {
-        $('.popover-body').last().html('<div class="input-group">\n' +
-            '      <input type="text" class="form-control" id="change-name-tab-textbox" placeholder="Type a name">\n' +
-            '      <span class="input-group-btn">\n' +
-            '        <button class="btn btn-light" type="button" id="change-name-tab"><i class="fa fa-chevron-right"></i></button>\n' +
-            '      </span>\n' +
-            '    </div>');
-        if (localStorage.getItem('mode') === 'dark') {
-            $('#change-name-tab').removeClass('btn-light');
-            $('#change-name-tab').addClass('btn-dark');
+    $(".btn-tab").on("inserted.bs.popover", function () {
+        $(".popover-body")
+            .last()
+            .html(
+                '<div class="input-group">\n' +
+                    '      <input type="text" class="form-control" id="change-name-tab-textbox" placeholder="Type a name">\n' +
+                    '      <span class="input-group-btn">\n' +
+                    '        <button class="btn btn-light" type="button" id="change-name-tab"><i class="fa fa-chevron-right"></i></button>\n' +
+                    "      </span>\n" +
+                    "    </div>"
+            );
+        if (localStorage.getItem("mode") === "dark") {
+            $("#change-name-tab").removeClass("btn-light");
+            $("#change-name-tab").addClass("btn-dark");
+        } else {
+            $("#change-name-tab").removeClass("btn-dark");
+            $("#change-name-tab").addClass("btn-light");
         }
-        else {
-            $('#change-name-tab').removeClass('btn-dark');
-            $('#change-name-tab').addClass('btn-light');
-        }
-        $('#change-name-tab-textbox').focus();
+        $("#change-name-tab-textbox").focus();
         let thisTab = $(this);
-        let idTabEditor = $(this).attr('data-target');
-        let idEditorToChangeTabName = $(idTabEditor).children().attr('id');
-        $('#change-name-tab').prop('disabled', true);
+        let idTabEditor = $(this).attr("data-target");
+        let idEditorToChangeTabName = $(idTabEditor).children().attr("id");
+        $("#change-name-tab").prop("disabled", true);
 
-        $('#change-name-tab-textbox').on('input', function () {
-            let nameValue = $('#change-name-tab-textbox').val().trim();
+        $("#change-name-tab-textbox").on("input", function () {
+            let nameValue = $("#change-name-tab-textbox").val().trim();
             if (nameValue.length === 0) {
-                $('#change-name-tab').prop('disabled', true);
-            }
-            else {
-                $('#change-name-tab').prop('disabled', false);
+                $("#change-name-tab").prop("disabled", true);
+            } else {
+                $("#change-name-tab").prop("disabled", false);
             }
         });
 
-        $('#change-name-tab').on('click', function () {
-            let nameValue = $('#change-name-tab-textbox').val().trim();
+        $("#change-name-tab").on("click", function () {
+            let nameValue = $("#change-name-tab-textbox").val().trim();
             if (nameValue.length !== 0) {
-                $('.check-run-tab[value="' + idEditorToChangeTabName + '"]').find('.check-tab-name').text(nameValue);
-                thisTab.children('.name-tab').text(nameValue);
-                thisTab.popover('hide');
+                $('.check-run-tab[value="' + idEditorToChangeTabName + '"]')
+                    .find(".check-tab-name")
+                    .text(nameValue);
+                thisTab.children(".name-tab").text(nameValue);
+                thisTab.popover("hide");
             }
         });
 
-        $('#change-name-tab-textbox').on('keyup', function (e) {
+        $("#change-name-tab-textbox").on("keyup", function (e) {
             if (e.key == "Enter") {
-                $('#change-name-tab').trigger('click');
+                $("#change-name-tab").trigger("click");
             }
         });
     });
 
-    $('.name-tab').on('contextmenu', function (e) {
-        $(e.target).siblings(".btn-context-tab").trigger('click');
+    $(".name-tab").on("contextmenu", function (e) {
+        $(e.target).siblings(".btn-context-tab").trigger("click");
         return false; // don't show the contest menu of the browser
     });
 }
 
-$(document).on('click', '#btn-add-option', function () {
+$(document).on("click", "#btn-add-option", function () {
     addOptionDOM();
     renameSelectOptionsAndBadge();
     setElementsColorMode();
 });
 
-$(document).on('click', '.btn-del-option', function () {
+$(document).on("click", ".btn-del-option", function () {
     delOptionDOM($(this));
     setElementsColorMode();
 });
 
-$(document).on('click', '.btn-del-value', function () {
+$(document).on("click", ".btn-del-value", function () {
     deleteInputValue($(this));
     setElementsColorMode();
 });
 
-$(document).on('click', '.btn-add', function () {
+$(document).on("click", ".btn-add", function () {
     addInputValue($(this).parent());
     setElementsColorMode();
 });
 
-$(document).on('mouseup', '#output-model', function () {
+$(document).on("mouseup", "#output-model", function () {
     $("#output-model").unmark();
     let start, end;
     let text = $("#output-model").text();
@@ -921,9 +951,16 @@ $(document).on('mouseup', '#output-model', function () {
     let isPreChartCompliance = preChart.match(/[\{\s\,]/g);
     let isPostChartCompliance = postChart.match(/[\(\s\,]/g);
     let isSelectedWordCompliance = !selected.match(/[\s\(\)\,]/g);
-    if (isPreChartCompliance && isPostChartCompliance && isSelectedWordCompliance) {
-        let regex = new RegExp('([\\s\\{\\,])(' + selected + ')([\\(\\,\\s])', 'g');
-        text = text.replace(regex, '$1<mark>$2</mark>$3');
+    if (
+        isPreChartCompliance &&
+        isPostChartCompliance &&
+        isSelectedWordCompliance
+    ) {
+        let regex = new RegExp(
+            "([\\s\\{\\,])(" + selected + ")([\\(\\,\\s])",
+            "g"
+        );
+        text = text.replace(regex, "$1<mark>$2</mark>$3");
         $("#output-model").empty();
         $("#output-model").html(text);
         let randomColor = Math.floor(Math.random() * 16777215).toString(16);
@@ -931,44 +968,44 @@ $(document).on('mouseup', '#output-model', function () {
     }
 });
 
-$(document).on('shown.bs.tab', 'a[data-toggle="tab"]', function (e) {
+$(document).on("shown.bs.tab", 'a[data-toggle="tab"]', function (e) {
     let currentTab = e.target;
-    if ($(this).hasClass('add-tab')) {
+    if ($(this).hasClass("add-tab")) {
         return;
     }
-    let idTab = $(currentTab).attr('data-target');
-    idEditor = $(idTab).find('.ace').attr("id");
+    let idTab = $(currentTab).attr("data-target");
+    idEditor = $(idTab).find(".ace").attr("id");
     editors[idEditor].focus();
 });
 
-$(document).on('click', '#dwn-output', function () {
+$(document).on("click", "#dwn-output", function () {
     downloadOutput();
 });
 
-$(document).on('click', '#clear-output', function () {
-    $('#output-model').empty();
-    $('#output-error').empty();
+$(document).on("click", "#clear-output", function () {
+    $("#output-model").empty();
+    $("#output-error").empty();
 });
 
-$(document).on('click', '#split', function () {
+$(document).on("click", "#split", function () {
     addSouthLayout(layout);
     setSizePanes();
 });
 
-$(document).on('click', '#split-up', function () {
+$(document).on("click", "#split-up", function () {
     addEastLayout(layout);
     setSizePanes();
 });
 
 // Sets the solvers and options on language change
-$(document).on('change', '#inputLanguage', function (event) {
+$(document).on("change", "#inputLanguage", function (event) {
     inizializeAutoComplete();
 
     loadLanguageSolvers();
 });
 
 // Sets the options on solver change
-$(document).on('change', '#inputengine', function (event) {
+$(document).on("change", "#inputengine", function (event) {
     loadSolverOptions();
     loadSolverExecutors();
 
@@ -980,7 +1017,7 @@ $(document).on('change', '#inputengine', function (event) {
  * @description - Load the languages
  */
 function loadLanguages() {
-    let inputLanguage = $('#inputLanguage');
+    let inputLanguage = $("#inputLanguage");
 
     inputLanguage.empty();
     inputLanguage.append(getLanguages());
@@ -991,21 +1028,21 @@ function loadLanguages() {
  * @description - Get avalable the languages
  */
 function getLanguages() {
-    return $('#servicesContainer > option').clone();
+    return $("#servicesContainer > option").clone();
 }
 
 /**
  * @description - Load the solvers for a specific language
  */
 function loadLanguageSolvers() {
-    let language = $('#inputLanguage').val();
-    let inputSolver = $('#inputengine');
+    let language = $("#inputLanguage").val();
+    let inputSolver = $("#inputengine");
 
     // Check that the value is not empty
-    if (language !== '') {
+    if (language !== "") {
         // Clear the values
         inputSolver.empty();
-        $('.form-control-option').empty();
+        $(".form-control-option").empty();
 
         // Load the solvers
         inputSolver.append(getLanguageSolvers(language));
@@ -1020,22 +1057,24 @@ function loadLanguageSolvers() {
  * @param {Object} language
  */
 function getLanguageSolvers(language) {
-    return $('#servicesContainer [name="solvers"][value="' + language + '"] > option').clone();
+    return $(
+        '#servicesContainer [name="solvers"][value="' + language + '"] > option'
+    ).clone();
 }
 
 /**
  * @description - Load the executors for a specific solver
  */
 function loadSolverExecutors() {
-    let inputLanguage = $('#inputLanguage');
-    let inputSolver = $('#inputengine');
-    let inputExecutor = $('#inputExecutor');
+    let inputLanguage = $("#inputLanguage");
+    let inputSolver = $("#inputengine");
+    let inputExecutor = $("#inputExecutor");
 
     let language = inputLanguage.val();
     let solver = inputSolver.val();
 
     // Check that the value is not empty
-    if (language !== '' && solver !== '') {
+    if (language !== "" && solver !== "") {
         inputExecutor.empty();
 
         // Append the executors to the DOM
@@ -1052,28 +1091,36 @@ function loadSolverExecutors() {
  * @param {Object} solver
  */
 function getSolverExecutors(language, solver) {
-    return $('#servicesContainer [name="solvers"][value="' + language + '"] [name="executors"][value="' + solver + '"] > option').clone();
+    return $(
+        '#servicesContainer [name="solvers"][value="' +
+            language +
+            '"] [name="executors"][value="' +
+            solver +
+            '"] > option'
+    ).clone();
 }
 
 /**
  * @description - Load the options for a specific solver
  */
 function loadSolverOptions() {
-    let inputLanguage = $('#inputLanguage');
-    let inputSolver = $('#inputengine');
+    let inputLanguage = $("#inputLanguage");
+    let inputSolver = $("#inputengine");
 
     let language = inputLanguage.val();
     let solver = inputSolver.val();
 
     // Check that the value is not empty
-    if (language !== '' && solver !== '') {
-        $('.form-control-option').empty();
+    if (language !== "" && solver !== "") {
+        $(".form-control-option").empty();
 
         // Append the options to the DOM
-        $('.row-option .form-control-option').append(getSolverOptions(language, solver));
+        $(".row-option .form-control-option").append(
+            getSolverOptions(language, solver)
+        );
 
         // Select the first option and refresh all input fields
-        $('.form-control-option').change();
+        $(".form-control-option").change();
     }
 }
 
@@ -1083,45 +1130,63 @@ function loadSolverOptions() {
  * @param {Object} solver
  */
 function getSolverOptions(language, solver) {
-    return $('#servicesContainer [name="solvers"][value="' + language + '"] [name="options"][value="' + solver + '"] > option').clone();
+    return $(
+        '#servicesContainer [name="solvers"][value="' +
+            language +
+            '"] [name="options"][value="' +
+            solver +
+            '"] > option'
+    ).clone();
 }
 
 // Add or remove the 'input type value' based on the option
-$(document).on('change', '.form-control-option', function () {
+$(document).on("change", ".form-control-option", function () {
     let val = $(this).val();
 
-    if ($(this).find("[value='" + val + "']").attr('word_argument') == 'true') {
-        if (($(this).closest('.row-option').find('.option-values').find('.option-value').length) <= 0) {
+    if (
+        $(this)
+            .find("[value='" + val + "']")
+            .attr("word_argument") == "true"
+    ) {
+        if (
+            $(this)
+                .closest(".row-option")
+                .find(".option-values")
+                .find(".option-value").length <= 0
+        ) {
             addInputValue($(this).parent());
-            $(this).addClass('not-alone');
+            $(this).addClass("not-alone");
         }
         setElementsColorMode();
-    }
-    else {
-        $(this).removeClass('not-alone');
-        $(this).closest('.row-option').find('.option-value').remove();
-        $(this).closest('.row-option').find('.btn-add').remove();
+    } else {
+        $(this).removeClass("not-alone");
+        $(this).closest(".row-option").find(".option-value").remove();
+        $(this).closest(".row-option").find(".btn-add").remove();
     }
 });
 
-$(document).on('click', '.add-tab', function () { // add new tab
+$(document).on("click", ".add-tab", function () {
+    // add new tab
     let tabID = addTab($(this), "");
-    $("[data-target='#" + tabID + "']").trigger('click'); //active last tab inserted
+    $("[data-target='#" + tabID + "']").trigger("click"); //active last tab inserted
 
-    let actualTheme = localStorage.getItem("theme") == null ? "" : localStorage.getItem("theme");
-    if(actualTheme.length == 0){
-        if (localStorage.getItem('mode') === 'dark')
+    let actualTheme =
+        localStorage.getItem("theme") == null
+            ? ""
+            : localStorage.getItem("theme");
+    if (actualTheme.length == 0) {
+        if (localStorage.getItem("mode") === "dark")
             setThemeEditors(defaultDarkTheme);
         else {
             setThemeEditors(defaultTheme);
         }
-    }
-    else {
-        setThemeEditors(actualTheme)
+    } else {
+        setThemeEditors(actualTheme);
     }
 });
 
-$(document).on('click', '.delete-tab', function (e) { // delete tab
+$(document).on("click", ".delete-tab", function (e) {
+    // delete tab
     deleteTab($(this), false);
 });
 
@@ -1131,17 +1196,17 @@ $(document).on('click', '.delete-tab', function (e) { // delete tab
 function addEastLayout(layout) {
     layout.removePane("south");
     saveOption("outputPos", "east");
-    let currentValModel = $('#output-model').text();
-    let currentValError = $('#output-error').text();
+    let currentValModel = $("#output-model").text();
+    let currentValError = $("#output-error").text();
     $("#split-up").parent().empty();
     layout.addPane("east");
-    createTextArea($('.ui-layout-east'));
-    let fontSizeO = $('#font-output').val();
+    createTextArea($(".ui-layout-east"));
+    let fontSizeO = $("#font-output").val();
     fontSizeO = fontSizeO !== "" ? fontSizeO : defaultFontSize;
     $("#font-output").val(fontSizeO);
-    $('#output').css('font-size', fontSizeO + "px");
-    $('#output-model').text(currentValModel);
-    $('#output-error').text(currentValError);
+    $("#output").css("font-size", fontSizeO + "px");
+    $("#output-model").text(currentValModel);
+    $("#output-error").text(currentValError);
 }
 
 /**
@@ -1150,19 +1215,19 @@ function addEastLayout(layout) {
 function addSouthLayout(layout) {
     layout.removePane("east");
     saveOption("outputPos", "south");
-    let currentValModel = $('#output-model').text();
-    let currentValError = $('#output-error').text();
+    let currentValModel = $("#output-model").text();
+    let currentValError = $("#output-error").text();
     $("#split").parent().empty();
     layout.addPane("south");
-    createTextArea($('.ui-layout-south'));
-    let fontSizeO = $('#font-output').val();
+    createTextArea($(".ui-layout-south"));
+    let fontSizeO = $("#font-output").val();
     fontSizeO = fontSizeO !== "" ? fontSizeO : defaultFontSize;
     $("#font-output").val(fontSizeO);
-    $('#output').css('font-size', fontSizeO + "px");
-    $('#output-model').text(currentValModel);
-    $('#output-error').text(currentValError);
-    $('#split').children().attr('class', 'fa fa-chevron-up');
-    $('#split').attr('id', 'split-up');
+    $("#output").css("font-size", fontSizeO + "px");
+    $("#output-model").text(currentValModel);
+    $("#output-error").text(currentValError);
+    $("#split").children().attr("class", "fa fa-chevron-up");
+    $("#split").attr("id", "split-up");
 }
 
 /**
@@ -1180,8 +1245,10 @@ function getSelectionCharOffsetsWithin(element) {
         priorRange.setEnd(range.startContainer, range.startOffset);
         start = priorRange.toString().length;
         end = start + range.toString().length;
-    } else if (typeof document.selection != "undefined" &&
-        (sel = document.selection).type != "Control") {
+    } else if (
+        typeof document.selection != "undefined" &&
+        (sel = document.selection).type != "Control"
+    ) {
         range = sel.createRange();
         priorRange = document.body.createTextRange();
         priorRange.moveToElementText(element);
@@ -1191,7 +1258,7 @@ function getSelectionCharOffsetsWithin(element) {
     }
     return {
         start: start,
-        end: end
+        end: end,
     };
 }
 
@@ -1200,7 +1267,7 @@ function getSelectionCharOffsetsWithin(element) {
  * @description Delete from the DOM an option block and iterates all of the form options to change their 'name' for a correct json format (if present, included input value)
  */
 function delOptionDOM(optionClassBtn) {
-    let row = $(optionClassBtn).closest('.row-option');
+    let row = $(optionClassBtn).closest(".row-option");
     row.fadeOut(300, function () {
         $(this).remove();
         renameSelectOptionsAndBadge();
@@ -1211,13 +1278,13 @@ function delOptionDOM(optionClassBtn) {
  * @description Create a new DOM element for the solver's options
  */
 function addOptionDOM() {
-    let solverOptions = $('#solver-options');
+    let solverOptions = $("#solver-options");
 
     // Append the DOM element containing the solver's options
     solverOptions.append(getSolverOptionDOMElement());
 
     // Select the first option
-    $('.row-option .form-control-option').last().change();
+    $(".row-option .form-control-option").last().change();
 }
 
 /**
@@ -1225,12 +1292,11 @@ function addOptionDOM() {
  * @description Delete input value to the DOM and if the lenght of the class is equal to one, append the button to add input value
  */
 function deleteInputValue(inputClass) {
-    let inputValue = $(inputClass).closest('.row-option');
-    if (inputValue.find('.option-value').length > 1) {
+    let inputValue = $(inputClass).closest(".row-option");
+    if (inputValue.find(".option-value").length > 1) {
         inputClass.parent().remove();
-    }
-    else {
-        inputClass.siblings('.option-value').val("");
+    } else {
+        inputClass.siblings(".option-value").val("");
     }
 }
 
@@ -1239,15 +1305,29 @@ function deleteInputValue(inputClass) {
  * @description Add the input type to a correct class parent
  */
 function addInputValue(inputClass) {
-    let currentName = $(inputClass).closest('.row-option').find('.form-control-option').attr('name');
+    let currentName = $(inputClass)
+        .closest(".row-option")
+        .find(".form-control-option")
+        .attr("name");
     /**
      * replace 'name' in 'value' for correct json format
      * @example currentName=option[0][name] , replaceName=option[0][value][]
      */
-    let replaceName = currentName.replace('name', 'value');
-    replaceName += '[]';
-    inputClass.closest('.row-option').find('.option-values').append('<div class="input-group"><input type="text" class="form-control form-control-value option-value" name=' + replaceName + '><span class="btn-del-value"><i class="fa fa-trash"></i></span></div>');
-    $(inputClass).siblings('.option-values').after('<button type="button" class="btn btn-light btn-add btn-block"> <i class="fa fa-plus"></i> Add value</button>');
+    let replaceName = currentName.replace("name", "value");
+    replaceName += "[]";
+    inputClass
+        .closest(".row-option")
+        .find(".option-values")
+        .append(
+            '<div class="input-group"><input type="text" class="form-control form-control-value option-value" name=' +
+                replaceName +
+                '><span class="btn-del-value"><i class="fa fa-trash"></i></span></div>'
+        );
+    $(inputClass)
+        .siblings(".option-values")
+        .after(
+            '<button type="button" class="btn btn-light btn-add btn-block"> <i class="fa fa-plus"></i> Add value</button>'
+        );
 }
 
 /**
@@ -1256,9 +1336,17 @@ function addInputValue(inputClass) {
  * @description check if the configration file has the correct property to set. If not, return false and display the content of the file in the text editor
  */
 function setJSONInput(config) {
-    if ({}.hasOwnProperty.call(config,'language') || {}.hasOwnProperty.call(config,'engine') || {}.hasOwnProperty.call(config,'executor') || {}.hasOwnProperty.call(config,'option')
-        || {}.hasOwnProperty.call(config,'program') || {}.hasOwnProperty.call(config,'output_model') || {}.hasOwnProperty.call(config,'output_error') || {}.hasOwnProperty.call(config,'tabname')) {
-        $('.nav-tabs li:not(:last)').each(function (index, element) {
+    if (
+        {}.hasOwnProperty.call(config, "language") ||
+        {}.hasOwnProperty.call(config, "engine") ||
+        {}.hasOwnProperty.call(config, "executor") ||
+        {}.hasOwnProperty.call(config, "option") ||
+        {}.hasOwnProperty.call(config, "program") ||
+        {}.hasOwnProperty.call(config, "output_model") ||
+        {}.hasOwnProperty.call(config, "output_error") ||
+        {}.hasOwnProperty.call(config, "tabname")
+    ) {
+        $(".nav-tabs li:not(:last)").each(function (index, element) {
             let id = $(this).find("a").attr("data-target");
             $(this).remove();
             $(id).remove();
@@ -1269,24 +1357,27 @@ function setJSONInput(config) {
         $(config.program).each(function (index, element) {
             tabID = addTab($(".add-tab"), config.program[index]);
         });
-        $("[data-target='#" + tabID + "']").trigger('click'); // active last tab inserted
-        if ({}.hasOwnProperty.call(config,'tab')) {
+        $("[data-target='#" + tabID + "']").trigger("click"); // active last tab inserted
+        if ({}.hasOwnProperty.call(config, "tab")) {
             $(config.tab).each(function (index, element) {
-                $('.check-run-tab[value="' + element + '"]').find('.check-icon').toggleClass('invisible');
-                $('.check-run-tab[value="' + element + '"]').toggleClass('checked');
+                $('.check-run-tab[value="' + element + '"]')
+                    .find(".check-icon")
+                    .toggleClass("invisible");
+                $('.check-run-tab[value="' + element + '"]').toggleClass(
+                    "checked"
+                );
             });
         }
-        if ({}.hasOwnProperty.call(config,'runAuto')) {
-            $("#run-dot").prop('checked', true);
+        if ({}.hasOwnProperty.call(config, "runAuto")) {
+            $("#run-dot").prop("checked", true);
+        } else {
+            $("#run-dot").prop("checked", false);
         }
-        else {
-            $("#run-dot").prop('checked', false);
-        }
-        $('#inputLanguage').val(config.language).change();
-        $('#inputengine').val(config.engine).change();
-        $('#inputExecutor').val(config.executor).change();
-        $('#output-model').text(config.output_model);
-        $('#output-error').text(config.output_error);
+        $("#inputLanguage").val(config.language).change();
+        $("#inputengine").val(config.engine).change();
+        $("#inputExecutor").val(config.executor).change();
+        $("#output-model").text(config.output_model);
+        $("#output-error").text(config.output_error);
 
         setOptions(config);
         setTabsName(config);
@@ -1303,17 +1394,16 @@ function setJSONInput(config) {
  * @description creates a option's form and append it to the DOM with the corresponding value
  */
 function addOption(option) {
-    $('#btn-add-option').trigger('click');
-    let lastOption = $('.row-option').last();
-    lastOption.find('.form-control-option').val(option.name).change();
+    $("#btn-add-option").trigger("click");
+    let lastOption = $(".row-option").last();
+    lastOption.find(".form-control-option").val(option.name).change();
     if (option.value != null) {
         option.value.forEach(function (item, index) {
             if (index == 0) {
-                lastOption.find('.option-value').last().val(item);
-            }
-            else if (index >= 1) {
-                lastOption.find('.btn-add').trigger('click');
-                lastOption.find('.option-value').last().val(item);
+                lastOption.find(".option-value").last().val(item);
+            } else if (index >= 1) {
+                lastOption.find(".btn-add").trigger("click");
+                lastOption.find(".option-value").last().val(item);
             }
         });
     }
@@ -1339,9 +1429,11 @@ function isJosn(str) {
 function createTextArea(layout) {
     $("#setting-output").remove();
     $(".output-container").remove();
-    $(layout).append('<div class="output-container"><div id="setting-output"> Output <div role="group" class="float-right"> <button type="button" id="dwn-output" class="btn btn-light btn-sm" data-toggle="tooltip" data-placement="bottom" title="Save output" data-delay=\'{"show":"700", "hide":"0"}\'><i class="fa fa-download" aria-hidden="true"></i></button> <button type="button" id="clear-output" class="btn btn-light btn-sm" data-toggle="tooltip" data-placement="bottom" title="Clear output" data-delay=\'{"show":"700", "hide":"0"}\'><i class="fa fa-eraser" aria-hidden="true"></i></button> <button type="button" id="split" class="btn btn-light btn-sm" title="Split"> <i class="fa fa-chevron-down" aria-hidden="true"></i> </button></div></div> <div id="output" class="output"> <div id="output-model" class="pb-2"></div><div id="output-error"></div></div> </div>');
+    $(layout).append(
+        '<div class="output-container"><div id="setting-output"> Output <div role="group" class="float-right"> <button type="button" id="dwn-output" class="btn btn-light btn-sm" data-toggle="tooltip" data-placement="bottom" title="Save output" data-delay=\'{"show":"700", "hide":"0"}\'><i class="fa fa-download" aria-hidden="true"></i></button> <button type="button" id="clear-output" class="btn btn-light btn-sm" data-toggle="tooltip" data-placement="bottom" title="Clear output" data-delay=\'{"show":"700", "hide":"0"}\'><i class="fa fa-eraser" aria-hidden="true"></i></button> <button type="button" id="split" class="btn btn-light btn-sm" title="Split"> <i class="fa fa-chevron-down" aria-hidden="true"></i> </button></div></div> <div id="output" class="output"> <div id="output-model" class="pb-2"></div><div id="output-error"></div></div> </div>'
+    );
     setLoideStyleMode();
-    $('#dwn-output').tooltip();
+    $("#dwn-output").tooltip();
 }
 
 function handleFileSelect(evt) {
@@ -1370,25 +1462,26 @@ function handleFileSelect(evt) {
         };
         reader.readAsText(files[0]);
     } else {
-        getValidFileList(files, onDone)
+        getValidFileList(files, onDone);
     }
 
     /**
      * remove and close container after success upload
      */
-    $('.collapse').collapse('hide');
-    $('#files').val("");
+    $(".collapse").collapse("hide");
+    $("#files").val("");
 }
 
 function getValidFileList(files, callback) {
-    let count = files.length;              // total number of files
+    let count = files.length; // total number of files
     let data = {
         names: [],
-        texts: []
-    };                     // accepted files
+        texts: [],
+    }; // accepted files
 
     // Get the selected files
-    for (let i = 0; i < count; i++) {       // invoke readers
+    for (let i = 0; i < count; i++) {
+        // invoke readers
         checkFile(files[i]);
     }
 
@@ -1397,58 +1490,57 @@ function getValidFileList(files, callback) {
         reader.onload = function (event) {
             let text = this.result;
             // Here I parse and check the data and if valid append it to texts
-            data.texts.push(text);        // or the original `file` blob..
+            data.texts.push(text); // or the original `file` blob..
             data.names.push(file.name);
 
-            if (!--count) callback(data);  // when done, invoke callback
+            if (!--count) callback(data); // when done, invoke callback
         };
         reader.readAsText(file);
     }
 }
 
 function onDone(data) {
-    let tabOpened = $('.btn-tab').length;
+    let tabOpened = $(".btn-tab").length;
     let tabID;
     let openOnFirst = false;
     for (let index = 0; index < data.texts.length; index++) {
         if (tabOpened == 1) {
             if (index == 0) {
-                if (editors[idEditor].getValue().trim() === '') {
+                if (editors[idEditor].getValue().trim() === "") {
                     editors[idEditor].setValue(data.texts[index]);
                     openOnFirst = true;
-                }
-                else {
+                } else {
                     tabID = addTab($(".add-tab"), data.texts[index]);
                 }
-            }
-            else {
+            } else {
                 tabID = addTab($(".add-tab"), data.texts[index]);
             }
-        }
-        else {
+        } else {
             tabID = addTab($(".add-tab"), data.texts[index]);
         }
     }
     if (tabOpened == 1) {
-        $("a[data-target='#tab1']").trigger('click');
-    }
-    else {
-        $("[data-target='#" + tabID + "']").trigger('click'); // active last tab inserted
+        $("a[data-target='#tab1']").trigger("click");
+    } else {
+        $("[data-target='#" + tabID + "']").trigger("click"); // active last tab inserted
     }
 
-    $('.name-tab').each(function (index) {
+    $(".name-tab").each(function (index) {
         if (openOnFirst) {
             $(this).text(data.names[index]);
             let id = index + 1;
             let editor = "editor" + id;
-            $('.check-run-tab[value="' + editor + '"]').find('.check-tab-name').text(data.names[index]);
-        }
-        else {
+            $('.check-run-tab[value="' + editor + '"]')
+                .find(".check-tab-name")
+                .text(data.names[index]);
+        } else {
             if (index > tabOpened - 1) {
                 $(this).text(data.names[index - tabOpened]);
                 let id = index + 1;
                 let editor = "editor" + id;
-                $('.check-run-tab[value="' + editor + '"]').find('.check-tab-name').text(data.names[index - tabOpened]);
+                $('.check-run-tab[value="' + editor + '"]')
+                    .find(".check-tab-name")
+                    .text(data.names[index - tabOpened]);
             }
         }
     });
@@ -1459,7 +1551,7 @@ function onDone(data) {
 function handleDragOver(evt) {
     evt.stopPropagation();
     evt.preventDefault();
-    evt.dataTransfer.dropEffect = 'copy'; // Explicitly show this is a copy.
+    evt.dataTransfer.dropEffect = "copy"; // Explicitly show this is a copy.
 }
 
 /**
@@ -1473,15 +1565,17 @@ function setUpAce(ideditor, text) {
     ace.config.set("modePath", "js/ace/mode");
     editors[ideditor].jumpToMatching();
 
-    let actualTheme = localStorage.getItem("theme") == null ? "" : localStorage.getItem("theme");
-    if(actualTheme.length == 0){
-        if (localStorage.getItem('mode') === 'dark')
+    let actualTheme =
+        localStorage.getItem("theme") == null
+            ? ""
+            : localStorage.getItem("theme");
+    if (actualTheme.length == 0) {
+        if (localStorage.getItem("mode") === "dark")
             editors[ideditor].setTheme(defaultDarkTheme);
         else {
             editors[ideditor].setTheme(defaultTheme);
         }
-    }
-    else {
+    } else {
         editors[ideditor].setTheme(actualTheme);
     }
 
@@ -1497,60 +1591,52 @@ function setUpAce(ideditor, text) {
         copyWithEmptySelection: true,
     });
 
-    editors[ideditor].commands.addCommand(
-        {
-            name: 'save',
-            bindKey: {win: "ctrl-s", "mac": "cmd-s"},
-            exec: function(editor) {
-                downloadLoDIEProject();
-            }
-        }
-    );
+    editors[ideditor].commands.addCommand({
+        name: "save",
+        bindKey: { win: "ctrl-s", mac: "cmd-s" },
+        exec: function (editor) {
+            downloadLoDIEProject();
+        },
+    });
 
-    editors[ideditor].commands.addCommand(
-        {
-            name: 'share',
-            bindKey: {win: "ctrl-shift-s", "mac": "cmd-shift-s"},
-            exec: function(editor) {
-                $('#btn-share').trigger('click');
-            }
-        }
-    );
+    editors[ideditor].commands.addCommand({
+        name: "share",
+        bindKey: { win: "ctrl-shift-s", mac: "cmd-shift-s" },
+        exec: function (editor) {
+            $("#btn-share").trigger("click");
+        },
+    });
 
-    editors[ideditor].commands.addCommand(
-        {
-            name: 'open',
-            bindKey: {win: "ctrl-o", "mac": "cmd-o"},
-            exec: function(editor) {
-                $('#btn-upload').trigger('click');
-            }
-        }
-    );
+    editors[ideditor].commands.addCommand({
+        name: "open",
+        bindKey: { win: "ctrl-o", mac: "cmd-o" },
+        exec: function (editor) {
+            $("#btn-upload").trigger("click");
+        },
+    });
 
-    editors[ideditor].commands.addCommand(
-        {
-            name: 'run-options',
-            bindKey: {win: "ctrl-shift-o", "mac": "cmd-shift-o"},
-            exec: function(editor) {
-                $('#btn-option').trigger('click');
-            }
-        }
-    );
+    editors[ideditor].commands.addCommand({
+        name: "run-options",
+        bindKey: { win: "ctrl-shift-o", mac: "cmd-shift-o" },
+        exec: function (editor) {
+            $("#btn-option").trigger("click");
+        },
+    });
 
     inizializeSnippets();
 
     /**
      * Execute the program when you insert a . and if the readio button is checked
      */
-    editors[ideditor].on('change', function (e) {
-        if ($('#run-dot').prop('checked')) {
-            if (e.lines[0] === '.') {
+    editors[ideditor].on("change", function (e) {
+        if ($("#run-dot").prop("checked")) {
+            if (e.lines[0] === ".") {
                 intervalRun();
             }
         }
         if (e.lines[0] === "'") {
             operation_alert({ reason: "Single quotes not yet supported" });
-            editors[ideditor].replaceAll("", { "needle": "'" });
+            editors[ideditor].replaceAll("", { needle: "'" });
         }
         inizializeAutoComplete();
     });
@@ -1560,52 +1646,48 @@ function setUpAce(ideditor, text) {
  * @description inizialize shortcuts and set title to the tooltips base on the OS
  */
 function inizializeShortcuts() {
-
-    Mousetrap.bind('mod+enter', function () {
-        $('#run').trigger('click');
+    Mousetrap.bind("mod+enter", function () {
+        $("#run").trigger("click");
         return false;
     });
-    
-    Mousetrap.bind('mod+s', function () {
+
+    Mousetrap.bind("mod+s", function () {
         downloadLoDIEProject();
         return false;
     });
-    
-    Mousetrap.bind('mod+o', function () {
-        $('#btn-upload').trigger('click');
+
+    Mousetrap.bind("mod+o", function () {
+        $("#btn-upload").trigger("click");
         return false;
     });
 
-    Mousetrap.bind('mod+shift+s', function () {
-        $('#btn-share').trigger('click');
+    Mousetrap.bind("mod+shift+s", function () {
+        $("#btn-share").trigger("click");
         return false;
     });
 
-    Mousetrap.bind('mod+shift+o', function () {
-        $('#btn-option').trigger('click');
+    Mousetrap.bind("mod+shift+o", function () {
+        $("#btn-option").trigger("click");
         return false;
     });
 
-    Mousetrap.bind('?', function() {
-        console.log('questioooon');
-        $('#modal-about').modal('hide');
-        $('#setting-editor').modal('hide');
-        $('#shortcut').modal('show');
+    Mousetrap.bind("?", function () {
+        console.log("questioooon");
+        $("#modal-about").modal("hide");
+        $("#setting-editor").modal("hide");
+        $("#shortcut").modal("show");
     });
 
     if (window.navigator.userAgent.indexOf("Mac") !== -1) {
-
-        $('[for="run"]').attr('data-original-title', '{ ⌘ + Enter }');
-        $('#btn-upload').attr('data-original-title', '{ ⌘ + O }');
-        $('[for="btn-download"]').attr('data-original-title', '{ ⌘ + S}');
-        $('#btn-share').attr('data-original-title', '{ ⌘ + ⇧ + S}');
-
+        $('[for="run"]').attr("data-original-title", "{ ⌘ + Enter }");
+        $("#btn-upload").attr("data-original-title", "{ ⌘ + O }");
+        $('[for="btn-download"]').attr("data-original-title", "{ ⌘ + S}");
+        $("#btn-share").attr("data-original-title", "{ ⌘ + ⇧ + S}");
     } else {
-
-        $('[for="run"]').attr('data-original-title', '{ CTRL + Enter }');
-        $('#btn-upload').attr('data-original-title', '{ CTRL + O }');
-        $('[for="btn-download"]').attr('data-original-title', '{ CTRL + S }');
-        $('#btn-share').attr('data-original-title', '{ CTRL + ⇧ + S}');
+        $('[for="run"]').attr("data-original-title", "{ CTRL + Enter }");
+        $("#btn-upload").attr("data-original-title", "{ CTRL + O }");
+        $('[for="btn-download"]').attr("data-original-title", "{ CTRL + S }");
+        $("#btn-share").attr("data-original-title", "{ CTRL + ⇧ + S}");
     }
 }
 
@@ -1616,14 +1698,25 @@ function inizializeShortcuts() {
 function addMorePrograms() {
     let check = false;
 
-    $('.check-run-tab.checked:not(.check-auto-run-tab)').each(function (index, element) {
+    $(".check-run-tab.checked:not(.check-auto-run-tab)").each(function (
+        index,
+        element
+    ) {
         check = true;
         let p = editors[$(this).val()].getValue();
-        $('.layout').prepend("<input type='hidden' name='program[" + index + "]' id='program" + $(this).val() + "' value='" + p + "' class='programs'>");
+        $(".layout").prepend(
+            "<input type='hidden' name='program[" +
+                index +
+                "]' id='program" +
+                $(this).val() +
+                "' value='" +
+                p +
+                "' class='programs'>"
+        );
     });
 
     if (check) {
-        $('#program').remove();
+        $("#program").remove();
     }
     return check;
 }
@@ -1632,21 +1725,31 @@ function addMorePrograms() {
  * @description adds the programs into the input type hidden to download
  */
 function addProgramsToDownload() {
-    $('#program').remove();
-    $('.tab-pane').each(function (index, element) {
-        let id = $(this).find('.ace').attr("id");
+    $("#program").remove();
+    $(".tab-pane").each(function (index, element) {
+        let id = $(this).find(".ace").attr("id");
         let value = editors[id].getValue();
-        $('.layout').prepend("<input type='hidden' name='program[" + index + "]' id='program" + index + "' value='" + value + "' class='programs'>");
+        $(".layout").prepend(
+            "<input type='hidden' name='program[" +
+                index +
+                "]' id='program" +
+                index +
+                "' value='" +
+                value +
+                "' class='programs'>"
+        );
     });
 }
 /**
  * @description destroy all the input type created and insert the default input type
  */
 function destroyPrograms() {
-    $('.programs').each(function (index) {
+    $(".programs").each(function (index) {
         $(this).remove();
     });
-    $('.layout').prepend('<input type="hidden" name="program[0]" id="program" class="programs" value="">');
+    $(".layout").prepend(
+        '<input type="hidden" name="program[0]" id="program" class="programs" value="">'
+    );
 }
 
 /**
@@ -1706,7 +1809,7 @@ function setThemeEditors(theme) {
  */
 function supportLocalStorage() {
     try {
-        return 'localStorage' in window && window['localStorage'] !== null;
+        return "localStorage" in window && window["localStorage"] !== null;
     } catch (e) {
         return false;
     }
@@ -1735,22 +1838,22 @@ function restoreOptions() {
     }
     let theme = localStorage.getItem("theme");
     theme = theme !== null ? theme : defaultTheme;
-    $('#theme').val(theme);
+    $("#theme").val(theme);
     setTheme(theme);
 
     let fontSizeE = localStorage.getItem("fontSizeE");
     fontSizeE = fontSizeE !== "" ? fontSizeE : defaultFontSize;
-    $('#font-editor').val(fontSizeE);
+    $("#font-editor").val(fontSizeE);
     setFontSizeEditors(fontSizeE);
 
     let fontSizeO = localStorage.getItem("fontSizeO");
     fontSizeO = fontSizeO !== "" ? fontSizeO : defaultFontSize;
     $("#font-output").val(fontSizeO);
-    $('#output').css('font-size', fontSizeO + "px");
+    $("#output").css("font-size", fontSizeO + "px");
 
     let outputSize = localStorage.getItem("outputSize");
     if (outputSize !== null) {
-        $('#output').parent().css("width", outputSize);
+        $("#output").parent().css("width", outputSize);
     }
 
     let layoutPos = localStorage.getItem("outputPos");
@@ -1767,8 +1870,9 @@ function restoreOptions() {
  * @description deletes all the options and add them to the DOM
  */
 function setOptions(obj) {
-    $('#solver-options').empty();
-    $(obj.option).each(function (index, item) { // create option's form
+    $("#solver-options").empty();
+    $(obj.option).each(function (index, item) {
+        // create option's form
         if (item !== null) {
             addOption(item);
         }
@@ -1785,23 +1889,40 @@ function addTab(obj, text, name) {
     let id = $(".nav-tabs").children().length;
     let tabId = generateIDTab();
     let editorId = "editor" + id;
-    let tabName = name == null ? 'L P ' + id : name;
-    $('<li class="nav-item"><a data-target="#' + tabId + '" role="tab" data-toggle="tab" class="btn-tab nav-link"> <button type="button" class="btn btn-light btn-sm btn-context-tab"><i class="fa fa-ellipsis-v" aria-hidden="true"></i></button> <span class="name-tab unselectable">' + tabName + '</span> <span class="delete-tab"> <i class="fa fa-times"></i> </span> </a> </li>').insertBefore($('.add-tab').parent());
-    $('.tab-content').append('<div role="tabpanel" class="tab-pane fade" id="' + tabId + '"><div id="' + editorId + '" class="ace"></div></div>');
+    let tabName = name == null ? "L P " + id : name;
+    $(
+        '<li class="nav-item"><a data-target="#' +
+            tabId +
+            '" role="tab" data-toggle="tab" class="btn-tab nav-link"> <button type="button" class="btn btn-light btn-sm btn-context-tab"><i class="fa fa-ellipsis-v" aria-hidden="true"></i></button> <span class="name-tab unselectable">' +
+            tabName +
+            '</span> <span class="delete-tab"> <i class="fa fa-times"></i> </span> </a> </li>'
+    ).insertBefore($(".add-tab").parent());
+    $(".tab-content").append(
+        '<div role="tabpanel" class="tab-pane fade" id="' +
+            tabId +
+            '"><div id="' +
+            editorId +
+            '" class="ace"></div></div>'
+    );
     setUpAce(editorId, text);
-    $('#tab-execute-new').append('<button type="button" class="list-group-item list-group-item-action check-run-tab" value="' + editorId + '"> <div class="check-box"><i class="fa fa-check check-icon invisible" aria-hidden="true"></i></div>  <span class="check-tab-name"> ' + tabName + '</span> </button>');
+    $("#tab-execute-new").append(
+        '<button type="button" class="list-group-item list-group-item-action check-run-tab" value="' +
+            editorId +
+            '"> <div class="check-box"><i class="fa fa-check check-icon invisible" aria-hidden="true"></i></div>  <span class="check-tab-name"> ' +
+            tabName +
+            "</span> </button>"
+    );
     addCommand(editorId);
 
     inizializeTabContextmenu();
     initializeCheckTabToRun();
     setAceMode();
     setElementsColorMode();
-    
-    let currentFontSize = $('#font-editor').val();
+
+    let currentFontSize = $("#font-editor").val();
     if (currentFontSize.length == 0) {
         editors[editorId].setFontSize(currentFontSize + "px");
-    }
-    else {
+    } else {
         editors[editorId].setFontSize(currentFontSize + "px");
     }
 
@@ -1815,12 +1936,12 @@ function addTab(obj, text, name) {
  */
 function addCommand(ideditor) {
     editors[ideditor].commands.addCommand({
-        name: 'myCommand',
-        bindKey: { win: 'Ctrl-enter', mac: 'Command-enter' },
+        name: "myCommand",
+        bindKey: { win: "Ctrl-enter", mac: "Command-enter" },
         exec: function (editor) {
             intervalRun();
         },
-        readOnly: true
+        readOnly: true,
     });
 }
 
@@ -1828,19 +1949,19 @@ function addCommand(ideditor) {
  * @description Reset editor options with default values
  */
 function resetEditorOptions() {
-    $('#theme').val(defaultTheme);
+    $("#theme").val(defaultTheme);
     saveOption("theme", defaultTheme);
     setTheme(defaultTheme);
 
-    $('#font-editor').val(defaultFontSize);
+    $("#font-editor").val(defaultFontSize);
     saveOption("fontSizeE", defaultFontSize);
     setFontSizeEditors(defaultFontSize);
 
     $("#font-output").val(defaultFontSize);
     saveOption("fontSizeO", defaultFontSize);
-    $('#output').css('font-size', defaultFontSize + "px");
+    $("#output").css("font-size", defaultFontSize + "px");
 
-    setLoideStyleMode('light');
+    setLoideStyleMode("light");
 }
 
 /**
@@ -1848,76 +1969,83 @@ function resetEditorOptions() {
  */
 function resetSolverOptions() {
     loadLanguages();
-    $("#run-dot").prop('checked', true);
-    $('#solver-options').empty();
+    $("#run-dot").prop("checked", true);
+    $("#solver-options").empty();
 }
 
 function closeAllPopovers(iam) {
     // close contestmenu popovers
-    $('.btn-tab').popover('hide');
-    if (iam != popoverType.SAVE) $('.popover-download').popover('hide');
-    if (iam != popoverType.SHARE) $('.popover-share').popover('hide');
+    $(".btn-tab").popover("hide");
+    if (iam != popoverType.SAVE) $(".popover-download").popover("hide");
+    if (iam != popoverType.SHARE) $(".popover-share").popover("hide");
 }
 
 const popoverType = {
-    SAVE: 'save',
-    SHARE: 'share'
-}
+    SAVE: "save",
+    SHARE: "share",
+};
 
 function inizializePopovers() {
+    $(".popover-download")
+        .popover({
+            trigger: "manual",
+            html: true,
+            placement: "bottom",
+            // content: ' ',
+        })
+        .click(function (e) {
+            closeAllPopovers(popoverType.SAVE);
+            $(this).popover("toggle");
+            $(".popover-download").not(this).popover("hide");
 
-    $(".popover-download").popover({
-        trigger: 'manual',
-        html: true,
-        placement: 'bottom',
-        // content: ' ',
-    }).click(function (e) {
-        closeAllPopovers(popoverType.SAVE);
-        $(this).popover('toggle');
-        $('.popover-download').not(this).popover('hide');
+            e.stopPropagation();
+        });
 
-        e.stopPropagation();
-    });
-
-    $('body').on('click', function (e) {
-        $('.popover-download').each(function () {
-            if (e.target.id !== 'btn-download' && !$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
-                $(this).popover('hide');
+    $("body").on("click", function (e) {
+        $(".popover-download").each(function () {
+            if (
+                e.target.id !== "btn-download" &&
+                !$(this).is(e.target) &&
+                $(this).has(e.target).length === 0 &&
+                $(".popover").has(e.target).length === 0
+            ) {
+                $(this).popover("hide");
             }
         });
     });
 
-    $('.popover-download').on('inserted.bs.popover', function () {
-
+    $(".popover-download").on("inserted.bs.popover", function () {
         // set what happens when user clicks on the button
-        $('.popover-header').last().html('');
-        $('.popover-body').last().html(
-            '<div class="save-content">\n' +
-            '<h6 class="mb-2"> Save the project to:\n </h6>' +
-            '<div class="save-btn text-center">\n' +
-            '<button id="local-download" class="btn btn-outline-dark btn-saver btn-block">Local</button>\n' +
-            // '<button id="cloud-download" class="btn btn-outline-dark btn-saver btn-block" disabled>Cloud</button>\n' +
-            '</div>\n' +
-            '</div>');
+        $(".popover-header").last().html("");
+        $(".popover-body")
+            .last()
+            .html(
+                '<div class="save-content">\n' +
+                    '<h6 class="mb-2"> Save the project to:\n </h6>' +
+                    '<div class="save-btn text-center">\n' +
+                    '<button id="local-download" class="btn btn-outline-dark btn-saver btn-block">Local</button>\n' +
+                    // '<button id="cloud-download" class="btn btn-outline-dark btn-saver btn-block" disabled>Cloud</button>\n' +
+                    "</div>\n" +
+                    "</div>"
+            );
 
-        if (localStorage.getItem('mode') === 'dark') {
-            $('#local-download').removeClass('btn-outline-dark');
-            $('#local-download').addClass('btn-outline-light');
+        if (localStorage.getItem("mode") === "dark") {
+            $("#local-download").removeClass("btn-outline-dark");
+            $("#local-download").addClass("btn-outline-light");
             // $('#cloud-download').removeClass('btn-outline-dark');
             // $('#cloud-download').addClass('btn-outline-light');
-        }
-        else {
-            $('#local-download').removeClass('btn-outline-light');
-            $('#local-download').addClass('btn-outline-dark');
+        } else {
+            $("#local-download").removeClass("btn-outline-light");
+            $("#local-download").addClass("btn-outline-dark");
             // $('#cloud-download').removeClass('btn-outline-light');
             // $('#cloud-download').addClass('btn-outline-dark');
         }
 
-        $("#local-download").on('click', function () {
+        $("#local-download").on("click", function () {
             downloadLoDIEProject();
 
             // TO MOVE ON OUTPUT DOWNLOAD
-            
+
             /* if($('#only-output').is(":checked")){
                 $('#program').removeAttr('name', 'program[0]');
                 $('#output-form').attr('name', 'output');
@@ -1930,118 +2058,117 @@ function inizializePopovers() {
                 $('#output-form').removeAttr('name', 'output');
              } */
         });
-        
-         /* $("#cloud-download").on('click', function () {
+
+        /* $("#cloud-download").on('click', function () {
            console.log('Save on cloud');
          }); */
-         
     });
 
-    $('.popover-download').on('hidden.bs.popover', function () {
+    $(".popover-download").on("hidden.bs.popover", function () {
         // clear listeners
-        $("#local-download").off('click');
-        $("#cloud-download").off('click');
-        $('.navbar-toggler').off('click');
+        $("#local-download").off("click");
+        $("#cloud-download").off("click");
+        $(".navbar-toggler").off("click");
     });
 
-    $(".popover-share").popover({
-        container: 'body',
-        trigger: 'manual',
-        html: true,
-        placement: 'bottom',
+    $(".popover-share")
+        .popover({
+            container: "body",
+            trigger: "manual",
+            html: true,
+            placement: "bottom",
+        })
+        .click(function (e) {
+            closeAllPopovers(popoverType.SHARE);
+            $(this).popover("toggle");
+            $(".popover-share").not(this).popover("hide");
+            e.stopPropagation();
+        });
 
-    }).click(function (e) {
-        closeAllPopovers(popoverType.SHARE);
-        $(this).popover('toggle');
-        $('.popover-share').not(this).popover('hide');
-        e.stopPropagation();
-    });
-
-    $('body').on('click', function (e) {
-        $('.popover-share').each(function () {
-            if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
-                $(this).popover('hide');
+    $("body").on("click", function (e) {
+        $(".popover-share").each(function () {
+            if (
+                !$(this).is(e.target) &&
+                $(this).has(e.target).length === 0 &&
+                $(".popover").has(e.target).length === 0
+            ) {
+                $(this).popover("hide");
             }
         });
     });
 
-    $('.popover-share').on('inserted.bs.popover', function () {
+    $(".popover-share").on("inserted.bs.popover", function () {
+        $(".popover-header").last().html("");
+        $(".popover-body")
+            .last()
+            .html(
+                "" +
+                    '<div class="popover-share-content">\n' +
+                    '<h6 class="mb-2"> Share the project:\n </h6>' +
+                    '<div class="input-group">' +
+                    '<input id="link-to-share" type="text" class="form-control" readonly>' +
+                    '<div class="input-group-append">' +
+                    '<button class="btn btn-outline-dark" type="button" id="btn-copy-link" data-clipboard-target="#link-to-share"><i class="fa fa-clipboard"></i></button>' +
+                    "</div>" +
+                    "</div>" +
+                    // '<div class="text-center mt-2 mb-2"> or </div>' +
+                    // '<button id="share-btn-download" type="button" class="btn btn-outline-dark btn-block">Download</button>\n' +
+                    // '<button id="share-btn-save-on-cloud" type="button" class="btn btn-outline-dark btn-block" disabled>Save on cloud</button>\n' +
+                    "</div>"
+            );
 
-        $('.popover-header').last().html('');
-        $('.popover-body').last().html('' +
-            '<div class="popover-share-content">\n' +
-            '<h6 class="mb-2"> Share the project:\n </h6>' +
-            '<div class="input-group">' +
-            '<input id="link-to-share" type="text" class="form-control" readonly>' +
-            '<div class="input-group-append">' +
-            '<button class="btn btn-outline-dark" type="button" id="btn-copy-link" data-clipboard-target="#link-to-share"><i class="fa fa-clipboard"></i></button>' +
-            '</div>' +
-            '</div>' +
-            // '<div class="text-center mt-2 mb-2"> or </div>' +
-            // '<button id="share-btn-download" type="button" class="btn btn-outline-dark btn-block">Download</button>\n' +
-            // '<button id="share-btn-save-on-cloud" type="button" class="btn btn-outline-dark btn-block" disabled>Save on cloud</button>\n' +
-            '</div>');
-
-        if (localStorage.getItem('mode') === 'dark') {
-            $('#btn-copy-link').removeClass('btn-outline-dark');
-            $('#btn-copy-link').addClass('btn-outline-light');
+        if (localStorage.getItem("mode") === "dark") {
+            $("#btn-copy-link").removeClass("btn-outline-dark");
+            $("#btn-copy-link").addClass("btn-outline-light");
+        } else {
+            $("#btn-copy-link").removeClass("btn-outline-light");
+            $("#btn-copy-link").addClass("btn-outline-dark");
         }
-        else {
-            $('#btn-copy-link').removeClass('btn-outline-light');
-            $('#btn-copy-link').addClass('btn-outline-dark');
-        }
 
-        $('#link-to-share').val("Loading...");
+        $("#link-to-share").val("Loading...");
         createURL();
-
     });
 
-    $('.popover-share').on('hidden.bs.popover', function () {
-        $('#btn-copy-link').off('click');
+    $(".popover-share").on("hidden.bs.popover", function () {
+        $("#btn-copy-link").off("click");
     });
 }
 
 function inizializeToolbar() {
-
-    $('#btn-undo').on('click', function () {
+    $("#btn-undo").on("click", function () {
         let undoManager = editors[idEditor].session.getUndoManager();
         if (undoManager.hasUndo()) {
             undoManager.undo();
         }
     });
 
-    $('#btn-redo').on('click', function () {
+    $("#btn-redo").on("click", function () {
         let undoManager = editors[idEditor].session.getUndoManager();
         if (undoManager.hasRedo()) {
             undoManager.redo();
         }
-
     });
 
-    $('#btn-search').on('click', function () {
-
-        let searchPanel = $('#' + idEditor).find('.ace_search');
+    $("#btn-search").on("click", function () {
+        let searchPanel = $("#" + idEditor).find(".ace_search");
 
         if (searchPanel.length == 0) {
             editors[idEditor].execCommand("find");
-        }
-        else {
-            if (searchPanel.css('display') == 'none') {
-                searchPanel.css('display', 'block');
-            }
-            else {
-                searchPanel.css('display', 'none');
+        } else {
+            if (searchPanel.css("display") == "none") {
+                searchPanel.css("display", "block");
+            } else {
+                searchPanel.css("display", "none");
             }
         }
-
     });
 
-    $('#btn-copy').on('click', function () {
+    $("#btn-copy").on("click", function () {
         copyStringToClipboard(editors[idEditor].getCopyText());
         editors[idEditor].focus();
     });
 
-    $('#btn-cut').on('click', function () {
+    $("#btn-cut").on("click", function () {
         copyStringToClipboard(editors[idEditor].getCopyText());
         editors[idEditor].execCommand("cut");
         editors[idEditor].focus();
@@ -2050,44 +2177,49 @@ function inizializeToolbar() {
     let clipboardSupport = undefined;
 
     try {
-        clipboardSupport = typeof(navigator.clipboard.readText)=='undefined' ? false : true
-    }
-    catch (error) {
-        console.error("Clipboard is not supported in this browser")
+        clipboardSupport =
+            typeof navigator.clipboard.readText == "undefined" ? false : true;
+    } catch (error) {
+        console.error("Clipboard is not supported in this browser");
         clipboardSupport = undefined;
     }
 
     if (clipboardSupport) {
-        $('#btn-paste').on('click', function () {
-            navigator.clipboard.readText()
-                .then(text => {
+        $("#btn-paste").on("click", function () {
+            navigator.clipboard
+                .readText()
+                .then((text) => {
                     editors[idEditor].insert(text);
                 })
-                .catch(err => {
+                .catch((err) => {
                     // maybe user didn't grant access to read from clipboard
-                    operation_alert({ reason: 'Clipboard read error, maybe you didn\'t grant the access to read from the clipboard.' });
-                    console.error((err));
+                    operation_alert({
+                        reason:
+                            "Clipboard read error, maybe you didn't grant the access to read from the clipboard.",
+                    });
+                    console.error(err);
                 });
         });
-    }
-    else {
-        console.error('Clipboard API is not supported in this browser');
-        $('#btn-paste').remove();
+    } else {
+        console.error("Clipboard API is not supported in this browser");
+        $("#btn-paste").remove();
     }
 
-    $('#btn-dwn-this-lp').on('click', function () {
+    $("#btn-dwn-this-lp").on("click", function () {
         downloadCurrentTabContent();
     });
 
-    $('#delete-all-tabs').on('click', function () {
+    $("#delete-all-tabs").on("click", function () {
         deleteAllTabs();
     });
 }
 
 function deleteAllTabs() {
-    let r = confirm("Are you sure you want to delete all tabs? This cannot be undone.");
-    if(r) {
-        $('.delete-tab').each(function(){
+    let r = confirm(
+        "Are you sure you want to delete all tabs? This cannot be undone."
+    );
+    if (r) {
+        $(".delete-tab").each(function () {
             deleteTab($(this), true);
         });
     }
@@ -2095,9 +2227,13 @@ function deleteAllTabs() {
 
 function deleteTab(tab, all) {
     let deleteAlertConfirm;
-    if (!all) { deleteAlertConfirm = confirm("Are you sure you want to delete this file? This cannot be undone."); }
+    if (!all) {
+        deleteAlertConfirm = confirm(
+            "Are you sure you want to delete this file? This cannot be undone."
+        );
+    }
     let ids = $(".nav-tabs").children().length - 1;
-    let t = tab.parent().attr('data-target');
+    let t = tab.parent().attr("data-target");
     let currentids = $(t).find(".ace").attr("id").substr(6);
     let parse = parseInt(currentids);
     if (deleteAlertConfirm || all) {
@@ -2105,62 +2241,95 @@ function deleteTab(tab, all) {
         if (prevEditor.length === 0) {
             prevEditor = tab.parent().parent().next();
         }
-        let currentID = tab.closest('a').attr('data-target');
+        let currentID = tab.closest("a").attr("data-target");
         tab.parent().parent().remove();
-        let ideditor = $(currentID).find('.ace').attr("id");
+        let ideditor = $(currentID).find(".ace").attr("id");
         $(currentID).remove();
         delete editors[ideditor];
-        $("[data-target='" + prevEditor.find("a").attr("data-target") + "']").trigger('click');
+        $(
+            "[data-target='" + prevEditor.find("a").attr("data-target") + "']"
+        ).trigger("click");
         $('.check-run-tab[value="' + ideditor + '"]').remove();
 
-        if ($(".nav-tabs").children().length === 1) { // add a new tab if we delete the last
-            let parent = $('.add-tab').parent();
-            idEditor = 'editor1';
-            ideditor = 'editor1';
-            $('<li class="nav-item"> <a data-target="#tab1" role="tab" data-toggle="tab" class="btn-tab nav-link"> <button type="button" class="btn btn-light btn-sm btn-context-tab"><i class="fa fa-ellipsis-v" aria-hidden="true"></i></button> <span class="name-tab unselectable">L P 1</span> <span class="delete-tab"> <i class="fa fa-times"></i> </span> </a> </li>').insertBefore(parent);
-            $('.tab-content').append('<div role="tabpanel" class="tab-pane fade" id="tab1"><div id="editor1" class="ace"></div></div>');
+        if ($(".nav-tabs").children().length === 1) {
+            // add a new tab if we delete the last
+            let parent = $(".add-tab").parent();
+            idEditor = "editor1";
+            ideditor = "editor1";
+            $(
+                '<li class="nav-item"> <a data-target="#tab1" role="tab" data-toggle="tab" class="btn-tab nav-link"> <button type="button" class="btn btn-light btn-sm btn-context-tab"><i class="fa fa-ellipsis-v" aria-hidden="true"></i></button> <span class="name-tab unselectable">L P 1</span> <span class="delete-tab"> <i class="fa fa-times"></i> </span> </a> </li>'
+            ).insertBefore(parent);
+            $(".tab-content").append(
+                '<div role="tabpanel" class="tab-pane fade" id="tab1"><div id="editor1" class="ace"></div></div>'
+            );
             editors[ideditor] = new ace.edit(ideditor);
             setUpAce(ideditor, "");
-            $('#tab-execute-new').append('<button type="button" class="list-group-item list-group-item-action check-run-tab" value="' + ideditor + '">  <div class="check-box"><i class="fa fa-check check-icon invisible" aria-hidden="true"></i></div>  <span class="check-tab-name"> L P 1 </span> </button>');
-            $("[data-target='#tab1']").trigger('click');
+            $("#tab-execute-new").append(
+                '<button type="button" class="list-group-item list-group-item-action check-run-tab" value="' +
+                    ideditor +
+                    '">  <div class="check-box"><i class="fa fa-check check-icon invisible" aria-hidden="true"></i></div>  <span class="check-tab-name"> L P 1 </span> </button>'
+            );
+            $("[data-target='#tab1']").trigger("click");
 
             inizializeTabContextmenu();
             initializeCheckTabToRun();
             setAceMode();
             setElementsColorMode();
-        }
-        else if (ids !== parse) { // renumber tabs if you delete the previous tab instead of the current one
+        } else if (ids !== parse) {
+            // renumber tabs if you delete the previous tab instead of the current one
             // $('.nav-tabs').find('li:not(:last)').each(function (index) {
             //     tab.find('a').text('L P ' + (index + 1));
             //     tab.find('a').append('<span class="delete-tab"> <i class="fa fa-times"></i> </span>');
             // });
-            $('.tab-content').find("[role='tabpanel']").each(function (index) {
-                ideditor = 'editor' + (index + 1);
-                let currentEditor = tab.find('.ace').attr('id');
-                if (ideditor !== currentEditor) {
-                    tab.find('.ace').attr("id", ideditor);
-                    editors[ideditor] = editors[currentEditor];
-                    delete editors[currentEditor];
-                    let currentCheck = $('.check-run-tab[value="' + currentEditor + '"]');
-                    let wasInvisible = false;
-                    if (currentCheck.find('check-icon').hasClass('invisible')) {
-                        wasInvisible = true;
+            $(".tab-content")
+                .find("[role='tabpanel']")
+                .each(function (index) {
+                    ideditor = "editor" + (index + 1);
+                    let currentEditor = tab.find(".ace").attr("id");
+                    if (ideditor !== currentEditor) {
+                        tab.find(".ace").attr("id", ideditor);
+                        editors[ideditor] = editors[currentEditor];
+                        delete editors[currentEditor];
+                        let currentCheck = $(
+                            '.check-run-tab[value="' + currentEditor + '"]'
+                        );
+                        let wasInvisible = false;
+                        if (
+                            currentCheck
+                                .find("check-icon")
+                                .hasClass("invisible")
+                        ) {
+                            wasInvisible = true;
+                        }
+                        currentCheck.empty();
+                        currentCheck.attr("value", ideditor);
+                        currentCheck.append(
+                            '<div class="check-box"><i class="fa fa-check check-icon invisible" aria-hidden="true"></i></div>  <span class="check-tab-name">L P ' +
+                                (index + 1) +
+                                "</span>"
+                        );
+                        if (!wasInvisible) {
+                            currentCheck
+                                .find("check-icon")
+                                .removeClass("invisible");
+                        }
                     }
-                    currentCheck.empty();
-                    currentCheck.attr('value', ideditor);
-                    currentCheck.append('<div class="check-box"><i class="fa fa-check check-icon invisible" aria-hidden="true"></i></div>  <span class="check-tab-name">L P ' + (index + 1) + '</span>');
-                    if (!wasInvisible) {
-                        currentCheck.find('check-icon').removeClass('invisible');
-                    }
-                }
-                $('.btn-tab').each(function (index) {
-                    let thisTab = tab;
-                    let idTabEditor = tab.attr('data-target');
-                    let idEditorToChangeTabName = $(idTabEditor).children().attr('id');
-                    let nameValue = thisTab.children('.name-tab').text();
-                    $('.check-run-tab[value="' + idEditorToChangeTabName + '"]').find('.check-tab-name').text(nameValue);
+                    $(".btn-tab").each(function (index) {
+                        let thisTab = tab;
+                        let idTabEditor = tab.attr("data-target");
+                        let idEditorToChangeTabName = $(idTabEditor)
+                            .children()
+                            .attr("id");
+                        let nameValue = thisTab.children(".name-tab").text();
+                        $(
+                            '.check-run-tab[value="' +
+                                idEditorToChangeTabName +
+                                '"]'
+                        )
+                            .find(".check-tab-name")
+                            .text(nameValue);
+                    });
                 });
-            });
         }
         if ($(".nav-tabs").children().length === 2) {
             idEditor = "editor1";
@@ -2170,9 +2339,11 @@ function deleteTab(tab, all) {
 
 function downloadCurrentTabContent() {
     let text = editors[idEditor].getValue();
-    let TabToDownload = $('#' + idEditor).parent().attr('id');
+    let TabToDownload = $("#" + idEditor)
+        .parent()
+        .attr("id");
     let nameTab = $(".btn-tab[data-target='#" + TabToDownload + "']");
-    let string = nameTab.text().replace(/\s/g, '');
+    let string = nameTab.text().replace(/\s/g, "");
     createFileToDownload(text, "local", "LogicProgram_" + string, "txt");
 }
 
@@ -2184,10 +2355,10 @@ function runCurrentTab() {
 }
 
 function inizializeSnippets() {
-    let languageChosen = $('#inputLanguage').val();
-    let solverChosen = $('#inputengine').val();
+    let languageChosen = $("#inputLanguage").val();
+    let solverChosen = $("#inputengine").val();
 
-    let langTools = ace.require('ace/ext/language_tools');
+    let langTools = ace.require("ace/ext/language_tools");
 
     langTools.setCompleters([]); // reset completers.
 
@@ -2200,104 +2371,116 @@ function inizializeSnippets() {
                 case "dlv":
                     completer = {
                         identifierRegexps: [/[a-zA-Z_0-9\#\$\-\u00A2-\uFFFF]/],
-                        getCompletions: function (editor, session, pos, prefix, callback) {
+                        getCompletions: function (
+                            editor,
+                            session,
+                            pos,
+                            prefix,
+                            callback
+                        ) {
                             let completions = [
                                 {
                                     caption: "#const",
-                                    snippet: "#const ${1:namedConstant} = ${2:costant}",
-                                    meta: "keyword"
+                                    snippet:
+                                        "#const ${1:namedConstant} = ${2:costant}",
+                                    meta: "keyword",
                                 },
                                 {
                                     caption: "#maxint",
                                     snippet: "#maxint = ${1:Number}",
-                                    meta: "keyword"
+                                    meta: "keyword",
                                 },
                                 {
                                     caption: "#append",
                                     snippet: "#append(${1:X}, ${2:Y}, ${3:Z})",
-                                    meta: "list predicate"
+                                    meta: "list predicate",
                                 },
                                 {
                                     caption: "#delnth",
                                     snippet: "#delnth(${1:X}, ${2:Y}, ${3:Z})",
-                                    meta: "list predicate"
+                                    meta: "list predicate",
                                 },
                                 {
                                     caption: "#flatten",
                                     snippet: "#flatten(${1:X}, ${2:Y}, ${3:Z})",
-                                    meta: "list predicate"
+                                    meta: "list predicate",
                                 },
                                 {
                                     caption: "#head",
                                     snippet: "#head(${1:X}, ${2:Y}, ${3:Z})",
-                                    meta: "list predicate"
+                                    meta: "list predicate",
                                 },
                                 {
                                     caption: "#insLast",
                                     snippet: "#insLast(${1:X}, ${2:Y}, ${3:Z})",
-                                    meta: "list predicate"
+                                    meta: "list predicate",
                                 },
                                 {
                                     caption: "#insnth",
-                                    snippet: "#insnth(${1:X}, ${2:Y}, ${3:Z}, ${4:W})",
-                                    meta: "list predicate"
+                                    snippet:
+                                        "#insnth(${1:X}, ${2:Y}, ${3:Z}, ${4:W})",
+                                    meta: "list predicate",
                                 },
                                 {
                                     caption: "#last",
                                     snippet: "#last(${1:X}, ${2:Y})",
-                                    meta: "list predicate"
+                                    meta: "list predicate",
                                 },
                                 {
                                     caption: "#length",
                                     snippet: "#length(${1:X}, ${2:Y})",
-                                    meta: "list predicate"
+                                    meta: "list predicate",
                                 },
                                 {
                                     caption: "#member",
                                     snippet: "#member(${1:X}, ${2:Y})",
-                                    meta: "list predicate"
+                                    meta: "list predicate",
                                 },
                                 {
                                     caption: "#reverse",
                                     snippet: "#reverse(${1:X}, ${2:Y})",
-                                    meta: "list predicate"
+                                    meta: "list predicate",
                                 },
                                 {
                                     caption: "#subList",
                                     snippet: "#subList(${1:X}, ${2:Y})",
-                                    meta: "list predicate"
+                                    meta: "list predicate",
                                 },
                                 {
                                     caption: "#tail",
                                     snippet: "#tail(${1:X}, ${2:Y})",
-                                    meta: "list predicate"
+                                    meta: "list predicate",
                                 },
                                 {
                                     caption: "#getnth",
                                     snippet: "#getnth(${1:X}, ${2:Y}, ${3:Z})",
-                                    meta: "list predicate"
+                                    meta: "list predicate",
                                 },
 
                                 // -------
                                 {
                                     caption: "+",
-                                    snippet: "+(${1:Var1}, ${2:Var2}, ${3:Var3})",
-                                    meta: "arithmetic predicates"
+                                    snippet:
+                                        "+(${1:Var1}, ${2:Var2}, ${3:Var3})",
+                                    meta: "arithmetic predicates",
                                 },
                                 {
                                     caption: "-",
-                                    snippet: "-(${1:Var1}, ${2:Var2}, ${3:Var3})",
-                                    meta: "arithmetic predicates"
+                                    snippet:
+                                        "-(${1:Var1}, ${2:Var2}, ${3:Var3})",
+                                    meta: "arithmetic predicates",
                                 },
                                 {
                                     caption: "*",
-                                    snippet: "*(${1:Var1}, ${2:Var2}, ${3:Var3})",
-                                    meta: "arithmetic predicates"
+                                    snippet:
+                                        "*(${1:Var1}, ${2:Var2}, ${3:Var3})",
+                                    meta: "arithmetic predicates",
                                 },
                                 {
                                     caption: "/",
-                                    snippet: "/(${1:Var1}, ${2:Var2}, ${3:Var3})",
-                                    meta: "arithmetic predicates"
+                                    snippet:
+                                        "/(${1:Var1}, ${2:Var2}, ${3:Var3})",
+                                    meta: "arithmetic predicates",
                                 },
                                 // {
                                 //     caption: "#int(X)",
@@ -2306,33 +2489,37 @@ function inizializeSnippets() {
                                 // },
                                 {
                                     caption: "#int",
-                                    snippet: "#int(${1:Var1}, ${2:Var2}, ${3:Var3})",
-                                    meta: "arithmetic predicates"
+                                    snippet:
+                                        "#int(${1:Var1}, ${2:Var2}, ${3:Var3})",
+                                    meta: "arithmetic predicates",
                                 },
                                 {
                                     caption: "#suc",
                                     snippet: "#suc(${1:Var1}, ${2:Var2})",
-                                    meta: "arithmetic predicates"
+                                    meta: "arithmetic predicates",
                                 },
                                 {
                                     caption: "#pred",
                                     snippet: "#pred(${1:Var1}, ${2:Var2})",
-                                    meta: "arithmetic predicates"
+                                    meta: "arithmetic predicates",
                                 },
                                 {
                                     caption: "#mod",
-                                    snippet: "#mod(${1:Var1}, ${2:Var2}, ${3:Var3})",
-                                    meta: "arithmetic predicates"
+                                    snippet:
+                                        "#mod(${1:Var1}, ${2:Var2}, ${3:Var3})",
+                                    meta: "arithmetic predicates",
                                 },
                                 {
                                     caption: "#absdiff",
-                                    snippet: "#absdiff(${1:Var1}, ${2:Var2}, ${3:Var3})",
-                                    meta: "arithmetic predicates"
+                                    snippet:
+                                        "#absdiff(${1:Var1}, ${2:Var2}, ${3:Var3})",
+                                    meta: "arithmetic predicates",
                                 },
                                 {
                                     caption: "#rand",
-                                    snippet: "#rand(${1:Var1}, ${2:Var2}, ${3:Var3})",
-                                    meta: "arithmetic predicates"
+                                    snippet:
+                                        "#rand(${1:Var1}, ${2:Var2}, ${3:Var3})",
+                                    meta: "arithmetic predicates",
                                 },
                                 // {
                                 //     caption: "#rand(X)",
@@ -2342,22 +2529,22 @@ function inizializeSnippets() {
                                 {
                                     caption: "#times",
                                     snippet: "#times{${1:Vars} : ${2:Congj}}",
-                                    meta: "aggregate function"
+                                    meta: "aggregate function",
                                 },
                                 {
                                     caption: "#sum",
                                     snippet: "#sum{${1:Vars} : ${2:Congj}}",
-                                    meta: "aggregate function"
+                                    meta: "aggregate function",
                                 },
                                 {
                                     caption: "#min",
                                     snippet: "#min{${1:Vars} : ${2:Congj}}",
-                                    meta: "aggregate function"
+                                    meta: "aggregate function",
                                 },
                                 {
                                     caption: "#max",
                                     snippet: "#max{${1:Vars} : ${2:Congj}}",
-                                    meta: "aggregate function"
+                                    meta: "aggregate function",
                                 },
                                 {
                                     caption: "#count",
@@ -2365,51 +2552,58 @@ function inizializeSnippets() {
                                     meta: "aggregate function",
                                 },
                                 {
-                                    caption: ':~',
-                                    snippet: ":~ ${1:literals}. [${2:conditions}]",
-                                    meta: "weak constraint"
+                                    caption: ":~",
+                                    snippet:
+                                        ":~ ${1:literals}. [${2:conditions}]",
+                                    meta: "weak constraint",
                                 },
                                 {
-                                    caption: ':-',
+                                    caption: ":-",
                                     snippet: ":- ${1:literals}.",
-                                    meta: "body/constraint"
-                                }
+                                    meta: "body/constraint",
+                                },
                             ];
                             callback(null, completions);
-                        }
-                    }
+                        },
+                    };
                     langTools.addCompleter(completer);
                     break;
 
                 case "dlv2":
                     completer = {
                         identifierRegexps: [/[a-zA-Z_0-9\#\$\-\u00A2-\uFFFF]/],
-                        getCompletions: function (editor, session, pos, prefix, callback) {
+                        getCompletions: function (
+                            editor,
+                            session,
+                            pos,
+                            prefix,
+                            callback
+                        ) {
                             let completions = [
                                 {
                                     caption: "#int",
                                     snippet: "#int",
-                                    meta: "keyword"
+                                    meta: "keyword",
                                 },
                                 {
                                     caption: "#times",
                                     snippet: "#times{${1:Vars} : ${2:Congj}}",
-                                    meta: "aggregate function"
+                                    meta: "aggregate function",
                                 },
                                 {
                                     caption: "#sum",
                                     snippet: "#sum{${1:Vars} : ${2:Congj}}",
-                                    meta: "aggregate function"
+                                    meta: "aggregate function",
                                 },
                                 {
                                     caption: "#min",
                                     snippet: "#min{${1:Vars} : ${2:Congj}}",
-                                    meta: "aggregate function"
+                                    meta: "aggregate function",
                                 },
                                 {
                                     caption: "#max",
                                     snippet: "#max{${1:Vars} : ${2:Congj}}",
-                                    meta: "aggregate function"
+                                    meta: "aggregate function",
                                 },
                                 {
                                     caption: "#count",
@@ -2417,19 +2611,20 @@ function inizializeSnippets() {
                                     meta: "aggregate function",
                                 },
                                 {
-                                    caption: ':~',
-                                    snippet: ":~ ${1:literals}. [${2:conditions}]",
-                                    meta: "weak constraint"
+                                    caption: ":~",
+                                    snippet:
+                                        ":~ ${1:literals}. [${2:conditions}]",
+                                    meta: "weak constraint",
                                 },
                                 {
-                                    caption: ':-',
+                                    caption: ":-",
                                     snippet: ":- ${1:literals}.",
-                                    meta: "body/constraint"
-                                }
+                                    meta: "body/constraint",
+                                },
                             ];
                             callback(null, completions);
-                        }
-                    }
+                        },
+                    };
                     langTools.addCompleter(completer);
                     break;
                 case "clingo":
@@ -2443,8 +2638,8 @@ function inizializeSnippets() {
 }
 
 function inizializeAutoComplete() {
-    let languageChosen = $('#inputLanguage').val();
-    let langTools = ace.require('ace/ext/language_tools');
+    let languageChosen = $("#inputLanguage").val();
+    let langTools = ace.require("ace/ext/language_tools");
     inizializeSnippets();
     switch (languageChosen) {
         case "asp": {
@@ -2462,15 +2657,21 @@ function inizializeAutoComplete() {
                     completions.push({
                         caption: value,
                         snippet: value + giveBrackets(key),
-                        meta: "atom"
+                        meta: "atom",
                     });
                 });
 
                 let completer = {
-                    getCompletions: function (editor, session, pos, prefix, callback) {
+                    getCompletions: function (
+                        editor,
+                        session,
+                        pos,
+                        prefix,
+                        callback
+                    ) {
                         callback(null, completions);
-                    }
-                }
+                    },
+                };
 
                 langTools.addCompleter(completer);
             }
@@ -2485,15 +2686,13 @@ function giveBrackets(value) {
     let par = "(";
     let LETTER = "A";
     let limit = 0;
-    if (value <= 26)
-        limit = value;
-    else
-        limit = 26;
+    if (value <= 26) limit = value;
+    else limit = 26;
     for (let i = 0; i < limit; i++) {
         let num = i + 1;
         par += "${" + num + ":" + LETTER + "}";
         if (i !== limit - 1) {
-            par += ","
+            par += ",";
         }
         LETTER = String.fromCharCode(LETTER.charCodeAt(0) + 1);
     }
@@ -2511,33 +2710,31 @@ function createURL() {
 
         URL += encodeURIComponent(editors[idE].getValue().trim());
         if (index < length - 1) {
-            URL += ','
+            URL += ",";
         }
 
-        if (editors[idE].getValue().length > 0)
-            empty = false;
+        if (editors[idE].getValue().length > 0) empty = false;
     }
 
     if (empty) {
-        $('#link-to-share').val(window.location.href);
-    }
-    else {
+        $("#link-to-share").val(window.location.href);
+    } else {
         // put the name of the tabs
-        URL += '&tabnames=';
-        let idx = 1
-        $('.name-tab').each(function () {
+        URL += "&tabnames=";
+        let idx = 1;
+        $(".name-tab").each(function () {
             URL += encodeURIComponent($(this).text());
             if (idx < length - 1) {
-                URL += ','
+                URL += ",";
             }
             idx++;
         });
 
         // put the language
-        URL += '&lang=' + $('#inputLanguage').val();
+        URL += "&lang=" + $("#inputLanguage").val();
 
         // put the solver
-        URL += '&solver=' + $('#inputengine').val();
+        URL += "&solver=" + $("#inputengine").val();
 
         saveOptions();
 
@@ -2546,68 +2743,74 @@ function createURL() {
             let obj = JSON.parse(opt);
             if (obj.option != null) {
                 // put the options
-                URL += '&options=' + encodeURIComponent(JSON.stringify(obj.option));
+                URL +=
+                    "&options=" +
+                    encodeURIComponent(JSON.stringify(obj.option));
             }
         }
 
         try {
             $.ajax({
                 method: "POST",
-                url: "https://is.gd/create.php?format=json&url=" + encodeURIComponent(URL),
-                dataType: 'json',
+                url:
+                    "https://is.gd/create.php?format=json&url=" +
+                    encodeURIComponent(URL),
+                dataType: "json",
                 crossDomain: true,
                 success: function (data) {
                     console.log(data);
                     if (data.shorturl == undefined) {
-                        $('#link-to-share').val("Ops. Something went wrong");
+                        $("#link-to-share").val("Ops. Something went wrong");
                         if (URL.length >= 5000) {
-                            operation_alert({ reason: "The logic program is too long to be shared." })
+                            operation_alert({
+                                reason:
+                                    "The logic program is too long to be shared.",
+                            });
                         }
                     } else {
-                        $('#link-to-share').val(data.shorturl);
-                        $('#btn-copy-link').prop('disabled', false);
+                        $("#link-to-share").val(data.shorturl);
+                        $("#btn-copy-link").prop("disabled", false);
                     }
                 },
                 error: function (err) {
                     console.log(err);
-                    $('#link-to-share').val("Ops. Something went wrong");
-                }
+                    $("#link-to-share").val("Ops. Something went wrong");
+                },
             });
-        }
-        catch (e) {
-            $('#link-to-share').val("Ops. Something went wrong");
+        } catch (e) {
+            $("#link-to-share").val("Ops. Something went wrong");
         }
     }
 }
 
 function getParameterByName(name, url) {
     if (!url) url = window.location.href;
-    name = name.replace(/[\[\]]/g, '\\$&');
-    let regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+    name = name.replace(/[\[\]]/g, "\\$&");
+    let regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
         results = regex.exec(url);
     if (!results) return null;
-    if (!results[2]) return '';
+    if (!results[2]) return "";
     return results[2];
 }
 
 function loadFromURL() {
     let thisURL = window.location.href;
 
-    if (getParameterByName('programs', thisURL) != null) {
+    if (getParameterByName("programs", thisURL) != null) {
         // get params from url
-        let logicPr = getParameterByName('programs', thisURL).split(',');
+        let logicPr = getParameterByName("programs", thisURL).split(",");
         // console.log('LogicPrograms:', logicPr);
 
-        let tabNames = getParameterByName('tabnames', thisURL).split(',');
+        let tabNames = getParameterByName("tabnames", thisURL).split(",");
         // console.log('TabNames:', tabNames);
 
-        let language = getParameterByName('lang', thisURL);
+        let language = getParameterByName("lang", thisURL);
         // console.log('lang:', language);
 
-        let solver = getParameterByName('solver', thisURL);
+        let solver = getParameterByName("solver", thisURL);
         // console.log('solver:', solver);
 
-        let options = getParameterByName('options', thisURL);
+        let options = getParameterByName("options", thisURL);
         // console.log('options:', options);
 
         // decode params
@@ -2626,21 +2829,22 @@ function loadFromURL() {
 
         // set params
         for (let index = 1; index <= tabNames.length; index++) {
-            if (index > 1)
-                $('.add-tab').trigger('click');
+            if (index > 1) $(".add-tab").trigger("click");
             let idE = "editor" + index;
             editors[idE].setValue(logicPr[index - 1]);
         }
 
-        $('.name-tab').each(function (index) {
+        $(".name-tab").each(function (index) {
             $(this).text(tabNames[index]);
             let id = index + 1;
             let editor = "editor" + id;
-            $('.check-run-tab[value="' + editor + '"]').find('.check-tab-name').text(tabNames[index]);
+            $('.check-run-tab[value="' + editor + '"]')
+                .find(".check-tab-name")
+                .text(tabNames[index]);
         });
 
-        $('#inputLanguage').val(language).change();
-        $('#inputengine').val(solver).change();
+        $("#inputLanguage").val(language).change();
+        $("#inputengine").val(solver).change();
 
         if (options != null) {
             $(options).each(function (index, item) {
@@ -2650,100 +2854,105 @@ function loadFromURL() {
             });
         }
     }
-
 }
 
 function setTooltip(btn, message) {
-    $(btn).tooltip('hide')
-        .attr('data-original-title', message)
-        .tooltip('show');
+    $(btn).tooltip("hide").attr("data-original-title", message).tooltip("show");
 }
 
 function hideTooltip(btn) {
     setTimeout(function () {
-        $(btn).tooltip('hide');
+        $(btn).tooltip("hide");
     }, 1000);
 }
 
 function setClipboard() {
-    $('#btn-copy-link').tooltip({
-        trigger: 'click',
-        placement: 'bottom'
+    $("#btn-copy-link").tooltip({
+        trigger: "click",
+        placement: "bottom",
     });
 
-    let clipboard = new ClipboardJS('#btn-copy-link');
+    let clipboard = new ClipboardJS("#btn-copy-link");
 
-    clipboard.on('success', function (e) {
-        setTooltip(e.trigger, 'Copied!');
+    clipboard.on("success", function (e) {
+        setTooltip(e.trigger, "Copied!");
         hideTooltip(e.trigger);
     });
 
-    clipboard.on('error', function (e) {
-        setTooltip(e.trigger, 'Failed!');
+    clipboard.on("error", function (e) {
+        setTooltip(e.trigger, "Failed!");
         hideTooltip(e.trigger);
     });
 }
 
 function setNotifications() {
-    $('#notification').toast({
+    $("#notification").toast({
         delay: 4000,
     });
-    $('#notification-project').toast({
+    $("#notification-project").toast({
         delay: 10000,
     });
-    $('#load-project').on('click', function () {
+    $("#load-project").on("click", function () {
         loadProjectFromLocalStorage();
-        $('#notification-project').toast('hide');
+        $("#notification-project").toast("hide");
     });
 }
 
 function setWindowResizeTrigger() {
-    $('#loide-collapse').on('hidden.bs.collapse', function () {
-        $(window).trigger('resize');
+    $("#loide-collapse").on("hidden.bs.collapse", function () {
+        $(window).trigger("resize");
     });
-    $('#loide-collapse').on('shown.bs.collapse', function () {
-        $(window).trigger('resize');
+    $("#loide-collapse").on("shown.bs.collapse", function () {
+        $(window).trigger("resize");
     });
 }
 
 function inizializeButtonLoideMode() {
-    $('#dark-light-mode').click(function () {
-        localStorage.setItem('mode', (localStorage.getItem('mode') || 'dark') === 'dark' ? 'light' : 'dark');
-        localStorage.getItem('mode') === 'dark' ? document.querySelector('body').classList.add('dark') : document.querySelector('body').classList.remove('dark');
+    $("#dark-light-mode").click(function () {
+        localStorage.setItem(
+            "mode",
+            (localStorage.getItem("mode") || "dark") === "dark"
+                ? "light"
+                : "dark"
+        );
+        localStorage.getItem("mode") === "dark"
+            ? document.querySelector("body").classList.add("dark")
+            : document.querySelector("body").classList.remove("dark");
         setElementsColorMode();
-        $('#theme').change();
+        $("#theme").change();
     });
 }
 
 function setLoideStyleMode(mode) {
-
     switch (mode) {
-        case 'light':
-            localStorage.setItem('mode', 'light');
-            document.querySelector('body').classList.remove('dark');
+        case "light":
+            localStorage.setItem("mode", "light");
+            document.querySelector("body").classList.remove("dark");
             break;
 
-        case 'dark':
-            localStorage.setItem('mode', 'dark');
-            document.querySelector('body').classList.add('dark');
+        case "dark":
+            localStorage.setItem("mode", "dark");
+            document.querySelector("body").classList.add("dark");
             break;
 
         default:
-            if (localStorage.getItem('mode') == null)
-                localStorage.setItem('mode', 'light');
-            ((localStorage.getItem('mode') || 'dark') === 'dark') ? document.querySelector('body').classList.add('dark') : document.querySelector('body').classList.remove('dark');
+            if (localStorage.getItem("mode") == null)
+                localStorage.setItem("mode", "light");
+            (localStorage.getItem("mode") || "dark") === "dark"
+                ? document.querySelector("body").classList.add("dark")
+                : document.querySelector("body").classList.remove("dark");
             break;
     }
     setElementsColorMode();
 }
 
 function setElementsColorMode() {
-    switch (localStorage.getItem('mode')) {
-        case 'light':
+    switch (localStorage.getItem("mode")) {
+        case "light":
             setLightStyleToUIElements();
             break;
 
-        case 'dark':
+        case "dark":
             setDarkStyleToUIElements();
             break;
 
@@ -2756,18 +2965,18 @@ function setElementsColorMode() {
 function setLightStyleToUIElements() {
     let length = $(".nav-tabs").children().length;
 
-    $('#dark-light-mode').text("Dark");
-    $('#theme').val(defaultTheme);
+    $("#dark-light-mode").text("Dark");
+    $("#theme").val(defaultTheme);
     $(".btn-dark").each(function () {
-        $(this).removeClass('btn-dark');
-        $(this).addClass('btn-light');
+        $(this).removeClass("btn-dark");
+        $(this).addClass("btn-light");
     });
     $(".btn-outline-light").each(function () {
-        $(this).addClass('btn-outline-dark');
-        $(this).removeClass('btn-outline-light');
+        $(this).addClass("btn-outline-dark");
+        $(this).removeClass("btn-outline-light");
     });
-    $('#dark-light-mode').addClass('btn-outline-dark');
-    $('#dark-light-mode').removeClass('btn-outline-light');
+    $("#dark-light-mode").addClass("btn-outline-dark");
+    $("#dark-light-mode").removeClass("btn-outline-light");
     for (let index = 1; index <= length - 1; index++) {
         let idE = "editor" + index;
         editors[idE].setTheme(defaultTheme);
@@ -2776,18 +2985,18 @@ function setLightStyleToUIElements() {
 
 function setDarkStyleToUIElements() {
     let length = $(".nav-tabs").children().length;
-    $('#dark-light-mode').text("Light");
-    $('#theme').val(defaultDarkTheme);
+    $("#dark-light-mode").text("Light");
+    $("#theme").val(defaultDarkTheme);
     $(".btn-light").each(function () {
-        $(this).removeClass('btn-light');
-        $(this).addClass('btn-dark');
+        $(this).removeClass("btn-light");
+        $(this).addClass("btn-dark");
     });
     $(".btn-outline-dark").each(function () {
-        $(this).removeClass('btn-outline-dark');
-        $(this).addClass('btn-outline-light');
+        $(this).removeClass("btn-outline-dark");
+        $(this).addClass("btn-outline-light");
     });
-    $('#dark-light-mode').removeClass('btn-outline-dark');
-    $('#dark-light-mode').addClass('btn-outline-light');
+    $("#dark-light-mode").removeClass("btn-outline-dark");
+    $("#dark-light-mode").addClass("btn-outline-light");
 
     for (let index = 1; index <= length - 1; index++) {
         let idE = "editor" + index;
@@ -2799,7 +3008,7 @@ function saveProjectToLocalStorage() {
     let tabsName = [];
     let logicProgEditors = [];
 
-    $('.name-tab').each(function () {
+    $(".name-tab").each(function () {
         tabsName.push($(this).text());
     });
     let length = $(".nav-tabs").children().length;
@@ -2816,12 +3025,17 @@ function checkProjectOnLocalStorage() {
     if (supportLocalStorage()) {
         let tabsName = [];
         let logicProgEditors = [];
-        if (localStorage.getItem("tabsName") != undefined && localStorage.getItem("logicProgEditors") != undefined) {
+        if (
+            localStorage.getItem("tabsName") != undefined &&
+            localStorage.getItem("logicProgEditors") != undefined
+        ) {
             tabsName = JSON.parse(localStorage.getItem("tabsName"));
-            logicProgEditors = JSON.parse(localStorage.getItem("logicProgEditors"));
+            logicProgEditors = JSON.parse(
+                localStorage.getItem("logicProgEditors")
+            );
 
             if (tabsName.length > 1 || logicProgEditors[0].trim().length > 0) {
-                $('#notification-project').toast('show');
+                $("#notification-project").toast("show");
             }
         }
     }
@@ -2835,59 +3049,69 @@ function loadProjectFromLocalStorage() {
         logicProgEditors = JSON.parse(localStorage.getItem("logicProgEditors"));
 
         for (let index = 1; index <= tabsName.length; index++) {
-            if (index > 1)
-                $('.add-tab').trigger('click');
+            if (index > 1) $(".add-tab").trigger("click");
             let idE = "editor" + index;
             editors[idE].setValue(logicProgEditors[index - 1]);
         }
 
-        $('.name-tab').each(function (index) {
+        $(".name-tab").each(function (index) {
             $(this).text(tabsName[index]);
             let id = index + 1;
             let editor = "editor" + id;
-            $('.check-run-tab[value="' + editor + '"]').find('.check-tab-name').text(tabsName[index]);
+            $('.check-run-tab[value="' + editor + '"]')
+                .find(".check-tab-name")
+                .text(tabsName[index]);
         });
 
-        $("a[data-target='#tab1']").trigger('click');
+        $("a[data-target='#tab1']").trigger("click");
 
         let opt = localStorage.getItem("solverOptions");
         if (opt !== null) {
             let obj = JSON.parse(opt);
-            $('#inputLanguage').val(obj.language).change();
-            $('#inputengine').val(obj.engine).change();
-            $('#inputExecutor').val(obj.executor).change();
+            $("#inputLanguage").val(obj.language).change();
+            $("#inputengine").val(obj.engine).change();
+            $("#inputExecutor").val(obj.executor).change();
             if (obj.option != null) {
                 setOptions(obj);
             }
-            if ({}.hasOwnProperty.call(obj,'runAuto')) {
-                $("#run-dot").prop('checked', true);
-            }
-            else {
-                $("#run-dot").prop('checked', false);
+            if ({}.hasOwnProperty.call(obj, "runAuto")) {
+                $("#run-dot").prop("checked", true);
+            } else {
+                $("#run-dot").prop("checked", false);
             }
         }
     }
 }
 
 function addTabsNameToDownload() {
-    $('.name-tab').each(function (index) {
-        $('.layout').prepend("<input type='hidden' name='tabname[" + index + "]' id='tabname" + index + "' value='" + $(this).text() + "' class='tabsname'>");
+    $(".name-tab").each(function (index) {
+        $(".layout").prepend(
+            "<input type='hidden' name='tabname[" +
+                index +
+                "]' id='tabname" +
+                index +
+                "' value='" +
+                $(this).text() +
+                "' class='tabsname'>"
+        );
     });
 }
 
 function destroyTabsName() {
-    $('.tabsname').each(function (index) {
+    $(".tabsname").each(function (index) {
         $(this).remove();
     });
 }
 
 function setTabsName(config) {
     let tabsName = config.tabname;
-    $('.name-tab').each(function (index) {
+    $(".name-tab").each(function (index) {
         $(this).text(tabsName[index]);
         let id = index + 1;
         let editor = "editor" + id;
-        $('.check-run-tab[value="' + editor + '"]').find('.check-tab-name').text(tabsName[index]);
+        $('.check-run-tab[value="' + editor + '"]')
+            .find(".check-tab-name")
+            .text(tabsName[index]);
     });
 }
 
@@ -2900,13 +3124,13 @@ function downloadLoDIEProject() {
 
     $("#run-dot").attr("name", "runAuto");
 
-    let form = $('#input').serializeFormJSON();
+    let form = $("#input").serializeFormJSON();
 
     form.output_model = model;
     form.output_error = errors;
     form.tab = [];
 
-    $('.check-run-tab.checked').each(function (index, element) {
+    $(".check-run-tab.checked").each(function (index, element) {
         form.tab.push($(this).val());
     });
 
@@ -2922,14 +3146,17 @@ function downloadLoDIEProject() {
 }
 
 function renameSelectOptionsAndBadge() {
-    $('.form-control-option').each(function (index) {
-        $(this).attr('name', 'option[' + index + '][name]');
-        $(this).closest('.row-option').find('.form-control-value').each(function (index2) {
-            $(this).attr('name', 'option[' + index + '][value][]');
-        });
+    $(".form-control-option").each(function (index) {
+        $(this).attr("name", "option[" + index + "][name]");
+        $(this)
+            .closest(".row-option")
+            .find(".form-control-value")
+            .each(function (index2) {
+                $(this).attr("name", "option[" + index + "][value][]");
+            });
     });
 
-    $('.option-number').each(function (index) {
+    $(".option-number").each(function (index) {
         let i = index + 1;
         $(this).text("Option " + i);
     });
@@ -2937,22 +3164,24 @@ function renameSelectOptionsAndBadge() {
 
 function closeRunOptionOnMobile() {
     if ($(window).width() <= display.small.size) {
-        $('.left-panel').removeClass('left-panel-show');
+        $(".left-panel").removeClass("left-panel-show");
     }
 }
 
 function openRunOptions() {
-    $('.left-panel').toggleClass('left-panel-show'); // add class 'left-panel-show' to increase the width of the left panel
-    $('.left-panel').toggleClass('mr-1');
+    $(".left-panel").toggleClass("left-panel-show"); // add class 'left-panel-show' to increase the width of the left panel
+    $(".left-panel").toggleClass("mr-1");
 
-    $(".left-panel-show, .left-panel").one('transitionend webkitTransitionEnd oTransitionEnd otransitionend MSTransitionEnd',
+    $(".left-panel-show, .left-panel").one(
+        "transitionend webkitTransitionEnd oTransitionEnd otransitionend MSTransitionEnd",
         function () {
             layout.resizeAll();
-    });
+        }
+    );
 }
 
 function getHTMLFromJQueryElement(jQueryElement) {
-    let DOMElement = '';
+    let DOMElement = "";
     for (let i = 0; i < jQueryElement.length; i++)
         DOMElement += jQueryElement.get(i).outerHTML;
 
@@ -2960,8 +3189,8 @@ function getHTMLFromJQueryElement(jQueryElement) {
 }
 
 function setAceMode() {
-    switch ($('#inputLanguage').val()) {
-        case 'asp': {
+    switch ($("#inputLanguage").val()) {
+        case "asp": {
             let length = $(".nav-tabs").children().length;
             for (let index = 1; index <= length - 1; index++) {
                 let idE = "editor" + index;
@@ -2981,6 +3210,7 @@ function setAceMode() {
 }
 
 function downloadOutput() {
-    let outputText = $('#output-model').text() + "\n" + $('#output-error').text();
-    createFileToDownload(outputText, 'local', 'LoIDE_output', 'txt');
+    let outputText =
+        $("#output-model").text() + "\n" + $("#output-error").text();
+    createFileToDownload(outputText, "local", "LoIDE_output", "txt");
 }

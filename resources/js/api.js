@@ -1,4 +1,3 @@
-
 // LoIDE Web Server API URL
 const APIUrl = "localhost:8084";
 
@@ -9,7 +8,7 @@ const createSocket = (callbackErrorConnection) => {
         socket = io(APIUrl, { reconnection: false });
         socket.on(APIWSEvents.on.connectError, async (error) => {
             console.error(Errors.ConnectionError);
-            callbackErrorConnection({reason: Errors.ConnectionError});
+            callbackErrorConnection({ reason: Errors.ConnectionError });
         });
     }
 };

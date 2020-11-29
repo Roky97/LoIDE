@@ -1,4 +1,4 @@
- const APIWSEvents = {
+const APIWSEvents = {
     emit: {
         run: "run",
         getLanguages: "getLanguages",

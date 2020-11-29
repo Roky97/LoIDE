@@ -1,9 +1,9 @@
-define('ace/mode/asp', [], function (require, exports, module) {
-
+define("ace/mode/asp", [], function (require, exports, module) {
     var oop = require("ace/lib/oop");
     var TextMode = require("ace/mode/text").Mode;
     var Tokenizer = require("ace/tokenizer").Tokenizer;
-    var aspHighlightRules = require("ace/mode/asp_highlight_rules").aspHighlightRules;
+    var aspHighlightRules = require("ace/mode/asp_highlight_rules")
+        .aspHighlightRules;
 
     var Mode = function () {
         this.HighlightRules = aspHighlightRules;
@@ -12,87 +12,103 @@ define('ace/mode/asp', [], function (require, exports, module) {
 
     (function () {
         this.lineCommentStart = "%";
-    }).call(Mode.prototype);
+    }.call(Mode.prototype));
 
     exports.Mode = Mode;
 });
 
-define('ace/mode/asp_highlight_rules', [], function (require, exports, module) {
-
+define("ace/mode/asp_highlight_rules", [], function (require, exports, module) {
     var oop = require("ace/lib/oop");
-    var TextHighlightRules = require("ace/mode/text_highlight_rules").TextHighlightRules;
+    var TextHighlightRules = require("ace/mode/text_highlight_rules")
+        .TextHighlightRules;
 
     var aspHighlightRules = function () {
-        var support = ("not");
-        var aggr = ("#count|#sum|#max|#min|#int|#maxint");
-        var keywordMapper = this.createKeywordMapper({
-            "constant.language": support,
-        }, "identifier", true);
-        var keywordAggr = this.createKeywordMapper({
-            "keyword": aggr,
-        }, "identifier", true);
+        var support = "not";
+        var aggr = "#count|#sum|#max|#min|#int|#maxint";
+        var keywordMapper = this.createKeywordMapper(
+            {
+                "constant.language": support,
+            },
+            "identifier",
+            true
+        );
+        var keywordAggr = this.createKeywordMapper(
+            {
+                keyword: aggr,
+            },
+            "identifier",
+            true
+        );
 
         this.$rules = {
-            "start": [{
+            start: [
+                {
                     token: "keyword",
                     regex: "[\\(]+",
-                    next: "blocktag"
-
-                }, {
+                    next: "blocktag",
+                },
+                {
                     token: keywordMapper,
                     regex: "[a-z]+",
-
-                }, {
+                },
+                {
                     token: "keyword.operator",
-                    regex: "\\-|\\+|\\*|\\/|\\<|\\<=|\\>|\\>=|\\=|\\!="
-                }, {
+                    regex: "\\-|\\+|\\*|\\/|\\<|\\<=|\\>|\\>=|\\=|\\!=",
+                },
+                {
                     token: "constant.numeric",
-                    regex: "[0-9]+"
+                    regex: "[0-9]+",
                 },
 
                 {
                     token: keywordAggr,
                     regex: "\\#[a-z]+",
-                    next: "blocktag"
-
-                }, {
+                    next: "blocktag",
+                },
+                {
                     token: "keyword",
-                    regex: ":-|:~"
-
+                    regex: ":-|:~",
                 },
                 {
                     token: "text",
-                    regex: "\s+"
-                }, {
+                    regex: "s+",
+                },
+                {
                     token: "comment",
-                    regex: "\%.+"
-                }
+                    regex: "%.+",
+                },
             ],
-            "blocktag": [{
-                token: "string",
-                regex: "[A-Za-z0-9_\"][a-zA-Z0-9_\"]*",
-                next: "blocknext"
-            }, {
-                token: "keyword",
-                regex: "\\("
-            }],
+            blocktag: [
+                {
+                    token: "string",
+                    regex: '[A-Za-z0-9_"][a-zA-Z0-9_"]*',
+                    next: "blocknext",
+                },
+                {
+                    token: "keyword",
+                    regex: "\\(",
+                },
+            ],
 
-            "blocktagproperties": [{
+            blocktagproperties: [
+                {
                     token: "string",
                     regex: "[A-Za-z0-9_][a-zA-Z0-9_]*",
-                    next: "blocknext"
-                }, {
+                    next: "blocknext",
+                },
+                {
                     token: "keyword",
                     regex: "[\\)]*",
-                    next: "start"
-                }
-
+                    next: "start",
+                },
             ],
-            "blocknext": [{
-                token: "text",
-                regex: "\\s*[,|.]*\\s*",
-                next: "blocktagproperties"
-            }]
+            blocknext: [
+                {
+                    token: "text",
+                    regex: "\\s*[,|.]*\\s*",
+                    next: "blocktagproperties",
+                },
+            ],
         };
         this.normalizeRules();
     };
