@@ -187,8 +187,15 @@ window.onbeforeunload = function () {
 
 $(window).resize(function () {
     checkScreenType();
+    setNewVhSize();
     resizeWindow();
 });
+
+function setNewVhSize() {
+    // We execute the same script as before
+    let vh = window.innerHeight * 0.01;
+    document.documentElement.style.setProperty("--vh", `${vh}px`);
+}
 
 function resizeWindow() {
     let fontSizeO = localStorage.getItem("fontSizeO");
@@ -421,9 +428,9 @@ function initializeLoide() {
 
     loadFromURL(); // load program from url
 
-    if (display.small.isActive) {
-        $(".left-panel").css("overflow-y", "auto");
-    }
+    // if (display.small.isActive) {
+    //     $(".left-panel").css("overflow-y", "auto");
+    // }
 
     inizializeAppareaceSettings();
 
@@ -514,6 +521,13 @@ $(document).ready(function () {
     );
 
     API.emitGetLanguages();
+
+    setNewVhSize();
+
+    window.addEventListener("orientationchange", function () {
+        setNewVhSize();
+        $(window).trigger("resize");
+    });
 
     initializeLoide();
 });
