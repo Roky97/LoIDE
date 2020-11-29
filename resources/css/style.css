@@ -751,6 +751,11 @@ label[for="run-dot"] {
     font-size: 16px;
 }
 
+.simplebar-content:before,
+.simplebar-content:after {
+    content: "";
+}
+
 /*DARK-MODE SECTION*/
 
 body.dark {

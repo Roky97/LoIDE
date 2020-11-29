@@ -6,7 +6,7 @@ var socket = undefined;
 const createSocket = (callbackErrorConnection) => {
     if (!socket) {
         socket = io(APIUrl, { reconnection: false });
-        socket.on(APIWSEvents.on.connectError, async (error) => {
+        socket.on(APIWSEvents.on.connectError, (error) => {
             console.error(Errors.ConnectionError);
             callbackErrorConnection({ reason: Errors.ConnectionError });
         });
