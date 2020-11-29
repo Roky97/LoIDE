@@ -223,7 +223,6 @@ function resizeWindow() {
             setSizePanes();
         }
     }
-    setHeightComponents();
     let length = $(".nav-tabs").children().length;
     for (let index = 1; index <= length - 1; index++) {
         let idE = "editor" + index;
@@ -304,7 +303,7 @@ function initializeLoide(){
         location.reload();
     });
 
-    layout = $('body > .container > form > .layout').layout({
+    layout = $('#layout').layout({
         onresize_end: function () {
             let length = $(".nav-tabs").children().length;
             for (let index = 1; index <= length - 1; index++) {
@@ -353,8 +352,7 @@ function initializeLoide(){
     });
 
     $('#btn-upload').on('click', function () {
-        let expandend = $('#btn-upload').attr('aria-expanded');
-        setHeightComponents(expandend, true);
+        $(window).trigger('resize');
     });
 
     /**
@@ -696,6 +694,14 @@ function destroyClickedElement(event) {
 }
 
 function inizializeDropzone() {
+    $('#upload-container').on('shown.bs.collapse', function(){
+        $(window).trigger('resize');
+    })
+
+    $('#upload-container').on('hidden.bs.collapse', function(){
+        $(window).trigger('resize');
+    })
+    
     let dropZone = document.getElementById('drop_zone');
     dropZone.addEventListener('dragover', handleDragOver, false);
     dropZone.addEventListener('drop', handleFileSelect, false);
@@ -1314,38 +1320,6 @@ function addOption(option) {
 }
 
 /**
- * @param {string} expanded - check if the upload container is expanded to resize the components
- * @description set the height of the components with the height of your browser
- */
-function setHeightComponents(expanded, open) {
-    let height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight; // cross-browser solution
-    let navbarHeight = $('.navbar').outerHeight(true);
-    let tabpanel = $(".nav-tabs").outerHeight(true);
-
-    $('.ace').css('height', height - navbarHeight - tabpanel);
-
-    if (expanded !== undefined || open == true) {
-        let containerUpload = $('#upload-container').outerHeight(true);
-        containerUpload += 22;
-        $('.left-panel').css('height', height - (navbarHeight + containerUpload));
-        $('.layout').css('height', height - (navbarHeight + containerUpload));
-        $('.ui-layout-pane-east').css('height', height - (navbarHeight + containerUpload));
-        $('.ui-layout-pane-center').css('height', height - (navbarHeight + containerUpload + 10));
-        $('.ace').css('height', height - (navbarHeight + tabpanel + containerUpload));
-        if (expanded === "true") {
-            $(window).trigger('resize');
-        }
-    } else {
-        $('.left-panel').css('height', height - navbarHeight);
-        $('.layout').css('height', height - navbarHeight);
-        $('.ui-layout-pane-east').css('height', height - navbarHeight);
-        $('.ui-layout-pane-center').css('height', height - navbarHeight);
-    }
-
-    editors[idEditor].resize();
-}
-
-/**
  * @param {string} str - string to check
  * @returns {boolean}
  * @description check if a string is JSON
@@ -1403,7 +1377,6 @@ function handleFileSelect(evt) {
      * remove and close container after success upload
      */
     $('.collapse').collapse('hide');
-    setHeightComponents();
     $('#files').val("");
 }
 
@@ -1522,7 +1495,6 @@ function setUpAce(ideditor, text) {
         enableSnippets: true,
         cursorStyle: "smooth",
         copyWithEmptySelection: true,
-        scrollPastEnd: 0.5
     });
 
     editors[ideditor].commands.addCommand(
@@ -1582,7 +1554,6 @@ function setUpAce(ideditor, text) {
         }
         inizializeAutoComplete();
     });
-    setHeightComponents();
 }
 
 /**
@@ -2123,12 +2094,13 @@ function deleteAllTabs() {
 }
 
 function deleteTab(tab, all) {
-    if (!all) { let r = confirm("Are you sure you want to delete this file? This cannot be undone."); }
+    let deleteAlertConfirm;
+    if (!all) { deleteAlertConfirm = confirm("Are you sure you want to delete this file? This cannot be undone."); }
     let ids = $(".nav-tabs").children().length - 1;
     let t = tab.parent().attr('data-target');
     let currentids = $(t).find(".ace").attr("id").substr(6);
     let parse = parseInt(currentids);
-    if (r || all) {
+    if (deleteAlertConfirm || all) {
         let prevEditor = tab.parent().parent().prev();
         if (prevEditor.length === 0) {
             prevEditor = tab.parent().parent().next();
@@ -2971,10 +2943,12 @@ function closeRunOptionOnMobile() {
 
 function openRunOptions() {
     $('.left-panel').toggleClass('left-panel-show'); // add class 'left-panel-show' to increase the width of the left panel
+    $('.left-panel').toggleClass('mr-1');
+
     $(".left-panel-show, .left-panel").one('transitionend webkitTransitionEnd oTransitionEnd otransitionend MSTransitionEnd',
         function () {
             layout.resizeAll();
-        });
+    });
 }
 
 function getHTMLFromJQueryElement(jQueryElement) {
