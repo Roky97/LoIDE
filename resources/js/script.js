@@ -734,6 +734,7 @@ function inizializeDropzone() {
 function inizializeTabContextmenu() {
     $.contextMenu({
         selector: ".btn-context-tab",
+        zIndex: 10,
         items: {
             RunThisTab: {
                 name: "Run",
