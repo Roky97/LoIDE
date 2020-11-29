@@ -388,7 +388,7 @@ function initializeLoide() {
     });
 
     $("#btn-option").click(function () {
-        openRunOptions();
+        toggleRunOptions();
     });
 
     $("#reset-editor").click(function () {
@@ -3164,11 +3164,11 @@ function renameSelectOptionsAndBadge() {
 
 function closeRunOptionOnMobile() {
     if ($(window).width() <= display.small.size) {
-        $(".left-panel").removeClass("left-panel-show");
+        toggleRunOptions();
     }
 }
 
-function openRunOptions() {
+function toggleRunOptions() {
     $(".left-panel").toggleClass("left-panel-show"); // add class 'left-panel-show' to increase the width of the left panel
     $(".left-panel").toggleClass("mr-1");
 
