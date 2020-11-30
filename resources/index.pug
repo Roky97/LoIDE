@@ -55,7 +55,7 @@
     <div class="splashscreen">
         <div class="splashscreen-container fade-in">
             <div class="d-flex justify-content-center align-items-center mb-4">
-                <img src="img/logo_LoIDE.svg" class="about-logo" width="150" alt="LoIDE logo" onerror="this.onerror=null; this.src='img/logo_LoIDE.png'">
+                <img src="img/logo_LoIDE.svg" width="150" alt="LoIDE logo" onerror="this.onerror=null; this.src='img/logo_LoIDE.png'">
                 <span class="classic info">Classic</span>
             </div>
             <div class="d-flex justify-content-center">
@@ -356,62 +356,76 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-4 col-xs-4 mb-3">
-                            <label for="font-editor">Font size Editor</label>
-                            <input id="font-editor" class="form-control" type="number" min="15" max="60">
-                        </div>
-                        <div class="col-md-4 col-xs-4 mb-3">
-                            <label for="font-output">Font size Output</label>
-                            <input id="font-output" class="form-control" type="number" min="15" max="60">
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-4 col-xs-4 mb-3">
-                            <label for="theme">Change theme Editor</label>
-                            <div class="input-group opname">
-                                <select id="theme" class="custom-select" style="width: 100%;">
-                                    <optgroup label="Bright">
-                                        <option value="ace/theme/tomorrow">Tomorrow</option>
-                                        <option value="ace/theme/solarized_light">Solarized Light</option>
-                                        <option value="ace/theme/clouds">Clouds</option>
-                                        <option value="ace/theme/github">Github</option>
-                                        <option value="ace/theme/xcode">XCode</option>
-                                        <option value="ace/theme/katzenmilch">KatzenMilch</option>
-                                        <option value="ace/theme/chrome">Chrome</option>
-                                        <option value="ace/theme/crimson_editor">Crimson Editor</option>
-                                        <option value="ace/theme/dawn">Dawn</option>
-                                        <option value="ace/theme/eclipse">Eclipse</option>
-                                        <option value="ace/theme/github">Github</option>
-                                        <option value="ace/theme/iplastic">Iplastic</option>
-                                        <option value="ace/theme/sqlserver">Sqlserver </option>
-                                        <option value="ace/theme/textmate">Textmate</option>
-                                    </optgroup>
-                                    <optgroup label="Dark">
-                                        <option value="ace/theme/idle_fingers">Idle Fingers</option>
-                                        <option value="ace/theme/kr_theme">KrTheme</option>
-                                        <option value="ace/theme/ambiance">Ambiance</option>
-                                        <option value="ace/theme/tomorrow_night">Tomorrow night</option>
-                                        <option value="ace/theme/tomorrow_night_bright">Tomorrow Night bright</option>
-                                        <option value="ace/theme/tomorrow_night_eighties">Tomorrow Night Eighties</option>
-                                        <option value="ace/theme/dracula">Dracula</option>
-                                        <option value="ace/theme/twilight">Twilight</option>
-                                        <option value="ace/theme/gruvbox">Gruvbox</option>
-                                        <option value="ace/theme/chaos">Chaos</option>
-                                        <option value="ace/theme/solarized_dark">Solarized Dark</option>
-                                        <option value="ace/theme/cobalt">Cobalt</option>
-                                        <option value="ace/theme/merbivore_soft">Merbivore Soft</option>
-                                        <option value="ace/theme/terminal">Terminal</option>
-                                        <option value="ace/theme/gob">Gob</option>
-                                        <option value="ace/theme/tomorrow_night_blue">Tomorrow Night Blue</option>
-                                        <option value="ace/theme/monokai">Monokai</option>
-                                    </optgroup>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-4 col-xs-4 mb-3">
-                            <label for="dark-light-mode">Change LoIDE mode</label>
-                            <button id="dark-light-mode" type="button" class="btn btn-outline-dark btn-block">Dark</button>
+                    <div class="row mb-4">
+                        <div class="col">
+                            <ul class="apperarance-list list-group list-group-flush">
+                                <li class="list-group-item">
+                                    <label for="dark-light-mode">Change LoIDE mode</label>
+                                    <button id="dark-light-mode" type="button" class="btn btn-outline-dark btn-block">Dark</button>
+                                </li>
+
+                                
+
+                                <li class="list-group-item">
+                                    <label> Font size Editor </label>
+                                    <div class="d-flex">
+                                        <span class="mr-3"> 10px</span>
+                                            <input type="range" class="custom-range" min="10" max="30" id="font-editor-range">
+                                        <span class="ml-3">30px</span>
+                                    </div>
+                                </li>
+                                <li class="list-group-item">
+                                    <label> Font size Output </label>
+                                    <div class="d-flex">
+                                        <span class="mr-3"> 10px</span>
+                                            <input type="range" class="custom-range" min="10" max="30" id="font-output-range">
+                                        <span class="ml-3">30px</span>
+                                    </div>
+                                </li>
+
+                                <li class="list-group-item">
+                                    <label for="theme">Change theme Editor</label>
+                                    <div class="input-group opname">
+                                        <select id="theme" class="custom-select" style="width: 100%;">
+                                            <optgroup label="Bright">
+                                                <option value="ace/theme/tomorrow">Tomorrow</option>
+                                                <option value="ace/theme/solarized_light">Solarized Light</option>
+                                                <option value="ace/theme/clouds">Clouds</option>
+                                                <option value="ace/theme/github">Github</option>
+                                                <option value="ace/theme/xcode">XCode</option>
+                                                <option value="ace/theme/katzenmilch">KatzenMilch</option>
+                                                <option value="ace/theme/chrome">Chrome</option>
+                                                <option value="ace/theme/crimson_editor">Crimson Editor</option>
+                                                <option value="ace/theme/dawn">Dawn</option>
+                                                <option value="ace/theme/eclipse">Eclipse</option>
+                                                <option value="ace/theme/github">Github</option>
+                                                <option value="ace/theme/iplastic">Iplastic</option>
+                                                <option value="ace/theme/sqlserver">Sqlserver </option>
+                                                <option value="ace/theme/textmate">Textmate</option>
+                                            </optgroup>
+                                            <optgroup label="Dark">
+                                                <option value="ace/theme/idle_fingers">Idle Fingers</option>
+                                                <option value="ace/theme/kr_theme">KrTheme</option>
+                                                <option value="ace/theme/ambiance">Ambiance</option>
+                                                <option value="ace/theme/tomorrow_night">Tomorrow night</option>
+                                                <option value="ace/theme/tomorrow_night_bright">Tomorrow Night bright</option>
+                                                <option value="ace/theme/tomorrow_night_eighties">Tomorrow Night Eighties</option>
+                                                <option value="ace/theme/dracula">Dracula</option>
+                                                <option value="ace/theme/twilight">Twilight</option>
+                                                <option value="ace/theme/gruvbox">Gruvbox</option>
+                                                <option value="ace/theme/chaos">Chaos</option>
+                                                <option value="ace/theme/solarized_dark">Solarized Dark</option>
+                                                <option value="ace/theme/cobalt">Cobalt</option>
+                                                <option value="ace/theme/merbivore_soft">Merbivore Soft</option>
+                                                <option value="ace/theme/terminal">Terminal</option>
+                                                <option value="ace/theme/gob">Gob</option>
+                                                <option value="ace/theme/tomorrow_night_blue">Tomorrow Night Blue</option>
+                                                <option value="ace/theme/monokai">Monokai</option>
+                                            </optgroup>
+                                        </select>
+                                    </div>
+                                </li>
+                            </ul>
                         </div>
                     </div>
                 </div>

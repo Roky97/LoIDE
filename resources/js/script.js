@@ -212,7 +212,7 @@ function resizeWindow() {
             $(".ui-layout-south").empty();
             layout.addPane("east");
             createTextArea($(".ui-layout-east"));
-            $("#font-output").val(fontSizeO);
+            $("#font-output-range").val(fontSizeO);
             $("#output").css("font-size", fontSizeO + "px");
             $("#output-model").text(currentValModel);
             $("#output-error").text(currentValError);
@@ -227,7 +227,7 @@ function resizeWindow() {
             $(".ui-layout-east").empty();
             layout.addPane("south");
             createTextArea($(".ui-layout-south"));
-            $("#font-output").val(fontSizeO);
+            $("#font-output-range").val(fontSizeO);
             $("#output").css("font-size", fontSizeO + "px");
             $("#output-model").text(currentValModel);
             $("#output-error").text(currentValError);
@@ -432,10 +432,6 @@ function initializeLoide() {
 
     loadFromURL(); // load program from url
 
-    // if (display.small.isActive) {
-    //     $(".left-panel").css("overflow-y", "auto");
-    // }
-
     inizializeAppareaceSettings();
 
     setSizePanes();
@@ -553,24 +549,19 @@ function checkScreenType() {
 }
 
 function inizializeAppareaceSettings() {
-    $("#font-output").change(function (e) {
-        let size = $(this).val();
-        if (size.length == 0) {
-            $(this).val(defaultFontSize);
-        }
-        $("#output").css("font-size", size + "px");
-        if (!saveOption("fontSizeO", size)) {
+    $("#font-editor-range").change(function (e) {
+        let value = e.target.value;
+        setFontSizeEditors(value);
+        if (!saveOption("fontSizeE", value)) {
             alert("Sorry, this options will not save in your browser");
         }
     });
 
-    $("#font-editor").change(function (e) {
-        let size = $(this).val();
-        if (size.length == 0) {
-            $(this).val(defaultFontSize);
-        }
-        setFontSizeEditors(size);
-        if (!saveOption("fontSizeE", size)) {
+    $("#font-output-range").change(function (e) {
+        let value = e.target.value;
+        console.log(value + "px");
+        $("#output").css("font-size", value + "px");
+        if (!saveOption("fontSizeO", value)) {
             alert("Sorry, this options will not save in your browser");
         }
     });
@@ -583,28 +574,31 @@ function inizializeAppareaceSettings() {
         }
     });
 
-    let size = $("#font-editor").val();
-    if (size.length == 0) {
-        $("#font-editor").val(defaultFontSize);
-    }
-    setFontSizeEditors(size);
-    size = $("#font-output").val();
-    if (size.length == 0) {
-        $("#font-output").val(defaultFontSize);
-    }
+    if (supportLocalStorage()) {
+        let fontSizeE = localStorage.getItem("fontSizeE");
+        fontSizeE = fontSizeE !== "" ? fontSizeE : defaultFontSize;
+        $("#font-editor-range").val(fontSizeE).change();
 
-    let actualTheme =
-        localStorage.getItem("theme") == null
-            ? ""
-            : localStorage.getItem("theme");
-    if (actualTheme.length == 0) {
-        if (localStorage.getItem("mode") === "dark")
-            setThemeEditors(defaultDarkTheme);
-        else {
-            setThemeEditors(defaultTheme);
+        let fontSizeO = localStorage.getItem("fontSizeO");
+        fontSizeO = fontSizeO !== "" ? fontSizeO : defaultFontSize;
+        $("#font-output-range").val(fontSizeO).change();
+
+        let actualTheme =
+            localStorage.getItem("theme") == null
+                ? ""
+                : localStorage.getItem("theme");
+        if (actualTheme.length === 0) {
+            if (localStorage.getItem("mode") === "dark")
+                setThemeEditors(defaultDarkTheme);
+            else {
+                setThemeEditors(defaultTheme);
+            }
+        } else {
+            setThemeEditors(actualTheme);
         }
     } else {
-        setThemeEditors(actualTheme);
+        $("#font-editor-range").val(defaultFontSize).change();
+        $("#font-output-range").val(defaultFontSize).change();
     }
 }
 
@@ -702,12 +696,14 @@ function createFileToDownload(text, where, name, type) {
     downloadLink.onclick = destroyClickedElement;
     downloadLink.style.display = "none";
     document.body.appendChild(downloadLink);
-    if (where == "local") {
-        downloadLink.click();
-    } else if (where == "dropbox") {
-        // console.log(downloadLink.href);
-        // let options = { error: function (errorMessage) { alert(errorMessage);}};
-        // Dropbox.save(downloadLink.href, fileNameToSaveAs, options);
+
+    switch (where) {
+        case "local":
+            downloadLink.click();
+            break;
+
+        default:
+            break;
     }
 }
 /**
@@ -1220,9 +1216,9 @@ function addEastLayout(layout) {
     $("#split-up").parent().empty();
     layout.addPane("east");
     createTextArea($(".ui-layout-east"));
-    let fontSizeO = $("#font-output").val();
+    let fontSizeO = $("#font-output-range").val();
     fontSizeO = fontSizeO !== "" ? fontSizeO : defaultFontSize;
-    $("#font-output").val(fontSizeO);
+    $("#font-output-range").val(fontSizeO);
     $("#output").css("font-size", fontSizeO + "px");
     $("#output-model").text(currentValModel);
     $("#output-error").text(currentValError);
@@ -1239,9 +1235,9 @@ function addSouthLayout(layout) {
     $("#split").parent().empty();
     layout.addPane("south");
     createTextArea($(".ui-layout-south"));
-    let fontSizeO = $("#font-output").val();
+    let fontSizeO = $("#font-output-range").val();
     fontSizeO = fontSizeO !== "" ? fontSizeO : defaultFontSize;
-    $("#font-output").val(fontSizeO);
+    $("#font-output-range").val(fontSizeO);
     $("#output").css("font-size", fontSizeO + "px");
     $("#output-model").text(currentValModel);
     $("#output-error").text(currentValError);
@@ -1700,7 +1696,6 @@ function inizializeShortcuts() {
     });
 
     Mousetrap.bind("?", function () {
-        console.log("questioooon");
         $("#modal-about").modal("hide");
         $("#setting-editor").modal("hide");
         $("#shortcut").modal("show");
@@ -1869,16 +1864,6 @@ function restoreOptions() {
     $("#theme").val(theme);
     setTheme(theme);
 
-    let fontSizeE = localStorage.getItem("fontSizeE");
-    fontSizeE = fontSizeE !== "" ? fontSizeE : defaultFontSize;
-    $("#font-editor").val(fontSizeE);
-    setFontSizeEditors(fontSizeE);
-
-    let fontSizeO = localStorage.getItem("fontSizeO");
-    fontSizeO = fontSizeO !== "" ? fontSizeO : defaultFontSize;
-    $("#font-output").val(fontSizeO);
-    $("#output").css("font-size", fontSizeO + "px");
-
     let outputSize = localStorage.getItem("outputSize");
     if (outputSize !== null) {
         $("#output").parent().css("width", outputSize);
@@ -1947,12 +1932,8 @@ function addTab(obj, text, name) {
     setAceMode();
     setElementsColorMode();
 
-    let currentFontSize = $("#font-editor").val();
-    if (currentFontSize.length == 0) {
-        editors[editorId].setFontSize(currentFontSize + "px");
-    } else {
-        editors[editorId].setFontSize(currentFontSize + "px");
-    }
+    let currentFontSize = $("#font-editor-range").val();
+    editors[editorId].setFontSize(currentFontSize + "px");
 
     return tabId;
 }
@@ -1980,15 +1961,8 @@ function resetEditorOptions() {
     $("#theme").val(defaultTheme);
     saveOption("theme", defaultTheme);
     setTheme(defaultTheme);
-
-    $("#font-editor").val(defaultFontSize);
-    saveOption("fontSizeE", defaultFontSize);
-    setFontSizeEditors(defaultFontSize);
-
-    $("#font-output").val(defaultFontSize);
-    saveOption("fontSizeO", defaultFontSize);
-    $("#output").css("font-size", defaultFontSize + "px");
-
+    $("#font-editor-range").val(defaultFontSize).change();
+    $("#font-output-range").val(defaultFontSize).change();
     setLoideStyleMode("light");
 }
 
@@ -2786,7 +2760,7 @@ function createURL() {
                 dataType: "json",
                 crossDomain: true,
                 success: function (data) {
-                    console.log(data);
+                    // console.log(data);
                     if (data.shorturl == undefined) {
                         $("#link-to-share").val("Ops. Something went wrong");
                         if (URL.length >= 5000) {

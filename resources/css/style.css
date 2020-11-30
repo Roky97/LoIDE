@@ -232,7 +232,7 @@
 
 body {
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.06);
+    background-color: rgba(0, 0, 0, 0.08);
     overflow: hidden;
 }
 
@@ -756,6 +756,10 @@ label[for="run-dot"] {
     content: "";
 }
 
+.close {
+    text-shadow: none;
+}
+
 /*DARK-MODE SECTION*/
 
 body.dark {
@@ -772,6 +776,19 @@ body.dark .ui-layout-pane {
 }
 
 body.dark .modal-content {
+    background-color: rgb(83, 83, 83);
+}
+
+body.dark .modal-header,
+body.dark .modal-footer {
+    border-color: #3b3b3b;
+}
+
+body.dark .close {
+    color: #fff;
+}
+
+body.dark .apperarance-list > .list-group-item {
     background-color: rgb(83, 83, 83);
 }
 
