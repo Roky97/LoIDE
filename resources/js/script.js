@@ -237,6 +237,10 @@ function resizeWindow() {
             setSizePanes();
         }
     }
+    resizeAllEditors();
+}
+
+function resizeAllEditors() {
     let length = $(".nav-tabs").children().length;
     for (let index = 1; index <= length - 1; index++) {
         let idE = "editor" + index;
@@ -1345,12 +1349,7 @@ function addInputValue(inputClass) {
         );
 }
 
-/**
- * @param {Object} text - configuration in json format
- * @returns {boolean}
- * @description check if the configration file has the correct property to set. If not, return false and display the content of the file in the text editor
- */
-function setJSONInput(config) {
+function isLoideProject(config) {
     if (
         {}.hasOwnProperty.call(config, "language") ||
         {}.hasOwnProperty.call(config, "engine") ||
@@ -1360,7 +1359,18 @@ function setJSONInput(config) {
         {}.hasOwnProperty.call(config, "output_model") ||
         {}.hasOwnProperty.call(config, "output_error") ||
         {}.hasOwnProperty.call(config, "tabname")
-    ) {
+    )
+        return true;
+    return false;
+}
+
+/**
+ * @param {Object} text - configuration in json format
+ * @returns {boolean}
+ * @description check if the configration file has the correct property to set. If not, return false and display the content of the file in the text editor
+ */
+function setJSONInput(config) {
+    if (isLoideProject(config)) {
         $(".nav-tabs li:not(:last)").each(function (index, element) {
             let id = $(this).find("a").attr("data-target");
             $(this).remove();
@@ -1372,7 +1382,6 @@ function setJSONInput(config) {
         $(config.program).each(function (index, element) {
             tabID = addTab($(".add-tab"), config.program[index]);
         });
-        $("[data-target='#" + tabID + "']").trigger("click"); // active last tab inserted
         if ({}.hasOwnProperty.call(config, "tab")) {
             $(config.tab).each(function (index, element) {
                 $('.check-run-tab[value="' + element + '"]')
@@ -1397,6 +1406,9 @@ function setJSONInput(config) {
         setOptions(config);
         setTabsName(config);
         initializeCheckTabToRun();
+
+        $("#editor-tabs li:first-child a").tab("show"); // select the first tab
+
         return true;
     } else {
         return false;
@@ -1595,6 +1607,7 @@ function setUpAce(ideditor, text) {
     }
 
     editors[ideditor].setValue(text);
+    editors[ideditor].clearSelection();
     editors[ideditor].resize();
     editors[ideditor].setBehavioursEnabled(true);
     editors[ideditor].setOptions({
@@ -3020,37 +3033,22 @@ function setDarkStyleToUIElements() {
 }
 
 function saveProjectToLocalStorage() {
-    let tabsName = [];
-    let logicProgEditors = [];
-
-    $(".name-tab").each(function () {
-        tabsName.push($(this).text());
-    });
-    let length = $(".nav-tabs").children().length;
-    for (let index = 1; index <= length - 1; index++) {
-        let idE = "editor" + index;
-        logicProgEditors.push(editors[idE].getValue());
-    }
-
-    saveOption("tabsName", JSON.stringify(tabsName));
-    saveOption("logicProgEditors", JSON.stringify(logicProgEditors));
+    let project = createLoideProjectConfig();
+    saveOption("loideProject", JSON.stringify(project));
 }
 
 function checkProjectOnLocalStorage() {
     if (supportLocalStorage()) {
-        let tabsName = [];
-        let logicProgEditors = [];
-        if (
-            localStorage.getItem("tabsName") != undefined &&
-            localStorage.getItem("logicProgEditors") != undefined
-        ) {
-            tabsName = JSON.parse(localStorage.getItem("tabsName"));
-            logicProgEditors = JSON.parse(
-                localStorage.getItem("logicProgEditors")
-            );
-
-            if (tabsName.length > 1 || logicProgEditors[0].trim().length > 0) {
-                $("#notification-project").toast("show");
+        let projectjson = localStorage.getItem("loideProject");
+        if (projectjson != undefined && isJosn(projectjson)) {
+            let project = JSON.parse(projectjson);
+            if ({}.hasOwnProperty.call(project, "program")) {
+                if (
+                    project.program.length > 1 ||
+                    project.program[0].trim().length > 0
+                ) {
+                    $("#notification-project").toast("show");
+                }
             }
         }
     }
@@ -3058,42 +3056,13 @@ function checkProjectOnLocalStorage() {
 
 function loadProjectFromLocalStorage() {
     if (supportLocalStorage()) {
-        let tabsName = [];
-        let logicProgEditors = [];
-        tabsName = JSON.parse(localStorage.getItem("tabsName"));
-        logicProgEditors = JSON.parse(localStorage.getItem("logicProgEditors"));
-
-        for (let index = 1; index <= tabsName.length; index++) {
-            if (index > 1) $(".add-tab").trigger("click");
-            let idE = "editor" + index;
-            editors[idE].setValue(logicProgEditors[index - 1]);
-        }
-
-        $(".name-tab").each(function (index) {
-            $(this).text(tabsName[index]);
-            let id = index + 1;
-            let editor = "editor" + id;
-            $('.check-run-tab[value="' + editor + '"]')
-                .find(".check-tab-name")
-                .text(tabsName[index]);
-        });
-
-        $("a[data-target='#tab1']").trigger("click");
-
-        let opt = localStorage.getItem("solverOptions");
-        if (opt !== null) {
-            let obj = JSON.parse(opt);
-            $("#inputLanguage").val(obj.language).change();
-            $("#inputengine").val(obj.engine).change();
-            $("#inputExecutor").val(obj.executor).change();
-            if (obj.option != null) {
-                setOptions(obj);
+        let projectjson = localStorage.getItem("loideProject");
+        if (isJosn(projectjson)) {
+            let project = JSON.parse(projectjson);
+            if (!setJSONInput(project)) {
+                operation_alert({ reason: "Error load the project" });
             }
-            if ({}.hasOwnProperty.call(obj, "runAuto")) {
-                $("#run-dot").prop("checked", true);
-            } else {
-                $("#run-dot").prop("checked", false);
-            }
+            inizializeTabContextmenu();
         }
     }
 }
@@ -3130,7 +3099,7 @@ function setTabsName(config) {
     });
 }
 
-function downloadLoDIEProject() {
+function createLoideProjectConfig() {
     addProgramsToDownload();
     addTabsNameToDownload();
 
@@ -3153,11 +3122,17 @@ function downloadLoDIEProject() {
         delete form.tab;
     }
 
-    let stringify = JSON.stringify(form);
-    createFileToDownload(stringify, "local", "LoIDE_Project", "json");
     destroyPrograms();
     destroyTabsName();
     $("#run-dot").removeAttr("name");
+
+    return form;
+}
+
+function downloadLoDIEProject() {
+    let project = createLoideProjectConfig();
+    let stringify = JSON.stringify(project);
+    createFileToDownload(stringify, "local", "LoIDE_Project", "json");
 }
 
 function renameSelectOptionsAndBadge() {
