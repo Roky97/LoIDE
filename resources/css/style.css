@@ -353,6 +353,11 @@ a[role="button"]:focus {
     padding-top: 5px;
 }
 
+.toolbar {
+    display: flex;
+    align-items: center;
+}
+
 #tab-execute {
     margin-top: 5%;
 }

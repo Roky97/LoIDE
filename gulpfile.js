@@ -6,6 +6,8 @@ const uglify = require('gulp-uglify-es').default;
 const nodemon = require('gulp-nodemon')
 var browserSync = require('browser-sync').create();
 var babel = require("gulp-babel");
+const inject = require('gulp-inject-string');
+const htmlmin = require('gulp-htmlmin');
 
 const path =  {
     dist: 'dist/',
@@ -57,8 +59,11 @@ function js() {
     .pipe(dest(path.dist + 'js/'))
 }
 
-function pug() {
-    return src(path.src + '**/*.pug')
+function html() {
+    let properties = require("./config/app-config.json");
+    return src(path.src + '**/*.html')
+    .pipe(inject.replace('#{loideURL}', properties.loide_url))
+    .pipe(htmlmin({collapseWhitespace: true, removeComments: true, removeEmptyAttributes: true}))
     .pipe(dest(path.dist))
 }
 
@@ -125,7 +130,7 @@ function startBrowserSync(done){
     }, done);
 }
 
-const build = parallel(css,faviconImage,faviconFiles,img,js,pug);
+const build = parallel(css,faviconImage,faviconFiles,img,js,html);
 
 exports.default = series(cleanDir, build, serveProd)
 exports.dev = series(cleanDir, serveDev, startBrowserSync)

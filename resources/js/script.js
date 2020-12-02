@@ -559,7 +559,6 @@ function inizializeAppareaceSettings() {
 
     $("#font-output-range").change(function (e) {
         let value = e.target.value;
-        console.log(value + "px");
         $("#output").css("font-size", value + "px");
         if (!saveOption("fontSizeO", value)) {
             alert("Sorry, this options will not save in your browser");

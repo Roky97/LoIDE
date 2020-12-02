@@ -45,7 +45,6 @@
     "express-force-ssl": "^0.3.2",
     "helmet": "^3.21.1",
     "json-pointer": "^0.6.1",
-    "pug": "^3.0.0",
     "socket.io": "^2.3.0",
     "websocket": "^1.0.32"
   },
@@ -59,6 +58,8 @@
     "gulp-babel": "^8.0.0",
     "gulp-clean": "^0.4.0",
     "gulp-csso": "^4.0.1",
+    "gulp-htmlmin": "^5.0.1",
+    "gulp-inject-string": "^1.1.2",
     "gulp-nodemon": "^2.5.0",
     "gulp-uglify-es": "^2.0.0"
   },
