@@ -1,14 +1,12 @@
 {
-    "port"  	:
-    {
-        "http"		: 3000,
-        "https"		: 3001
+    "port": {
+        "http": 3000,
+        "https": 3001
     },
-    "path"		:
-    {
-        "key"		: "",
-        "cert"		: ""
+    "path": {
+        "key": "",
+        "cert": ""
     },
-    "max_age"	: 31536000,
-    "loide_url" : "url"
+    "max_age": 31536000,
+    "loide_url": "url"
 }

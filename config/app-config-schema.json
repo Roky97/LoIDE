@@ -41,9 +41,7 @@
                     "maximum": 65535
                 }
             },
-            "required": [
-                "http"
-            ],
+            "required": ["http"],
             "additionalProperties": false
         },
         "path": {
@@ -62,16 +60,10 @@
                     "type": "string"
                 }
             },
-            "required": [
-                "key",
-                "cert"
-            ],
+            "required": ["key", "cert"],
             "additionalProperties": false
         }
     },
-    "required": [
-        "port",
-        "max_age"
-    ],
+    "required": ["port", "max_age"],
     "additionalProperties": false
 }
