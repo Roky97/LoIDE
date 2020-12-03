@@ -69,11 +69,6 @@ app.use(
 app.use(compression());
 app.use(express.static(resourcesPath));
 
-app.post("/version", function (req, res) {
-    // send the version (and take it in package.json) of the application
-    res.send('{"version":"' + pckg.version + '"}');
-});
-
 if (enableHTTPS) {
     secureServer.listen(httpsPortP, function () {
         print_log("App listening on secure port " + httpsPortP);

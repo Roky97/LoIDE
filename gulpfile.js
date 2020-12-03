@@ -61,8 +61,10 @@ function js() {
 
 function html() {
     let properties = require("./config/app-config.json");
+    let pckg = require("./package.json");
     return src(path.src + '**/*.html')
     .pipe(inject.replace('#{loideURL}', properties.loide_url))
+    .pipe(inject.replace('#{loideVersion}', pckg.version))
     .pipe(htmlmin({collapseWhitespace: true, removeComments: true, removeEmptyAttributes: true}))
     .pipe(dest(path.dist))
 }
