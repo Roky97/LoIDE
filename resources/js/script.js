@@ -1,6 +1,6 @@
 (function ($) {
     /**
-     *  @description Serialize form as json object
+     * Serialize form as json object
      */
     $.fn.serializeFormJSON = function () {
         let self = this,
@@ -72,8 +72,8 @@
 })(jQuery);
 
 /**
+ * Copy a string to clipboard
  * @param {string} str - text to copy
- * @description Copy a string to clipboard
  */
 function copyStringToClipboard(str) {
     // Create new element
@@ -93,48 +93,55 @@ function copyStringToClipboard(str) {
 }
 
 /**
- * @param {json} result - description of the problem
- * @description Open a container to display the result
+ * Show the toast notification
+ * @param {json} message - message informations
+ * @param {json} message.reason - message text
  */
-function operation_alert(result) {
-    $("#notidication-body").html("<strong>" + result.reason + "</strong>");
+function operation_alert(message) {
+    $("#notidication-body").html("<strong>" + message.reason + "</strong>");
     $("#notification").toast("show");
 }
 
 /**
- ** @global
- * @description place object layout
+ * @global
+ * Place object layout
  */
 var layout;
 
 /**
  * @global
- * @description place the id of the current shown editor
+ * Place the ID of the current shown editor
  */
 var idEditor = "editor1";
 
 /**
  * @global
- * @description default font size editor
+ * Default font size editor
  */
 const defaultFontSize = 15;
 
 /**
  * @global
- * @description default ace theme
+ * Default ace theme
  */
 const defaultTheme = "ace/theme/tomorrow";
 const defaultDarkTheme = "ace/theme/idle_fingers";
 
 /**
- * set up ace editors into object
+ * Set up ace editors into object
  */
 var editors = {};
 setUpAce(idEditor, "");
 
 /**
  * @global
- * @description default screens sizes and activated status
+ * ID value of the clicked button 'submit'
+ */
+var clkBtn = "";
+
+/**
+ * @global
+ * Default screens sizes and activated status
  */
 var display = {
     small: { size: 576, isActive: false },
@@ -143,7 +150,7 @@ var display = {
 };
 
 /**
- * @description - Returns the DOM element for the solver's option
+ * Returns the DOM element for the solver's option
  */
 function getSolverOptionDOMElement() {
     return (
@@ -169,34 +176,42 @@ function getSolverOptionDOMElement() {
 }
 
 /**
- * set autofocus in modal
- */
-$(".modal").on("shown.bs.modal", function () {
-    $("#myInput").focus();
-});
-
-/**
- * active tooltip bootstrap
+ * Active tooltip bootstrap
  */
 $('[data-toggle="tooltip"]').tooltip();
 
+/**
+ *  Save the project on localstorage before unloading the page
+ */
 window.onbeforeunload = function () {
-    $("#save-options").trigger("click");
+    $("#save-run-settings").trigger("click");
     saveProjectToLocalStorage();
 };
 
+/**
+ *  Check the screen type,
+ *  set the new height of the page and
+ *  adjust the layout based on the screen dimensions.
+ */
 $(window).resize(function () {
     checkScreenType();
     setNewVhSize();
     resizeWindow();
 });
 
+/**
+ *  Get the viewport height and multiples it by 1% to get a value for a vh unit,
+ *  then set the value in the --vh custom property to the root of the document.
+ */
 function setNewVhSize() {
-    // We execute the same script as before
     let vh = window.innerHeight * 0.01;
     document.documentElement.style.setProperty("--vh", `${vh}px`);
 }
 
+/**
+ *  Adjust the output panel position based on the screen dimensions
+ *  and resize the Ace editors
+ */
 function resizeWindow() {
     let fontSizeO = localStorage.getItem("fontSizeO");
     fontSizeO = fontSizeO !== "" ? fontSizeO : defaultFontSize;
@@ -211,13 +226,13 @@ function resizeWindow() {
             let currentValError = $("#output-error").text();
             $(".ui-layout-south").empty();
             layout.addPane("east");
-            createTextArea($(".ui-layout-east"));
+            createOutputArea($(".ui-layout-east"));
             $("#font-output-range").val(fontSizeO);
             $("#output").css("font-size", fontSizeO + "px");
             $("#output-model").text(currentValModel);
             $("#output-error").text(currentValError);
             saveOption("outputPos", "east");
-            setSizePanes();
+            setOuputPaneSize();
         }
     } else {
         if (outputPos == "east") {
@@ -226,7 +241,7 @@ function resizeWindow() {
             let currentValError = $("#output-error").text();
             $(".ui-layout-east").empty();
             layout.addPane("south");
-            createTextArea($(".ui-layout-south"));
+            createOutputArea($(".ui-layout-south"));
             $("#font-output-range").val(fontSizeO);
             $("#output").css("font-size", fontSizeO + "px");
             $("#output-model").text(currentValModel);
@@ -234,12 +249,15 @@ function resizeWindow() {
             $("#split").children().attr("class", "fa fa-chevron-up");
             $("#split").attr("id", "split-up");
             saveOption("outputPos", "south");
-            setSizePanes();
+            setOuputPaneSize();
         }
     }
     resizeAllEditors();
 }
 
+/**
+ * Resize editors dimensions of all Ace editor istances
+ */
 function resizeAllEditors() {
     let length = $(".nav-tabs").children().length;
     for (let index = 1; index <= length - 1; index++) {
@@ -248,7 +266,10 @@ function resizeAllEditors() {
     }
 }
 
-function setSizePanes() {
+/**
+ * Set output pane size based on screen dimensions
+ */
+function setOuputPaneSize() {
     let outputPos = localStorage.getItem("outputPos");
     outputPos = outputPos !== null ? outputPos : "east";
 
@@ -273,7 +294,10 @@ function setSizePanes() {
     }
 }
 
-function saveOptions() {
+/**
+ * Save run settings data on the localStorage
+ */
+function saveRunSettings() {
     $("#run-dot").attr("name", "runAuto");
     let form = $("#input").serializeFormJSON();
     form.tab = [];
@@ -287,35 +311,16 @@ function saveOptions() {
     }
 
     let stringify = JSON.stringify(form);
-    if (!saveOption("solverOptions", stringify)) {
+    if (!saveOption("runSettings", stringify)) {
         alert("Sorry, this options will not save in your browser");
     }
     $("#run-dot").removeAttr("name");
 }
 
-function initializeLoide() {
-    checkScreenType();
-
-    setNotifications();
-
-    setClipboard();
-
-    inizializePopovers();
-
-    inizializeTabContextmenu();
-
-    inizializeToolbar();
-
-    inizializeButtonLoideMode();
-
-    setWindowResizeTrigger();
-
-    initializeCheckTabToRun();
-
-    $(".navbar-logo").on("click", function (e) {
-        location.reload();
-    });
-
+/**
+ * Initialize the layout pane of the editor and output sections
+ */
+function initializeLayout() {
     layout = $("#layout").layout({
         onresize_end: function () {
             let length = $(".nav-tabs").children().length;
@@ -330,20 +335,15 @@ function initializeLoide() {
         resizable: true,
         slidable: true,
     });
+}
 
-    $("[data-target='#tab1']").trigger("click"); // active the first tab
-
-    inizializeShortcuts();
-
-    restoreOptions();
-
-    inizializeDropzone();
-
+/**
+ * Initialize the tooltips on the Open, Save and Share navbar buttons
+ */
+function initializeNavbarTooltips() {
     $("[rel='tooltip']").tooltip();
 
-    /**
-     * Hidden tooltip when button is clicked
-     */
+    // Hidden tooltip when button is clicked
     $('[data-toggle="tooltip"]').on("click", function () {
         $(this).tooltip("hide");
     });
@@ -351,31 +351,19 @@ function initializeLoide() {
     $('[rel="tooltip"]').on("click", function () {
         $(this).tooltip("hide");
     });
+}
 
-    $('[data-target="#modal-about"]').on("click", function () {
-        $.ajax({
-            type: "POST",
-            url: "/version",
-            dataType: "JSON",
-            success: function (response) {
-                $("#version").empty();
-                $("#version").append(response.version);
-            },
-        });
+/**
+ * Initialize the navbar buttons
+ */
+function initializeNavbar() {
+    // refresh the page if the logo on navbar is clicked
+    $(".navbar-logo").on("click", function (e) {
+        location.reload();
     });
 
-    $("#btn-upload").on("click", function () {
+    $("#btn-save").on("click", function () {
         $(window).trigger("resize");
-    });
-
-    /**
-     * @global
-     * @description id of the clicked button 'submit'
-     */
-    let clkBtn = "";
-
-    $('button[type="submit"]').click(function (evt) {
-        clkBtn = evt.target.id;
     });
 
     $("#btn-run-nav").click(function (e) {
@@ -386,6 +374,82 @@ function initializeLoide() {
         callSocketServer();
     });
 
+    $("#btn-run-settings").click(function () {
+        toggleRunSettings();
+    });
+
+    initializeNavbarTooltips();
+}
+
+function initializeRunSettings() {
+    $("#reset-run-settings").click(function () {
+        resetRunSettings();
+    });
+
+    $("#inputLanguage").on("change", function () {
+        initializeAutoComplete();
+        setAceMode();
+    });
+
+    $("#btn-add-option").on("click", function () {
+        addOptionDOM();
+        remunerateSelectOptionsAndBadge();
+        setElementsColorMode();
+    });
+
+    $(document).on("click", ".btn-del-option", function () {
+        delOptionDOM($(this));
+        setElementsColorMode();
+    });
+
+    $(document).on("click", ".btn-del-value", function () {
+        deleteInputValue($(this));
+        setElementsColorMode();
+    });
+
+    $(document).on("click", ".btn-add", function () {
+        addInputValue($(this).parent());
+        setElementsColorMode();
+    });
+}
+
+/**
+ * Initialize the LoIDE application
+ */
+function initializeLoide() {
+    checkScreenType();
+
+    initializeToastNotifications();
+
+    setClipboard();
+
+    initializePopovers();
+
+    initializeTabContextmenu();
+
+    initializeToolbar();
+
+    setWindowResizeTrigger();
+
+    initializeCheckTabToRun();
+
+    initializeLayout();
+
+    // select and active the first tab
+    $("#editor-tabs li:first-child a").tab("show");
+
+    initializeShortcuts();
+
+    restoreOptions();
+
+    initializeDropzone();
+
+    initializeNavbar();
+
+    $('button[type="submit"]').click(function (evt) {
+        clkBtn = evt.target.id;
+    });
+
     $("#input").submit(function (e) {
         e.preventDefault();
         if (clkBtn === "run") {
@@ -393,31 +457,14 @@ function initializeLoide() {
             $("#output-error").empty();
             $("#output-model").text("Sending..");
             callSocketServer(false);
-        } else if (clkBtn === "save-options") {
-            saveOptions();
+        } else if (clkBtn === "save-run-settings") {
+            saveRunSettings();
         }
     });
 
-    $("#btn-option").click(function () {
-        toggleRunOptions();
-    });
+    initializeRunSettings();
 
-    $("#reset-editor").click(function () {
-        resetEditorOptions();
-    });
-
-    $("#reset-options").click(function () {
-        resetSolverOptions();
-    });
-
-    addCommand(idEditor);
-
-    inizializeSnippets();
-
-    $("#inputLanguage").on("change", function () {
-        inizializeAutoComplete();
-        setAceMode();
-    });
+    initializeSnippets();
 
     setLoideStyleMode();
 
@@ -425,26 +472,31 @@ function initializeLoide() {
 
     setAceMode();
 
-    closeRunOptionOnMobile();
+    closeRunSettingsOnMobile();
 
     // Set the default options
-    resetSolverOptions();
+    resetRunSettings();
 
     loadFromURL(); // load program from url
 
-    inizializeAppareaceSettings();
+    initializeAppearanceSettings();
 
-    setSizePanes();
+    setOuputPaneSize();
 
+    // Move down the output pane on mobile screens
     if (display.small.isActive) {
         $("#split").trigger("click");
     }
 
+    // Hide the splashscreen and remove it from the DOM
     setTimeout(() => {
-        $(".splashscreen").addClass("display-none");
+        $(".splashscreen").fadeOut(function () {
+            $(this).remove();
+        });
     }, 500);
 }
 
+// Initialize the connection to the LoIDE WebSocket Server API and the application
 $(document).ready(function () {
     API.createSocket((problem) => {
         operation_alert(problem);
@@ -453,6 +505,8 @@ $(document).ready(function () {
     });
 
     API.setGetLanguagesListener((data) => {
+        // This function sets the languages data into the DOM and load the languages on the Run Settings
+
         let servicesContainer = $("#servicesContainer");
         servicesContainer.empty();
         for (let lang of data) {
@@ -498,6 +552,7 @@ $(document).ready(function () {
 
     API.setRunProjectListener(
         (response) => {
+            // This function puts the output data on the output panel
             if (response.error == "") {
                 $("#output-model").text(response.model); // append the response in the container
                 let outputPos = localStorage.getItem("outputPos");
@@ -514,6 +569,8 @@ $(document).ready(function () {
             }
         },
         (response) => {
+            // This function shows the execution problem on the output panel and in a toast notification
+
             operation_alert(response);
             $("#output-error").text(response.reason); // append the response in the container
             $("#output-model").text(""); // append the response in the container
@@ -524,14 +581,17 @@ $(document).ready(function () {
 
     setNewVhSize();
 
+    // Resize the window when the user rotates the screen
     window.addEventListener("orientationchange", function () {
-        setNewVhSize();
-        $(window).trigger("resize");
+        $(window).trigger("resize"); // it has to set the new Vh screen size!
     });
 
     initializeLoide();
 });
 
+/**
+ * Check the screen size and set if the screen is small or medium or large
+ */
 function checkScreenType() {
     if ($(window).width() < display.medium.size) {
         display.small.isActive = true;
@@ -548,7 +608,24 @@ function checkScreenType() {
     }
 }
 
-function inizializeAppareaceSettings() {
+/**
+ * Initialize buttons and inputs of the Appearance Settings modal
+ */
+function initializeAppearanceSettings() {
+    $("#dark-light-mode").click(function () {
+        localStorage.setItem(
+            "mode",
+            (localStorage.getItem("mode") || "dark") === "dark"
+                ? "light"
+                : "dark"
+        );
+        localStorage.getItem("mode") === "dark"
+            ? document.querySelector("body").classList.add("dark")
+            : document.querySelector("body").classList.remove("dark");
+        setElementsColorMode();
+        $("#theme").change();
+    });
+
     $("#font-editor-range").change(function (e) {
         let value = e.target.value;
         setFontSizeEditors(value);
@@ -571,6 +648,10 @@ function inizializeAppareaceSettings() {
         if (!saveOption("theme", theme)) {
             alert("Sorry, this options will not save in your browser");
         }
+    });
+
+    $("#reset-appearance-settings").click(function () {
+        resetAppearanceSettings();
     });
 
     if (supportLocalStorage()) {
@@ -601,16 +682,19 @@ function inizializeAppareaceSettings() {
     }
 }
 
+/**
+ * Initialize the "Current Tab" and the tab items on the "choose tab to execute" list.
+ */
 function initializeCheckTabToRun() {
     $(".check-run-tab:not(.check-auto-run-tab)").off();
     $(".check-auto-run-tab").off();
 
-    checkEmptyTabSelected();
+    checkCurrentTabSelected();
 
     $(".check-run-tab:not(.check-auto-run-tab)").on("click", function (e) {
         $(this).find(".check-icon").toggleClass("invisible");
         $(this).toggleClass("checked");
-        checkEmptyTabSelected();
+        checkCurrentTabSelected();
     });
 
     $(".check-auto-run-tab").on("click", function (e) {
@@ -620,11 +704,14 @@ function initializeCheckTabToRun() {
         });
         $(this).find(".check-icon").removeClass("invisible");
         $(this).addClass("checked");
-        checkEmptyTabSelected();
+        checkCurrentTabSelected();
     });
 }
 
-function checkEmptyTabSelected() {
+/**
+ * Select the "Current Tab" item if there are no tabs selected.
+ */
+function checkCurrentTabSelected() {
     let tot = $(".check-run-tab.checked:not(.check-auto-run-tab)").length;
     if (tot === 0) {
         $(".check-auto-run-tab").find(".check-icon").removeClass("invisible");
@@ -636,7 +723,7 @@ function checkEmptyTabSelected() {
 }
 
 /**
- * @description Serialize form and send it to socket server and waits for the response
+ * Serialize the input form and send it to socket server and waits for the response
  */
 function callSocketServer(onlyActiveTab) {
     $(".tab-pane").each(function (index, element) {
@@ -657,17 +744,19 @@ function callSocketServer(onlyActiveTab) {
 }
 
 /**
- * @description Trigger a 'run' button to execute the program
+ * Trigger a 'run' button to execute the project
  */
 function intervalRun() {
     $("#run").trigger("click");
 }
 
 /**
- * @param {string} text - json configuration to be saved
- * @description Create a new Blob that contains the data from your form feild, then create a link object to attach the file to download
+ * Create a new Blob that contains the data from your form feild, then create a link object to attach the file to download
+ * @param {string} text - configuration project in JSON string format to be saved
+ * @param where - where the file will be saved
+ * @param name - name of the file
+ * @param type - type of the file
  */
-
 function createFileToDownload(text, where, name, type) {
     let textFileAsBlob = new Blob([text], {
         type: "application/" + type,
@@ -706,14 +795,17 @@ function createFileToDownload(text, where, name, type) {
     }
 }
 /**
+ * Remove the link from the DOM
  * @param {Object} event - reference to the object that dispatched the event
- * @description Remove the link from the DOM
  */
 function destroyClickedElement(event) {
     document.body.removeChild(event.target);
 }
 
-function inizializeDropzone() {
+/**
+ * Initialize the Open file dropzone.
+ */
+function initializeDropzone() {
     $("#upload-container").on("shown.bs.collapse", function () {
         $(window).trigger("resize");
     });
@@ -723,14 +815,25 @@ function inizializeDropzone() {
     });
 
     let dropZone = document.getElementById("drop_zone");
-    dropZone.addEventListener("dragover", handleDragOver, false);
+    dropZone.addEventListener(
+        "dragover",
+        function (evt) {
+            evt.stopPropagation();
+            evt.preventDefault();
+            evt.dataTransfer.dropEffect = "copy"; // Explicitly show this is a copy.
+        },
+        false
+    );
     dropZone.addEventListener("drop", handleFileSelect, false);
     document
         .getElementById("files")
         .addEventListener("change", handleFileSelect, false);
 }
 
-function inizializeTabContextmenu() {
+/**
+ * Initialize the context menu of every editor tab.
+ */
+function initializeTabContextmenu() {
     $.contextMenu({
         selector: ".btn-context-tab",
         zIndex: 10,
@@ -782,7 +885,7 @@ function inizializeTabContextmenu() {
                 },
                 callback: function (itemKey, opt, e) {
                     let textToDuplicate = editors[idEditor].getValue();
-                    let tabID = addTab(null, textToDuplicate);
+                    let tabID = addEditorTab(textToDuplicate);
                     $("[data-target='#" + tabID + "']").trigger("click"); //active last tab inserted
                 },
             },
@@ -842,6 +945,7 @@ function inizializeTabContextmenu() {
         },
     });
 
+    $(".btn-context-tab").off();
     $(".btn-context-tab").on("click", function (e) {
         $(this).trigger("contextmenu");
     });
@@ -854,6 +958,8 @@ function inizializeTabContextmenu() {
         placement: "bottom",
     });
 
+    // Close all popovers on clicks
+    $("html").off("mouseup");
     $("html").on("mouseup", function (e) {
         let l = $(e.target);
         if (l[0].className.indexOf("popover") == -1) {
@@ -863,6 +969,8 @@ function inizializeTabContextmenu() {
         }
     });
 
+    // close all popopvers on right click
+    $("html").off("contextmenu");
     $("html").on("contextmenu", function (e) {
         let l = $(e.target);
         if (l[0].className.indexOf("popover") == -1) {
@@ -872,6 +980,8 @@ function inizializeTabContextmenu() {
         }
     });
 
+    // initialize change tab name popopver
+    $(".btn-tab").off("inserted.bs.popover");
     $(".btn-tab").on("inserted.bs.popover", function () {
         $(".popover-body")
             .last()
@@ -883,6 +993,8 @@ function inizializeTabContextmenu() {
                     "      </span>\n" +
                     "    </div>"
             );
+
+        // set the color of buttons if the darkmode is on
         if (localStorage.getItem("mode") === "dark") {
             $("#change-name-tab").removeClass("btn-light");
             $("#change-name-tab").addClass("btn-dark");
@@ -890,12 +1002,18 @@ function inizializeTabContextmenu() {
             $("#change-name-tab").removeClass("btn-dark");
             $("#change-name-tab").addClass("btn-light");
         }
+
+        // focus the input text box
         $("#change-name-tab-textbox").focus();
         let thisTab = $(this);
         let idTabEditor = $(this).attr("data-target");
         let idEditorToChangeTabName = $(idTabEditor).children().attr("id");
+
+        // disable the enter button
         $("#change-name-tab").prop("disabled", true);
 
+        $("#change-name-tab-textbox").off("input");
+        // add event for disable the enter button if there are no letters in the input text box
         $("#change-name-tab-textbox").on("input", function () {
             let nameValue = $("#change-name-tab-textbox").val().trim();
             if (nameValue.length === 0) {
@@ -905,6 +1023,8 @@ function inizializeTabContextmenu() {
             }
         });
 
+        $("#change-name-tab").off("click");
+        // add event to change the tab name when the enter button is clicked
         $("#change-name-tab").on("click", function () {
             let nameValue = $("#change-name-tab-textbox").val().trim();
             if (nameValue.length !== 0) {
@@ -916,40 +1036,25 @@ function inizializeTabContextmenu() {
             }
         });
 
+        $("#change-name-tab-textbox").off("keyup");
+        // change the name tab when the user digit the enter key from the keyboard
         $("#change-name-tab-textbox").on("keyup", function (e) {
             if (e.key == "Enter") {
                 $("#change-name-tab").trigger("click");
             }
         });
     });
-
+    $(".name-tab").off("contextmenu");
+    // show the contest menu on right click on the tab name
     $(".name-tab").on("contextmenu", function (e) {
         $(e.target).siblings(".btn-context-tab").trigger("click");
         return false; // don't show the contest menu of the browser
     });
 }
 
-$(document).on("click", "#btn-add-option", function () {
-    addOptionDOM();
-    renameSelectOptionsAndBadge();
-    setElementsColorMode();
-});
-
-$(document).on("click", ".btn-del-option", function () {
-    delOptionDOM($(this));
-    setElementsColorMode();
-});
-
-$(document).on("click", ".btn-del-value", function () {
-    deleteInputValue($(this));
-    setElementsColorMode();
-});
-
-$(document).on("click", ".btn-add", function () {
-    addInputValue($(this).parent());
-    setElementsColorMode();
-});
-
+/**
+ * Highlight the words on the output pane of the model output.
+ */
 $(document).on("mouseup", "#output-model", function () {
     $("#output-model").unmark();
     let start, end;
@@ -982,53 +1087,69 @@ $(document).on("mouseup", "#output-model", function () {
     }
 });
 
+/**
+ * Set the new editor ID related to the tab that will be shown
+ */
 $(document).on("shown.bs.tab", 'a[data-toggle="tab"]', function (e) {
     let currentTab = e.target;
-    if ($(this).hasClass("add-tab")) {
-        return;
+    if ($(this).hasClass("btn-tab")) {
+        let idTab = $(currentTab).attr("data-target");
+        idEditor = $(idTab).find(".ace").attr("id");
+        editors[idEditor].focus();
     }
-    let idTab = $(currentTab).attr("data-target");
-    idEditor = $(idTab).find(".ace").attr("id");
-    editors[idEditor].focus();
 });
 
+/**
+ * Set the event on click that downloads the output on a text file
+ */
 $(document).on("click", "#dwn-output", function () {
     downloadOutput();
 });
 
+/**
+ * Set the event on click that clears the output
+ */
 $(document).on("click", "#clear-output", function () {
     $("#output-model").empty();
     $("#output-error").empty();
 });
 
+/**
+ * Set the event on click that move the output pane to under of the editor
+ */
 $(document).on("click", "#split", function () {
     addSouthLayout(layout);
-    setSizePanes();
-});
-
-$(document).on("click", "#split-up", function () {
-    addEastLayout(layout);
-    setSizePanes();
-});
-
-// Sets the solvers and options on language change
-$(document).on("change", "#inputLanguage", function (event) {
-    inizializeAutoComplete();
-
-    loadLanguageSolvers();
-});
-
-// Sets the options on solver change
-$(document).on("change", "#inputengine", function (event) {
-    loadSolverOptions();
-    loadSolverExecutors();
-
-    // Snippets
-    inizializeSnippets();
+    setOuputPaneSize();
 });
 
 /**
- * @description - Load the languages
+ * Set the event on click that move the output pane to right of the editor
+ */
+$(document).on("click", "#split-up", function () {
+    addEastLayout(layout);
+    setOuputPaneSize();
+});
+
+/**
+ * Set the solvers and options on language change
+ */
+$(document).on("change", "#inputLanguage", function (event) {
+    initializeAutoComplete();
+    loadLanguageSolvers();
+});
+
+/**
+ * Set the options on solver change
+ */
+$(document).on("change", "#inputengine", function (event) {
+    loadSolverOptions();
+    loadSolverExecutors();
+    // Snippets
+    initializeSnippets();
+});
+
+/**
+ * Load the languages
  */
 function loadLanguages() {
     let inputLanguage = $("#inputLanguage");
@@ -1039,14 +1160,14 @@ function loadLanguages() {
 }
 
 /**
- * @description - Get avalable the languages
+ * Get the available languages from the HTML hidden configuration elements
  */
 function getLanguages() {
     return $("#servicesContainer > option").clone();
 }
 
 /**
- * @description - Load the solvers for a specific language
+ * Load the solvers for a specific language
  */
 function loadLanguageSolvers() {
     let language = $("#inputLanguage").val();
@@ -1067,8 +1188,8 @@ function loadLanguageSolvers() {
 }
 
 /**
- * @description - Get the solvers for a specific language
- * @param {Object} language
+ * Get the solvers for a specific language from the HTML hidden configuration elements
+ * @param {string} language - language value
  */
 function getLanguageSolvers(language) {
     return $(
@@ -1077,7 +1198,7 @@ function getLanguageSolvers(language) {
 }
 
 /**
- * @description - Load the executors for a specific solver
+ * Load the executors for a specific solver
  */
 function loadSolverExecutors() {
     let inputLanguage = $("#inputLanguage");
@@ -1100,9 +1221,9 @@ function loadSolverExecutors() {
 }
 
 /**
- * @description - Get the executors for a specific solver
- * @param {Object} language
- * @param {Object} solver
+ * Get the executors for a specific solver from the HTML hidden configuration elements
+ * @param {string} language - language value
+ * @param {string} solver - solver value
  */
 function getSolverExecutors(language, solver) {
     return $(
@@ -1115,7 +1236,7 @@ function getSolverExecutors(language, solver) {
 }
 
 /**
- * @description - Load the options for a specific solver
+ * Load the options for a specific solver
  */
 function loadSolverOptions() {
     let inputLanguage = $("#inputLanguage");
@@ -1139,9 +1260,9 @@ function loadSolverOptions() {
 }
 
 /**
- * @description - Get the options for a specific solver
- * @param {Object} language
- * @param {Object} solver
+ * Get the options for a specific solver from the HTML hidden configuration elements
+ * @param {string} language
+ * @param {string} solver
  */
 function getSolverOptions(language, solver) {
     return $(
@@ -1153,7 +1274,9 @@ function getSolverOptions(language, solver) {
     ).clone();
 }
 
-// Add or remove the 'input type value' based on the option
+/**
+ * Add or remove the 'input type value' based on the option
+ */
 $(document).on("change", ".form-control-option", function () {
     let val = $(this).val();
 
@@ -1179,9 +1302,11 @@ $(document).on("change", ".form-control-option", function () {
     }
 });
 
+/**
+ * Add new editor tab
+ */
 $(document).on("click", ".add-tab", function () {
-    // add new tab
-    let tabID = addTab($(this), "");
+    let tabID = addEditorTab("");
     $("[data-target='#" + tabID + "']").trigger("click"); //active last tab inserted
 
     let actualTheme =
@@ -1199,13 +1324,15 @@ $(document).on("click", ".add-tab", function () {
     }
 });
 
+/**
+ * Delete the editor tab
+ */
 $(document).on("click", ".delete-tab", function (e) {
-    // delete tab
     deleteTab($(this), false);
 });
 
 /**
- * @description Add east and remove south layout
+ * Add east and remove south layout
  */
 function addEastLayout(layout) {
     layout.removePane("south");
@@ -1214,7 +1341,7 @@ function addEastLayout(layout) {
     let currentValError = $("#output-error").text();
     $("#split-up").parent().empty();
     layout.addPane("east");
-    createTextArea($(".ui-layout-east"));
+    createOutputArea($(".ui-layout-east"));
     let fontSizeO = $("#font-output-range").val();
     fontSizeO = fontSizeO !== "" ? fontSizeO : defaultFontSize;
     $("#font-output-range").val(fontSizeO);
@@ -1224,7 +1351,7 @@ function addEastLayout(layout) {
 }
 
 /**
- * @description Add south and remove east layout
+ * Add south and remove east layout
  */
 function addSouthLayout(layout) {
     layout.removePane("east");
@@ -1233,7 +1360,7 @@ function addSouthLayout(layout) {
     let currentValError = $("#output-error").text();
     $("#split").parent().empty();
     layout.addPane("south");
-    createTextArea($(".ui-layout-south"));
+    createOutputArea($(".ui-layout-south"));
     let fontSizeO = $("#font-output-range").val();
     fontSizeO = fontSizeO !== "" ? fontSizeO : defaultFontSize;
     $("#font-output-range").val(fontSizeO);
@@ -1245,8 +1372,9 @@ function addSouthLayout(layout) {
 }
 
 /**
- * @param {*} element - container  where to search
- * @description Returns the start and the end position of the selected string in the output container
+ * Returns the start and the end position of the selected string in the output container
+ * @param {HTMLElement} element - Container where to search
+ * @returns {Object}
  */
 function getSelectionCharOffsetsWithin(element) {
     let start = 0,
@@ -1277,19 +1405,19 @@ function getSelectionCharOffsetsWithin(element) {
 }
 
 /**
- * @param optionClassBtn - class of the clicked button to find the closest row
- * @description Delete from the DOM an option block and iterates all of the form options to change their 'name' for a correct json format (if present, included input value)
+ * Delete from the DOM an option block and iterates all of the form options to change their 'name' for a correct json format (if present, included input value)
+ * @param {jQuery} deleteButton - jQuery object of the clicked button
  */
-function delOptionDOM(optionClassBtn) {
-    let row = $(optionClassBtn).closest(".row-option");
+function delOptionDOM(deleteButton) {
+    let row = $(deleteButton).closest(".row-option");
     row.fadeOut(300, function () {
         $(this).remove();
-        renameSelectOptionsAndBadge();
+        remunerateSelectOptionsAndBadge();
     });
 }
 
 /**
- * @description Create a new DOM element for the solver's options
+ * Create a new DOM element for the solver's options
  */
 function addOptionDOM() {
     let solverOptions = $("#solver-options");
@@ -1302,24 +1430,24 @@ function addOptionDOM() {
 }
 
 /**
- * @param inputClass - class of the clicked button to find the closest row
- * @description Delete input value to the DOM and if the lenght of the class is equal to one, append the button to add input value
+ * Delete input value to the DOM and if the lenght of the class is equal to one, append the button to add input value
+ * @param {jQuery} deleteButton - jQuery object of the clicked button
  */
-function deleteInputValue(inputClass) {
-    let inputValue = $(inputClass).closest(".row-option");
+function deleteInputValue(deleteButton) {
+    let inputValue = $(deleteButton).closest(".row-option");
     if (inputValue.find(".option-value").length > 1) {
-        inputClass.parent().remove();
+        deleteButton.parent().remove();
     } else {
-        inputClass.siblings(".option-value").val("");
+        deleteButton.siblings(".option-value").val("");
     }
 }
 
 /**
- * @param inputClass - class of the clicked button to find the closest row
- * @description Add the input type to a correct class parent
+ * Add an input textbox for the option solver
+ * @param {jQuery} buttonAddValue - jQuery object of the clicked button
  */
-function addInputValue(inputClass) {
-    let currentName = $(inputClass)
+function addInputValue(buttonAddValue) {
+    let currentName = $(buttonAddValue)
         .closest(".row-option")
         .find(".form-control-option")
         .attr("name");
@@ -1329,7 +1457,7 @@ function addInputValue(inputClass) {
      */
     let replaceName = currentName.replace("name", "value");
     replaceName += "[]";
-    inputClass
+    buttonAddValue
         .closest(".row-option")
         .find(".option-values")
         .append(
@@ -1337,13 +1465,19 @@ function addInputValue(inputClass) {
                 replaceName +
                 '><span class="btn-del-value"><i class="fa fa-trash"></i></span></div>'
         );
-    $(inputClass)
+    $(buttonAddValue)
         .siblings(".option-values")
         .after(
             '<button type="button" class="btn btn-light btn-add btn-block"> <i class="fa fa-plus"></i> Add value</button>'
         );
 }
 
+/**
+ * Check if the parameters of the config object correspond to a LoIDE project
+ * @param {Object} config - project configuration object
+ * @returns {boolean}
+ *
+ */
 function isLoideProject(config) {
     if (
         {}.hasOwnProperty.call(config, "language") ||
@@ -1360,9 +1494,9 @@ function isLoideProject(config) {
 }
 
 /**
- * @param {Object} text - configuration in json format
+ * Check if the configration file has the correct property to set. If not, return false and display the content of the file in the text editor
+ * @param {Object} config - project configuration object
  * @returns {boolean}
- * @description check if the configration file has the correct property to set. If not, return false and display the content of the file in the text editor
  */
 function setJSONInput(config) {
     if (isLoideProject(config)) {
@@ -1375,7 +1509,7 @@ function setJSONInput(config) {
         });
         let tabID;
         $(config.program).each(function (index, element) {
-            tabID = addTab($(".add-tab"), config.program[index]);
+            tabID = addEditorTab(config.program[index]);
         });
         if ({}.hasOwnProperty.call(config, "tab")) {
             $(config.tab).each(function (index, element) {
@@ -1411,9 +1545,8 @@ function setJSONInput(config) {
 }
 
 /**
- * @param {number} index - Item number Created
- * @param {string} valueOption - option's value
- * @description creates a option's form and append it to the DOM with the corresponding value
+ * Creates a option's form and append it to the DOM with the corresponding value
+ * @param {Object} option - option object
  */
 function addOption(option) {
     $("#btn-add-option").trigger("click");
@@ -1432,11 +1565,11 @@ function addOption(option) {
 }
 
 /**
+ * Check if a string is a JSON
  * @param {string} str - string to check
  * @returns {boolean}
- * @description check if a string is JSON
  */
-function isJosn(str) {
+function isJSON(str) {
     try {
         JSON.parse(str);
     } catch (e) {
@@ -1444,11 +1577,12 @@ function isJosn(str) {
     }
     return true;
 }
+
 /**
- * @param {string} layout - specific layout
- * @description append textarea to a specific layout
+ * Create the output area in the specific pane layout
+ * @param {string} layout - specific pane layout
  */
-function createTextArea(layout) {
+function createOutputArea(layout) {
     $("#setting-output").remove();
     $(".output-container").remove();
     $(layout).append(
@@ -1458,6 +1592,12 @@ function createTextArea(layout) {
     $("#dwn-output").tooltip();
 }
 
+/**
+ * Handle the event of a dropzone or an input file box.
+ * If the event contains only a single file and it is a project config, it will be loaded.
+ * Otherwise the file or file array will be loaded as text in each individual tab of the editor .
+ * @param {Object} evt - Event object
+ */
 function handleFileSelect(evt) {
     evt.stopPropagation();
     evt.preventDefault();
@@ -1472,56 +1612,69 @@ function handleFileSelect(evt) {
         let reader = new FileReader();
         reader.onload = function (event) {
             let text = event.target.result;
-            if (isJosn(text)) {
-                let jsontext = JSON.parse(text); // takes content of the file in the response
-                if (!setJSONInput(jsontext)) {
+            if (isJSON(text)) {
+                let project = JSON.parse(text); // takes content of the file in the response
+                if (!setJSONInput(project)) {
                     editors[idEditor].setValue(JSON.stringify(text)); // set value of the file in text editor
                 }
-                inizializeTabContextmenu();
+                initializeTabContextmenu();
             } else {
                 editors[idEditor].setValue(text);
             }
         };
         reader.readAsText(files[0]);
     } else {
-        getValidFileList(files, onDone);
+        scanFileList(files, createEditorTabs);
     }
 
-    /**
-     * remove and close container after success upload
-     */
+    // Remove and close container after success upload
     $(".collapse").collapse("hide");
     $("#files").val("");
 }
 
-function getValidFileList(files, callback) {
-    let count = files.length; // total number of files
+/**
+ * Scan all the file list and create a data object that contains the list of the files name and its contents and it will passed to the callback function.
+ * @param {Object[]} files - file object array from a dropzon or an input file box
+ * @param callback - callback function called when all files are scanned
+ */
+function scanFileList(files, callback) {
+    let count = files.length; // Total number of files
     let data = {
         names: [],
         texts: [],
-    }; // accepted files
+    }; // Accepted files
 
     // Get the selected files
     for (let i = 0; i < count; i++) {
-        // invoke readers
+        // Invoke readers
         checkFile(files[i]);
     }
 
+    /**
+     * Read the file object and push its file name and content in the data object
+     * @param {Object} file - file object
+     */
     function checkFile(file) {
         let reader = new FileReader();
         reader.onload = function (event) {
             let text = this.result;
             // Here I parse and check the data and if valid append it to texts
-            data.texts.push(text); // or the original `file` blob..
+            data.texts.push(text); // Or the original `file` blob..
             data.names.push(file.name);
 
-            if (!--count) callback(data); // when done, invoke callback
+            if (!--count) callback(data); // When done, invoke callback
         };
         reader.readAsText(file);
     }
 }
 
-function onDone(data) {
+/**
+ * Create new editor tabs for every file data
+ * @param data - Infomation about the files
+ * @param data.names - Array of file names
+ * @param data.texts - Array of file contents
+ */
+function createEditorTabs(data) {
     let tabOpened = $(".btn-tab").length;
     let tabID;
     let openOnFirst = false;
@@ -1532,13 +1685,13 @@ function onDone(data) {
                     editors[idEditor].setValue(data.texts[index]);
                     openOnFirst = true;
                 } else {
-                    tabID = addTab($(".add-tab"), data.texts[index]);
+                    tabID = addEditorTab(data.texts[index]);
                 }
             } else {
-                tabID = addTab($(".add-tab"), data.texts[index]);
+                tabID = addEditorTab(data.texts[index]);
             }
         } else {
-            tabID = addTab($(".add-tab"), data.texts[index]);
+            tabID = addEditorTab(data.texts[index]);
         }
     }
     if (tabOpened == 1) {
@@ -1566,27 +1719,20 @@ function onDone(data) {
             }
         }
     });
-    inizializeTabContextmenu();
+    initializeTabContextmenu();
     setAceMode();
 }
 
-function handleDragOver(evt) {
-    evt.stopPropagation();
-    evt.preventDefault();
-    evt.dataTransfer.dropEffect = "copy"; // Explicitly show this is a copy.
-}
-
 /**
- * @param {string} ideditor - current id editor
- * @param {string} text - value of the text editor
- * @description set up current editor
+ * Set up a new Ace editor
+ * @param {string} ideditor - ID of the new editor
+ * @param {string} text -  text content of the new editor
  */
 function setUpAce(ideditor, text) {
     editors[ideditor] = new ace.edit(ideditor);
     ace.config.set("packaged", true);
     ace.config.set("modePath", "js/ace/mode");
     editors[ideditor].jumpToMatching();
-
     let actualTheme =
         localStorage.getItem("theme") == null
             ? ""
@@ -1615,6 +1761,15 @@ function setUpAce(ideditor, text) {
     });
 
     editors[ideditor].commands.addCommand({
+        name: "run",
+        bindKey: { win: "Ctrl-enter", mac: "Command-enter" },
+        exec: function (editor) {
+            intervalRun();
+        },
+        readOnly: true,
+    });
+
+    editors[ideditor].commands.addCommand({
         name: "save",
         bindKey: { win: "ctrl-s", mac: "cmd-s" },
         exec: function (editor) {
@@ -1634,7 +1789,7 @@ function setUpAce(ideditor, text) {
         name: "open",
         bindKey: { win: "ctrl-o", mac: "cmd-o" },
         exec: function (editor) {
-            $("#btn-upload").trigger("click");
+            $("#btn-save").trigger("click");
         },
     });
 
@@ -1642,11 +1797,11 @@ function setUpAce(ideditor, text) {
         name: "run-options",
         bindKey: { win: "ctrl-shift-o", mac: "cmd-shift-o" },
         exec: function (editor) {
-            $("#btn-option").trigger("click");
+            $("#btn-run-settings").trigger("click");
         },
     });
 
-    inizializeSnippets();
+    initializeSnippets();
 
     /**
      * Execute the program when you insert a . and if the readio button is checked
@@ -1661,14 +1816,14 @@ function setUpAce(ideditor, text) {
             operation_alert({ reason: "Single quotes not yet supported" });
             editors[ideditor].replaceAll("", { needle: "'" });
         }
-        inizializeAutoComplete();
+        initializeAutoComplete();
     });
 }
 
 /**
- * @description inizialize shortcuts and set title to the tooltips base on the OS
+ * Initialize shortcuts and set title to the tooltips based on the OS
  */
-function inizializeShortcuts() {
+function initializeShortcuts() {
     Mousetrap.bind("mod+enter", function () {
         $("#run").trigger("click");
         return false;
@@ -1680,7 +1835,7 @@ function inizializeShortcuts() {
     });
 
     Mousetrap.bind("mod+o", function () {
-        $("#btn-upload").trigger("click");
+        $("#btn-save").trigger("click");
         return false;
     });
 
@@ -1690,7 +1845,7 @@ function inizializeShortcuts() {
     });
 
     Mousetrap.bind("mod+shift+o", function () {
-        $("#btn-option").trigger("click");
+        $("#btn-run-settings").trigger("click");
         return false;
     });
 
@@ -1702,20 +1857,20 @@ function inizializeShortcuts() {
 
     if (window.navigator.userAgent.indexOf("Mac") !== -1) {
         $('[for="run"]').attr("data-original-title", "{ ⌘ + Enter }");
-        $("#btn-upload").attr("data-original-title", "{ ⌘ + O }");
+        $("#btn-save").attr("data-original-title", "{ ⌘ + O }");
         $('[for="btn-download"]').attr("data-original-title", "{ ⌘ + S}");
         $("#btn-share").attr("data-original-title", "{ ⌘ + ⇧ + S}");
     } else {
         $('[for="run"]').attr("data-original-title", "{ CTRL + Enter }");
-        $("#btn-upload").attr("data-original-title", "{ CTRL + O }");
+        $("#btn-save").attr("data-original-title", "{ CTRL + O }");
         $('[for="btn-download"]').attr("data-original-title", "{ CTRL + S }");
         $("#btn-share").attr("data-original-title", "{ CTRL + ⇧ + S}");
     }
 }
 
 /**
+ * Add the programs into the hidden input type to be serialized
  * @returns {boolean}
- * @description add the programs into the input type hidden to serialize
  */
 function addMorePrograms() {
     let check = false;
@@ -1744,7 +1899,7 @@ function addMorePrograms() {
 }
 
 /**
- * @description adds the programs into the input type hidden to download
+ * Adds the programs into the hidden input type to be downloaded
  */
 function addProgramsToDownload() {
     $("#program").remove();
@@ -1763,7 +1918,7 @@ function addProgramsToDownload() {
     });
 }
 /**
- * @description destroy all the input type created and insert the default input type
+ * Destroy all th hidden input type created and insert the default input type
  */
 function destroyPrograms() {
     $(".programs").each(function (index) {
@@ -1775,8 +1930,8 @@ function destroyPrograms() {
 }
 
 /**
+ * Generate unique id for the new tab
  * @returns {string}
- *@description generate unique id for the tabs
  */
 function generateIDTab() {
     let id = $(".nav-tabs").children().length;
@@ -1790,8 +1945,8 @@ function generateIDTab() {
 }
 
 /**
- * @param {string} theme - value of the theme choosed
- * @description Sets the theme to all the editors
+ * Sets the theme to all the editors
+ * @param {string} theme - value of the theme chosen
  */
 function setTheme(theme) {
     let length = $(".nav-tabs").children().length;
@@ -1802,8 +1957,8 @@ function setTheme(theme) {
 }
 
 /**
+ * Sets the font's size to all the editors
  * @param {number} size - font's size
- * @description Sets the font's size to all the editors
  */
 function setFontSizeEditors(size) {
     let length = $(".nav-tabs").children().length;
@@ -1814,8 +1969,8 @@ function setFontSizeEditors(size) {
 }
 
 /**
+ * Sets the theme to all the editors
  * @param {number} theme - theme
- * @description Sets the theme to all the editors
  */
 function setThemeEditors(theme) {
     let length = $(".nav-tabs").children().length;
@@ -1826,8 +1981,8 @@ function setThemeEditors(theme) {
 }
 
 /**
+ * Checks if the browser supports the localStorage
  * @returns {boolean}
- * @description Checks if the browser supports the localStorage
  */
 function supportLocalStorage() {
     try {
@@ -1838,10 +1993,10 @@ function supportLocalStorage() {
 }
 
 /**
+ * Saves options in localStorage
  * @param {string} key
  * @param {string} value
  * @returns {boolean}
- * @description Saves options in localStorage
  */
 function saveOption(key, value) {
     if (!supportLocalStorage) {
@@ -1852,7 +2007,8 @@ function saveOption(key, value) {
 }
 
 /**
- * @description Sets the saved options in the localStorage
+ * Sets the saved options from the localStorage
+ * @returns {boolean}
  */
 function restoreOptions() {
     if (!supportLocalStorage) {
@@ -1875,15 +2031,16 @@ function restoreOptions() {
     } else {
         addSouthLayout(layout);
     }
+    return true;
 }
 
 /**
- * @param {JSON} - obj
- * @description deletes all the options and add them to the DOM
+ * Remove all the current options and add the new options from the project configuration
+ * @param {Object} config - project configuration object
  */
-function setOptions(obj) {
+function setOptions(config) {
     $("#solver-options").empty();
-    $(obj.option).each(function (index, item) {
+    $(config.option).each(function (index, item) {
         // create option's form
         if (item !== null) {
             addOption(item);
@@ -1892,12 +2049,12 @@ function setOptions(obj) {
 }
 
 /**
- * @returns {string}
- * @param {string} obj - where insert the tab
- * @param {string} text - set value of the editor
- * @description Adds tab to the DOM
+ * Create and Adds new editor tab
+ * @param {string} text - set value of the new editor tab
+ * @param {string} name - set name of the new editor tab
+ * @returns {string} new editor ID
  */
-function addTab(obj, text, name) {
+function addEditorTab(text, name) {
     let id = $(".nav-tabs").children().length;
     let tabId = generateIDTab();
     let editorId = "editor" + id;
@@ -1917,6 +2074,7 @@ function addTab(obj, text, name) {
             '" class="ace"></div></div>'
     );
     setUpAce(editorId, text);
+
     $("#tab-execute-new").append(
         '<button type="button" class="list-group-item list-group-item-action check-run-tab" value="' +
             editorId +
@@ -1924,9 +2082,8 @@ function addTab(obj, text, name) {
             tabName +
             "</span> </button>"
     );
-    addCommand(editorId);
 
-    inizializeTabContextmenu();
+    initializeTabContextmenu();
     initializeCheckTabToRun();
     setAceMode();
     setElementsColorMode();
@@ -1938,25 +2095,9 @@ function addTab(obj, text, name) {
 }
 
 /**
- *
- * @param {int} ideditor - editor id
- * @description Add New Commands and Keybindings
+ * Reset Appearance settings with default values
  */
-function addCommand(ideditor) {
-    editors[ideditor].commands.addCommand({
-        name: "myCommand",
-        bindKey: { win: "Ctrl-enter", mac: "Command-enter" },
-        exec: function (editor) {
-            intervalRun();
-        },
-        readOnly: true,
-    });
-}
-
-/**
- * @description Reset editor options with default values
- */
-function resetEditorOptions() {
+function resetAppearanceSettings() {
     $("#theme").val(defaultTheme);
     saveOption("theme", defaultTheme);
     setTheme(defaultTheme);
@@ -1966,14 +2107,18 @@ function resetEditorOptions() {
 }
 
 /**
- * @description Reset solver options with default values
+ * Reset run settings with default values
  */
-function resetSolverOptions() {
+function resetRunSettings() {
     loadLanguages();
     $("#run-dot").prop("checked", true);
     $("#solver-options").empty();
 }
 
+/**
+ * Close all the opened popovers
+ * @param {string} iam
+ */
 function closeAllPopovers(iam) {
     // close contestmenu popovers
     $(".btn-tab").popover("hide");
@@ -1981,12 +2126,18 @@ function closeAllPopovers(iam) {
     if (iam != popoverType.SHARE) $(".popover-share").popover("hide");
 }
 
+/**
+ * Popover type
+ */
 const popoverType = {
     SAVE: "save",
     SHARE: "share",
 };
 
-function inizializePopovers() {
+/**
+ * Initialize the Save and Share popover
+ */
+function initializePopovers() {
     $(".popover-download")
         .popover({
             trigger: "manual",
@@ -1997,7 +2148,7 @@ function inizializePopovers() {
         .click(function (e) {
             closeAllPopovers(popoverType.SAVE);
             $(this).popover("toggle");
-            $(".popover-download").not(this).popover("hide");
+            // $(".popover-download").not(this).popover("hide");
 
             e.stopPropagation();
         });
@@ -2044,20 +2195,6 @@ function inizializePopovers() {
 
         $("#local-download").on("click", function () {
             downloadLoDIEProject();
-
-            // TO MOVE ON OUTPUT DOWNLOAD
-
-            /* if($('#only-output').is(":checked")){
-                $('#program').removeAttr('name', 'program[0]');
-                $('#output-form').attr('name', 'output');
-                let text = $("#output").text();
-                $('#output-form').val(text);
-                form = $('#input').serializeFormJSON();
-                stringify = JSON.stringify(form);
-                createFileToDownload(stringify, "local","LoIDE_Output", "json");
-                $('#program').attr('name', 'program[0]');
-                $('#output-form').removeAttr('name', 'output');
-             } */
         });
 
         /* $("#cloud-download").on('click', function () {
@@ -2135,7 +2272,10 @@ function inizializePopovers() {
     });
 }
 
-function inizializeToolbar() {
+/**
+ * Initialize the toolbar buttons
+ */
+function initializeToolbar() {
     $("#btn-undo").on("click", function () {
         let undoManager = editors[idEditor].session.getUndoManager();
         if (undoManager.hasUndo()) {
@@ -2175,14 +2315,14 @@ function inizializeToolbar() {
         editors[idEditor].focus();
     });
 
-    let clipboardSupport = undefined;
+    let clipboardSupport = false;
 
     try {
         clipboardSupport =
             typeof navigator.clipboard.readText == "undefined" ? false : true;
     } catch (error) {
         console.error("Clipboard is not supported in this browser");
-        clipboardSupport = undefined;
+        clipboardSupport = false;
     }
 
     if (clipboardSupport) {
@@ -2215,35 +2355,43 @@ function inizializeToolbar() {
     });
 }
 
+/**
+ * Create a confirmation alert and delete all the editor tabs if the user confirms
+ */
 function deleteAllTabs() {
-    let r = confirm(
+    let deleteAlertConfirm = confirm(
         "Are you sure you want to delete all tabs? This cannot be undone."
     );
-    if (r) {
+    if (deleteAlertConfirm) {
         $(".delete-tab").each(function () {
             deleteTab($(this), true);
         });
     }
 }
 
-function deleteTab(tab, all) {
+/**
+ * Create a confirmation alert and delete the editor tab if the user confirms
+ * @param {jQuery} deleteTabButton - delete tab button of the tab to delete
+ * @param {boolean} skipConfirm - indicate if need to show the confirmation alert
+ */
+function deleteTab(deleteTabButton, skipConfirm) {
     let deleteAlertConfirm;
-    if (!all) {
+    if (!skipConfirm) {
         deleteAlertConfirm = confirm(
             "Are you sure you want to delete this file? This cannot be undone."
         );
     }
     let ids = $(".nav-tabs").children().length - 1;
-    let t = tab.parent().attr("data-target");
+    let t = deleteTabButton.parent().attr("data-target");
     let currentids = $(t).find(".ace").attr("id").substr(6);
     let parse = parseInt(currentids);
-    if (deleteAlertConfirm || all) {
-        let prevEditor = tab.parent().parent().prev();
+    if (deleteAlertConfirm || skipConfirm) {
+        let prevEditor = deleteTabButton.parent().parent().prev();
         if (prevEditor.length === 0) {
-            prevEditor = tab.parent().parent().next();
+            prevEditor = deleteTabButton.parent().parent().next();
         }
-        let currentID = tab.closest("a").attr("data-target");
-        tab.parent().parent().remove();
+        let currentID = deleteTabButton.closest("a").attr("data-target");
+        deleteTabButton.parent().parent().remove();
         let ideditor = $(currentID).find(".ace").attr("id");
         $(currentID).remove();
         delete editors[ideditor];
@@ -2272,7 +2420,7 @@ function deleteTab(tab, all) {
             );
             $("[data-target='#tab1']").trigger("click");
 
-            inizializeTabContextmenu();
+            initializeTabContextmenu();
             initializeCheckTabToRun();
             setAceMode();
             setElementsColorMode();
@@ -2286,9 +2434,9 @@ function deleteTab(tab, all) {
                 .find("[role='tabpanel']")
                 .each(function (index) {
                     ideditor = "editor" + (index + 1);
-                    let currentEditor = tab.find(".ace").attr("id");
+                    let currentEditor = deleteTabButton.find(".ace").attr("id");
                     if (ideditor !== currentEditor) {
-                        tab.find(".ace").attr("id", ideditor);
+                        deleteTabButton.find(".ace").attr("id", ideditor);
                         editors[ideditor] = editors[currentEditor];
                         delete editors[currentEditor];
                         let currentCheck = $(
@@ -2316,8 +2464,8 @@ function deleteTab(tab, all) {
                         }
                     }
                     $(".btn-tab").each(function (index) {
-                        let thisTab = tab;
-                        let idTabEditor = tab.attr("data-target");
+                        let thisTab = deleteTabButton;
+                        let idTabEditor = deleteTabButton.attr("data-target");
                         let idEditorToChangeTabName = $(idTabEditor)
                             .children()
                             .attr("id");
@@ -2338,6 +2486,9 @@ function deleteTab(tab, all) {
     }
 }
 
+/**
+ * Download the current tab in a text file
+ */
 function downloadCurrentTabContent() {
     let text = editors[idEditor].getValue();
     let TabToDownload = $("#" + idEditor)
@@ -2348,6 +2499,9 @@ function downloadCurrentTabContent() {
     createFileToDownload(text, "local", "LogicProgram_" + string, "txt");
 }
 
+/**
+ * Run the logic program of the current tab
+ */
 function runCurrentTab() {
     $("#output-model").empty();
     $("#output-error").empty();
@@ -2355,7 +2509,10 @@ function runCurrentTab() {
     callSocketServer(true);
 }
 
-function inizializeSnippets() {
+/**
+ * Load the snippets in the ACE editor
+ */
+function initializeSnippets() {
     let languageChosen = $("#inputLanguage").val();
     let solverChosen = $("#inputengine").val();
 
@@ -2638,10 +2795,13 @@ function inizializeSnippets() {
     }
 }
 
-function inizializeAutoComplete() {
+/**
+ * Find the compatible words in the content editor and put them in the snippets of the ACE editor
+ */
+function initializeAutoComplete() {
     let languageChosen = $("#inputLanguage").val();
     let langTools = ace.require("ace/ext/language_tools");
-    inizializeSnippets();
+    initializeSnippets();
     switch (languageChosen) {
         case "asp": {
             let splitRegex = /(([a-zA-Z_]+[0-9]*)*)(\(.+?\))/gi;
@@ -2654,10 +2814,10 @@ function inizializeAutoComplete() {
                     map.set(name, arities);
                 });
                 let completions = [];
-                map.forEach(function (key, value) {
+                map.forEach(function (value, key) {
                     completions.push({
-                        caption: value,
-                        snippet: value + giveBrackets(key),
+                        caption: key,
+                        snippet: key + giveBrackets(value),
                         meta: "atom",
                     });
                 });
@@ -2683,6 +2843,12 @@ function inizializeAutoComplete() {
     }
 }
 
+/**
+ * Return the arities of the atom in TextMate format
+ * @param value - arities of the atom
+ * @returns {string}
+ * @example atom(1,2) -> value is 2, then the function return (${1:A},${2:B})
+ */
 function giveBrackets(value) {
     let par = "(";
     let LETTER = "A";
@@ -2701,6 +2867,11 @@ function giveBrackets(value) {
     return par;
 }
 
+/**
+ * Create the URL that contains params about the loide project and
+ * call the "is.gd" API to get the short version of the URL.
+ * Then put the URL into the share popover.
+ */
 function createURL() {
     let URL = window.location.host + "/?programs=";
     let length = $(".nav-tabs").children().length;
@@ -2737,9 +2908,9 @@ function createURL() {
         // put the solver
         URL += "&solver=" + $("#inputengine").val();
 
-        saveOptions();
+        saveRunSettings();
 
-        let opt = localStorage.getItem("solverOptions");
+        let opt = localStorage.getItem("runSettings");
         if (opt !== null) {
             let obj = JSON.parse(opt);
             if (obj.option != null) {
@@ -2784,6 +2955,11 @@ function createURL() {
     }
 }
 
+/**
+ * Get the param value of a param in a URL
+ * @param {string} name - name of the param to get the value
+ * @param {string} url - URL where to find the param
+ */
 function getParameterByName(name, url) {
     if (!url) url = window.location.href;
     name = name.replace(/[\[\]]/g, "\\$&");
@@ -2794,6 +2970,9 @@ function getParameterByName(name, url) {
     return results[2];
 }
 
+/**
+ * Check if there is a project on the current URL and load it
+ */
 function loadFromURL() {
     let thisURL = window.location.href;
 
@@ -2857,16 +3036,32 @@ function loadFromURL() {
     }
 }
 
-function setTooltip(btn, message) {
-    $(btn).tooltip("hide").attr("data-original-title", message).tooltip("show");
+/**
+ * Set a tooltip in a HTML element
+ * @param {HTMLElement} element - HTML element where set a tooltip
+ * @param {string} message - Tooltip message
+ */
+function setTooltip(element, message) {
+    $(element)
+        .tooltip("hide")
+        .attr("data-original-title", message)
+        .tooltip("show");
 }
 
-function hideTooltip(btn) {
+/**
+ * Hide the tooltip in a HTML element
+ * @param {HTMLElement} element - Button where set a tooltip
+ * @param {string} message - Tooltip message
+ */
+function hideTooltip(element) {
     setTimeout(function () {
-        $(btn).tooltip("hide");
+        $(element).tooltip("hide");
     }, 1000);
 }
 
+/**
+ * Set ClipboardJS plugin in the input text of share popover
+ */
 function setClipboard() {
     $("#btn-copy-link").tooltip({
         trigger: "click",
@@ -2886,7 +3081,10 @@ function setClipboard() {
     });
 }
 
-function setNotifications() {
+/**
+ * Initialize the toast notifications
+ */
+function initializeToastNotifications() {
     $("#notification").toast({
         delay: 4000,
     });
@@ -2899,6 +3097,9 @@ function setNotifications() {
     });
 }
 
+/**
+ * Add window resize trigger events when the user open or close the open file section
+ */
 function setWindowResizeTrigger() {
     $("#loide-collapse").on("hidden.bs.collapse", function () {
         $(window).trigger("resize");
@@ -2908,22 +3109,10 @@ function setWindowResizeTrigger() {
     });
 }
 
-function inizializeButtonLoideMode() {
-    $("#dark-light-mode").click(function () {
-        localStorage.setItem(
-            "mode",
-            (localStorage.getItem("mode") || "dark") === "dark"
-                ? "light"
-                : "dark"
-        );
-        localStorage.getItem("mode") === "dark"
-            ? document.querySelector("body").classList.add("dark")
-            : document.querySelector("body").classList.remove("dark");
-        setElementsColorMode();
-        $("#theme").change();
-    });
-}
-
+/**
+ * Set or remove the 'dark' class in body related on the mode value
+ * @param {string} mode - mode value
+ */
 function setLoideStyleMode(mode) {
     switch (mode) {
         case "light":
@@ -2947,6 +3136,9 @@ function setLoideStyleMode(mode) {
     setElementsColorMode();
 }
 
+/**
+ * Change the HTML element color style based on the LoIDE mode
+ */
 function setElementsColorMode() {
     switch (localStorage.getItem("mode")) {
         case "light":
@@ -2963,6 +3155,9 @@ function setElementsColorMode() {
     }
 }
 
+/**
+ * Change the HTML element color style in the light mode
+ */
 function setLightStyleToUIElements() {
     let length = $(".nav-tabs").children().length;
 
@@ -2984,6 +3179,9 @@ function setLightStyleToUIElements() {
     }
 }
 
+/**
+ * Change the HTML element color style in the dark mode
+ */
 function setDarkStyleToUIElements() {
     let length = $(".nav-tabs").children().length;
     $("#dark-light-mode").text("Light");
@@ -3005,15 +3203,22 @@ function setDarkStyleToUIElements() {
     }
 }
 
+/**
+ * Create the project object and save it in the localStorage
+ */
 function saveProjectToLocalStorage() {
     let project = createLoideProjectConfig();
     saveOption("loideProject", JSON.stringify(project));
 }
 
+/**
+ * Check if there is a project object saved in the localStorage,
+ * if there is LoIDE will show a toast notification if the user want to restore it
+ */
 function checkProjectOnLocalStorage() {
     if (supportLocalStorage()) {
         let projectjson = localStorage.getItem("loideProject");
-        if (projectjson != undefined && isJosn(projectjson)) {
+        if (projectjson != undefined && isJSON(projectjson)) {
             let project = JSON.parse(projectjson);
             if ({}.hasOwnProperty.call(project, "program")) {
                 if (
@@ -3027,19 +3232,25 @@ function checkProjectOnLocalStorage() {
     }
 }
 
+/**
+ * Take the project object from the localStorage and restore it
+ */
 function loadProjectFromLocalStorage() {
     if (supportLocalStorage()) {
         let projectjson = localStorage.getItem("loideProject");
-        if (isJosn(projectjson)) {
+        if (isJSON(projectjson)) {
             let project = JSON.parse(projectjson);
             if (!setJSONInput(project)) {
                 operation_alert({ reason: "Error load the project" });
             }
-            inizializeTabContextmenu();
+            initializeTabContextmenu();
         }
     }
 }
 
+/**
+ * Create HTML hidden elements for each tab with the value of the tab name
+ */
 function addTabsNameToDownload() {
     $(".name-tab").each(function (index) {
         $(".layout").prepend(
@@ -3054,12 +3265,19 @@ function addTabsNameToDownload() {
     });
 }
 
+/**
+ * Destroy the HTML hidden elements that contains the value of the tab name
+ */
 function destroyTabsName() {
     $(".tabsname").each(function (index) {
         $(this).remove();
     });
 }
 
+/**
+ * Set the tab names from the project configuration
+ * @param {Object} config - project configuration
+ */
 function setTabsName(config) {
     let tabsName = config.tabname;
     $(".name-tab").each(function (index) {
@@ -3072,6 +3290,10 @@ function setTabsName(config) {
     });
 }
 
+/**
+ * Create the project configuration
+ * @returns {Object} - project configuration
+ */
 function createLoideProjectConfig() {
     addProgramsToDownload();
     addTabsNameToDownload();
@@ -3102,13 +3324,19 @@ function createLoideProjectConfig() {
     return form;
 }
 
+/**
+ * Create and download in a text file of the project configuration converted in JSON format
+ */
 function downloadLoDIEProject() {
     let project = createLoideProjectConfig();
     let stringify = JSON.stringify(project);
     createFileToDownload(stringify, "local", "LoIDE_Project", "json");
 }
 
-function renameSelectOptionsAndBadge() {
+/**
+ * Remunerate all the solver option titles
+ */
+function remunerateSelectOptionsAndBadge() {
     $(".form-control-option").each(function (index) {
         $(this).attr("name", "option[" + index + "][name]");
         $(this)
@@ -3125,13 +3353,19 @@ function renameSelectOptionsAndBadge() {
     });
 }
 
-function closeRunOptionOnMobile() {
+/**
+ * Close the run settings pane on mobile
+ */
+function closeRunSettingsOnMobile() {
     if ($(window).width() <= display.small.size) {
-        toggleRunOptions();
+        toggleRunSettings();
     }
 }
 
-function toggleRunOptions() {
+/**
+ * Toggle the run settings pane
+ */
+function toggleRunSettings() {
     $(".left-panel").toggleClass("left-panel-show"); // add class 'left-panel-show' to increase the width of the left panel
     $(".left-panel").toggleClass("mr-1");
 
@@ -3143,6 +3377,11 @@ function toggleRunOptions() {
     );
 }
 
+/**
+ * Get the HTML element string format from a jQuery element
+ * @param {jQuery} jQueryElement
+ * @returns {strings} - HTML element string format
+ */
 function getHTMLFromJQueryElement(jQueryElement) {
     let DOMElement = "";
     for (let i = 0; i < jQueryElement.length; i++)
@@ -3151,6 +3390,9 @@ function getHTMLFromJQueryElement(jQueryElement) {
     return DOMElement;
 }
 
+/**
+ * Set the mode of the ACE editor from the input language select
+ */
 function setAceMode() {
     switch ($("#inputLanguage").val()) {
         case "asp": {
@@ -3172,6 +3414,9 @@ function setAceMode() {
     }
 }
 
+/**
+ * Download the output content in a text file
+ */
 function downloadOutput() {
     let outputText =
         $("#output-model").text() + "\n" + $("#output-error").text();
