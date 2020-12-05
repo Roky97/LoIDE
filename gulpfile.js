@@ -149,4 +149,5 @@ const build = parallel(css, faviconImage, faviconFiles, img, js, html);
 
 exports.default = series(cleanDir, build, serveProd);
 exports.dev = series(cleanDir, serveDev, startBrowserSync);
+exports.build = series(cleanDir, build);
 exports.clean = series(cleanDir);
