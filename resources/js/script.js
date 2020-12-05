@@ -184,7 +184,6 @@ $('[data-toggle="tooltip"]').tooltip();
  *  Save the project on localstorage before unloading the page
  */
 window.onbeforeunload = function () {
-    $("#save-run-settings").trigger("click");
     saveProjectToLocalStorage();
 };
 
@@ -295,9 +294,10 @@ function setOuputPaneSize() {
 }
 
 /**
- * Save run settings data on the localStorage
+ * Returns an object containing the current values of run settings
+ * @returns {Object}
  */
-function saveRunSettings() {
+function getRunSettingsData() {
     $("#run-dot").attr("name", "runAuto");
     let form = $("#input").serializeFormJSON();
     form.tab = [];
@@ -310,11 +310,9 @@ function saveRunSettings() {
         delete form.tab;
     }
 
-    let stringify = JSON.stringify(form);
-    if (!saveOption("runSettings", stringify)) {
-        alert("Sorry, this options will not save in your browser");
-    }
     $("#run-dot").removeAttr("name");
+
+    return form;
 }
 
 /**
@@ -457,8 +455,6 @@ function initializeLoide() {
             $("#output-error").empty();
             $("#output-model").text("Sending..");
             callSocketServer(false);
-        } else if (clkBtn === "save-run-settings") {
-            saveRunSettings();
         }
     });
 
@@ -2908,16 +2904,14 @@ function createURL() {
         // put the solver
         URL += "&solver=" + $("#inputengine").val();
 
-        saveRunSettings();
+        let runSettingsData = getRunSettingsData();
 
-        let opt = localStorage.getItem("runSettings");
-        if (opt !== null) {
-            let obj = JSON.parse(opt);
-            if (obj.option != null) {
+        if (runSettingsData !== null) {
+            if (runSettingsData.option != null) {
                 // put the options
                 URL +=
                     "&options=" +
-                    encodeURIComponent(JSON.stringify(obj.option));
+                    encodeURIComponent(JSON.stringify(runSettingsData.option));
             }
         }
 
