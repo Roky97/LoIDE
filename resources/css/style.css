@@ -389,8 +389,10 @@ mark {
     padding: 5px 5px 20px 5px;
 }
 
-#btn-save {
-    color: white;
+#btn-save,
+#btn-share,
+a[for="btn-download"] {
+    color: white !important;
 }
 
 .btn-outline {

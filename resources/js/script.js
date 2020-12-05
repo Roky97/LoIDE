@@ -944,6 +944,8 @@ function initializeTabContextmenu() {
     $(".btn-context-tab").off();
     $(".btn-context-tab").on("click", function (e) {
         $(this).trigger("contextmenu");
+        e.stopPropagation();
+        e.preventDefault();
     });
 
     $(".btn-tab").popover({
@@ -952,28 +954,6 @@ function initializeTabContextmenu() {
         trigger: "manual",
         html: true,
         placement: "bottom",
-    });
-
-    // Close all popovers on clicks
-    $("html").off("mouseup");
-    $("html").on("mouseup", function (e) {
-        let l = $(e.target);
-        if (l[0].className.indexOf("popover") == -1) {
-            $(".popover").each(function () {
-                $(this).popover("hide");
-            });
-        }
-    });
-
-    // close all popopvers on right click
-    $("html").off("contextmenu");
-    $("html").on("contextmenu", function (e) {
-        let l = $(e.target);
-        if (l[0].className.indexOf("popover") == -1) {
-            $(".popover").each(function () {
-                $(this).popover("hide");
-            });
-        }
     });
 
     // initialize change tab name popopver
@@ -2124,6 +2104,7 @@ function closeAllPopovers(iam) {
 }
 
 /**
+ * @global
  * Popover type
  */
 const popoverType = {
@@ -2135,33 +2116,28 @@ const popoverType = {
  * Initialize the Save and Share popover
  */
 function initializePopovers() {
+    // Prevent to not close the popover when the user clicks inside of the popover
+    $("body").on("mousedown", ".popover", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+    });
+
+    $("body").on("mousedown", function (e) {
+        closeAllPopovers();
+    });
+
     $(".popover-download")
         .popover({
-            trigger: "manual",
             html: true,
             placement: "bottom",
-            // content: ' ',
+            trigger: "manual",
         })
-        .click(function (e) {
+        .on("mousedown", function (e) {
             closeAllPopovers(popoverType.SAVE);
             $(this).popover("toggle");
-            // $(".popover-download").not(this).popover("hide");
-
             e.stopPropagation();
+            e.preventDefault();
         });
-
-    $("body").on("click", function (e) {
-        $(".popover-download").each(function () {
-            if (
-                e.target.id !== "btn-download" &&
-                !$(this).is(e.target) &&
-                $(this).has(e.target).length === 0 &&
-                $(".popover").has(e.target).length === 0
-            ) {
-                $(this).popover("hide");
-            }
-        });
-    });
 
     $(".popover-download").on("inserted.bs.popover", function () {
         // set what happens when user clicks on the button
@@ -2202,35 +2178,23 @@ function initializePopovers() {
     $(".popover-download").on("hidden.bs.popover", function () {
         // clear listeners
         $("#local-download").off("click");
-        $("#cloud-download").off("click");
+        // $("#cloud-download").off("click");
         $(".navbar-toggler").off("click");
     });
 
     $(".popover-share")
         .popover({
             container: "body",
-            trigger: "manual",
             html: true,
             placement: "bottom",
+            trigger: "manual",
         })
-        .click(function (e) {
+        .on("mousedown", function (e) {
             closeAllPopovers(popoverType.SHARE);
             $(this).popover("toggle");
-            $(".popover-share").not(this).popover("hide");
             e.stopPropagation();
+            e.preventDefault();
         });
-
-    $("body").on("click", function (e) {
-        $(".popover-share").each(function () {
-            if (
-                !$(this).is(e.target) &&
-                $(this).has(e.target).length === 0 &&
-                $(".popover").has(e.target).length === 0
-            ) {
-                $(this).popover("hide");
-            }
-        });
-    });
 
     $(".popover-share").on("inserted.bs.popover", function () {
         $(".popover-header").last().html("");
