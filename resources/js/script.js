@@ -2108,6 +2108,7 @@ function resetAppearanceSettings() {
 function resetRunSettings() {
     loadLanguages();
     $("#run-dot").prop("checked", true);
+    $(".check-auto-run-tab").trigger("click");
     $("#solver-options").empty();
 }
 
