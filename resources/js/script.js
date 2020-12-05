@@ -2492,7 +2492,9 @@ function initializeSnippets() {
             switch (solverChosen) {
                 case "dlv":
                     completer = {
-                        identifierRegexps: [/[a-zA-Z_0-9\#\$\-\u00A2-\uFFFF]/],
+                        identifierRegexps: [
+                            /[a-zA-Z_0-9\#\:\$\-\u00A2-\uFFFF]/,
+                        ],
                         getCompletions: function (
                             editor,
                             session,
@@ -2693,7 +2695,9 @@ function initializeSnippets() {
 
                 case "dlv2":
                     completer = {
-                        identifierRegexps: [/[a-zA-Z_0-9\#\$\-\u00A2-\uFFFF]/],
+                        identifierRegexps: [
+                            /[a-zA-Z_0-9\#\:\$\-\u00A2-\uFFFF]/,
+                        ],
                         getCompletions: function (
                             editor,
                             session,
