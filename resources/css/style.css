@@ -44,6 +44,17 @@
         margin-right: 0px;
         margin-left: 0px;
     }
+
+    .badge-option {
+        font-size: 1.4rem;
+    }
+
+    .ui-layout-east > .output-container > #setting-output {
+        flex-direction: column;
+    }
+    #setting-output {
+        font-size: 1rem;
+    }
 }
 
 @media (min-width: 577px) {
@@ -222,6 +233,14 @@
     margin-top: 10px;
     padding: 5px 5px 5px 5px;
     white-space: pre-wrap;
+}
+
+#setting-output {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.5rem;
+    flex-shrink: 0;
 }
 
 #output-model {
@@ -591,10 +610,6 @@ li.nav-item:hover > a:not(.active) {
 
 #btn-add-option {
     margin-top: 10px;
-}
-
-.btn-del-option {
-    margin-top: 5px;
 }
 
 .btn-add {
