@@ -22,13 +22,18 @@
         width: 0%;
         float: left;
         transition: 0.5s;
+        margin-left: 0.5%;
     }
 
     .left-panel-show {
-        width: 100%;
+        width: 99%;
         padding: 0 3% 3% 3%;
         background: rgba(255, 245, 238, 1);
         margin-bottom: 0.75rem;
+    }
+
+    .split-container {
+        margin-left: 0.5%;
     }
 
     body.dark .left-panel-show {
@@ -51,6 +56,7 @@
         width: 0%;
         float: left;
         transition: 0.5s;
+        margin-left: 0.5%;
     }
     .left-panel-show {
         width: 18%;
@@ -484,7 +490,6 @@ label[for="btn-download"] {
 .left-panel {
     left: -500px;
     overflow: hidden;
-    margin-left: 0.5%;
     margin-bottom: 0.5%;
     height: 100%;
 
