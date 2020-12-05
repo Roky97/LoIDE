@@ -455,8 +455,6 @@ function initializeLoide() {
 
     resetRunSettings();
 
-    loadFromURL();
-
     initializeAppearanceSettings();
 
     setOuputPaneSize();
@@ -491,6 +489,8 @@ function initializeLoide() {
 
     // Hide the splashscreen and remove it from the DOM
     setTimeout(() => {
+        loadFromURL();
+
         $(".splashscreen").fadeOut(function () {
             $(this).remove();
         });
@@ -2837,51 +2837,23 @@ function giveBrackets(value) {
  * Then put the URL into the share popover.
  */
 function createURL() {
-    let URL = window.location.host + "/?programs=";
-    let length = $(".nav-tabs").children().length;
+    let URL = window.location.host + "/?project=";
+    let project = createLoideProjectConfig();
     let empty = true;
 
-    for (let index = 1; index <= length - 1; index++) {
-        let idE = "editor" + index;
-
-        URL += encodeURIComponent(editors[idE].getValue().trim());
-        if (index < length - 1) {
-            URL += ",";
+    for (let i = 0; i < project.program.length; i++) {
+        if (project.program[i].trim().length > 0) {
+            empty = false;
+            break;
         }
-
-        if (editors[idE].getValue().length > 0) empty = false;
     }
 
+    // If the are only empties editor tabs shows only the window.location.href
     if (empty) {
         $("#link-to-share").val(window.location.href);
     } else {
-        // put the name of the tabs
-        URL += "&tabnames=";
-        let idx = 1;
-        $(".name-tab").each(function () {
-            URL += encodeURIComponent($(this).text());
-            if (idx < length - 1) {
-                URL += ",";
-            }
-            idx++;
-        });
-
-        // put the language
-        URL += "&lang=" + $("#inputLanguage").val();
-
-        // put the solver
-        URL += "&solver=" + $("#inputengine").val();
-
-        let runSettingsData = getRunSettingsData();
-
-        if (runSettingsData !== null) {
-            if (runSettingsData.option != null) {
-                // put the options
-                URL +=
-                    "&options=" +
-                    encodeURIComponent(JSON.stringify(runSettingsData.option));
-            }
-        }
+        let param = encodeURIComponent(JSON.stringify(project));
+        URL += param;
 
         try {
             $.ajax({
@@ -2892,7 +2864,6 @@ function createURL() {
                 dataType: "json",
                 crossDomain: true,
                 success: function (data) {
-                    // console.log(data);
                     if (data.shorturl == undefined) {
                         $("#link-to-share").val("Ops. Something went wrong");
                         if (URL.length >= 5000) {
@@ -2938,62 +2909,21 @@ function getParameterByName(name, url) {
 function loadFromURL() {
     let thisURL = window.location.href;
 
-    if (getParameterByName("programs", thisURL) != null) {
-        // get params from url
-        let logicPr = getParameterByName("programs", thisURL).split(",");
-        // console.log('LogicPrograms:', logicPr);
-
-        let tabNames = getParameterByName("tabnames", thisURL).split(",");
-        // console.log('TabNames:', tabNames);
-
-        let language = getParameterByName("lang", thisURL);
-        // console.log('lang:', language);
-
-        let solver = getParameterByName("solver", thisURL);
-        // console.log('solver:', solver);
-
-        let options = getParameterByName("options", thisURL);
-        // console.log('options:', options);
-
-        // decode params
-        for (let i = 0; i < logicPr.length; i++) {
-            logicPr[i] = decodeURIComponent(logicPr[i]);
-        }
-        // console.log('LogicPrograms decoded:', logicPr);
-
-        for (let i = 0; i < tabNames.length; i++) {
-            tabNames[i] = decodeURIComponent(tabNames[i]);
-        }
-        // console.log('TabNames decoded:', tabNames);
-
-        options = JSON.parse(decodeURIComponent(options));
-        // console.log('Options decoded:', options);
-
-        // set params
-        for (let index = 1; index <= tabNames.length; index++) {
-            if (index > 1) $(".add-tab").trigger("click");
-            let idE = "editor" + index;
-            editors[idE].setValue(logicPr[index - 1]);
-        }
-
-        $(".name-tab").each(function (index) {
-            $(this).text(tabNames[index]);
-            let id = index + 1;
-            let editor = "editor" + id;
-            $('.check-run-tab[value="' + editor + '"]')
-                .find(".check-tab-name")
-                .text(tabNames[index]);
-        });
-
-        $("#inputLanguage").val(language).change();
-        $("#inputengine").val(solver).change();
-
-        if (options != null) {
-            $(options).each(function (index, item) {
-                if (item !== null) {
-                    addOption(item);
-                }
-            });
+    let projectParam = getParameterByName("project", thisURL);
+    if (projectParam != null) {
+        let projectjson = decodeURIComponent(projectParam);
+        if (projectjson != undefined && isJSON(projectjson)) {
+            let project = JSON.parse(projectjson);
+            if (!setJSONInput(project)) {
+                operation_alert({
+                    reason: "Error load the project from the URL",
+                });
+            } else {
+                initializeTabContextmenu();
+                operation_alert({
+                    reason: "Project loaded successfully from the URL",
+                });
+            }
         }
     }
 }
