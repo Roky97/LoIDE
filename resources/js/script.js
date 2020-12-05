@@ -433,30 +433,13 @@ function initializeLoide() {
 
     initializeLayout();
 
-    // select and active the first tab
-    $("#editor-tabs li:first-child a").tab("show");
-
     initializeShortcuts();
 
-    restoreOptions();
+    restoreOutputPaneLayout();
 
     initializeDropzone();
 
     initializeNavbar();
-
-    $('button[type="submit"]').click(function (evt) {
-        clkBtn = evt.target.id;
-    });
-
-    $("#input").submit(function (e) {
-        e.preventDefault();
-        if (clkBtn === "run") {
-            $("#output-model").empty();
-            $("#output-error").empty();
-            $("#output-model").text("Sending..");
-            callSocketServer(false);
-        }
-    });
 
     initializeRunSettings();
 
@@ -470,14 +453,36 @@ function initializeLoide() {
 
     closeRunSettingsOnMobile();
 
-    // Set the default options
     resetRunSettings();
 
-    loadFromURL(); // load program from url
+    loadFromURL();
 
     initializeAppearanceSettings();
 
     setOuputPaneSize();
+
+    // Select and active the first tab
+    $("#editor-tabs li:first-child a").tab("show");
+
+    // Save the button ID that clicked on submit buttons
+    $('button[type="submit"]').click(function (evt) {
+        clkBtn = evt.target.id;
+    });
+
+    $("#input").submit(function (e) {
+        e.preventDefault();
+        switch (clkBtn) {
+            case "run":
+                $("#output-model").empty();
+                $("#output-error").empty();
+                $("#output-model").text("Sending..");
+                callSocketServer(false);
+                break;
+
+            default:
+                break;
+        }
+    });
 
     // Move down the output pane on mobile screens
     if (display.small.isActive) {
@@ -651,6 +656,10 @@ function initializeAppearanceSettings() {
     });
 
     if (supportLocalStorage()) {
+        let theme = localStorage.getItem("theme");
+        theme = theme !== null ? theme : defaultTheme;
+        $("#theme").val(theme).change();
+
         let fontSizeE = localStorage.getItem("fontSizeE");
         fontSizeE = fontSizeE !== "" ? fontSizeE : defaultFontSize;
         $("#font-editor-range").val(fontSizeE).change();
@@ -1031,7 +1040,7 @@ function initializeTabContextmenu() {
 /**
  * Highlight the words on the output pane of the model output.
  */
-$(document).on("mouseup", "#output-model", function () {
+$(document).on("mousedown", "#output-model", function () {
     $("#output-model").unmark();
     let start, end;
     let text = $("#output-model").text();
@@ -1386,7 +1395,7 @@ function getSelectionCharOffsetsWithin(element) {
  */
 function delOptionDOM(deleteButton) {
     let row = $(deleteButton).closest(".row-option");
-    row.fadeOut(300, function () {
+    row.slideUp(300, function () {
         $(this).remove();
         remunerateSelectOptionsAndBadge();
     });
@@ -1400,6 +1409,10 @@ function addOptionDOM() {
 
     // Append the DOM element containing the solver's options
     solverOptions.append(getSolverOptionDOMElement());
+
+    // Do a slide animation
+    $(".row-option").last().css("display", "none");
+    $(".row-option").last().slideDown(200);
 
     // Select the first option
     $(".row-option .form-control-option").last().change();
@@ -1983,21 +1996,11 @@ function saveOption(key, value) {
 }
 
 /**
- * Sets the saved options from the localStorage
- * @returns {boolean}
+ * Restore the saved output pane layout data from the localStorage
  */
-function restoreOptions() {
+function restoreOutputPaneLayout() {
     if (!supportLocalStorage) {
         return false;
-    }
-    let theme = localStorage.getItem("theme");
-    theme = theme !== null ? theme : defaultTheme;
-    $("#theme").val(theme);
-    setTheme(theme);
-
-    let outputSize = localStorage.getItem("outputSize");
-    if (outputSize !== null) {
-        $("#output").parent().css("width", outputSize);
     }
 
     let layoutPos = localStorage.getItem("outputPos");
