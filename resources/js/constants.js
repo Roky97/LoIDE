@@ -4,7 +4,7 @@ const APIWSEvents = {
         getLanguages: "getLanguages",
     },
     on: {
-        connectError: "connect_error",
+        connectError: "error",
         problem: "problem",
         output: "output",
         languages: "languages",
