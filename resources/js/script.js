@@ -2505,6 +2505,25 @@ function initializeSnippets() {
     let completer;
 
     switch (languageChosen) {
+    	case "datalog":
+            switch(solverChosen) {
+                case "idlv":
+                    completer = {
+                        identifierRegexps: [/[a-zA-Z_0-9\#\$\-\u00A2-\uFFFF]/],
+                        getCompletions: function (editor, session, pos, prefix, callback) {
+                            var completions = [
+                                {
+                                    caption: ':-',
+                                    snippet: ":- ${1:literals}.",
+                                    meta: "body/constraint"
+                                }
+                            ];
+                            callback(null, completions);
+                        }
+                    }
+                    langTools.addCompleter(completer);
+                    break;   
+            }
         case "asp":
             switch (solverChosen) {
                 case "dlv":
@@ -2788,7 +2807,8 @@ function initializeAutoComplete() {
     let langTools = ace.require("ace/ext/language_tools");
     initializeSnippets();
     switch (languageChosen) {
-        case "asp": {
+        case "asp":
+        case "datalog": {
             let splitRegex = /(([a-zA-Z_]+[0-9]*)*)(\(.+?\))/gi;
             let words = editors[idEditor].getValue().match(splitRegex);
             if (words != null) {
@@ -3316,7 +3336,14 @@ function setAceMode() {
             }
             break;
         }
-
+        case 'datalog': {
+            let length = $(".nav-tabs").children().length;
+            for (let index = 1; index <= length - 1; index++) {
+                let idE = "editor" + index;
+                editors[idE].session.setMode("ace/mode/datalog");
+            }
+            break;
+        }
         default: {
             let length = $(".nav-tabs").children().length;
             for (let index = 1; index <= length - 1; index++) {
