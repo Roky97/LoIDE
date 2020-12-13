@@ -2914,6 +2914,7 @@ function createURL() {
                 crossDomain: true,
                 success: function (data) {
                     if (data.shorturl == undefined) {
+                        console.error(data);
                         $("#link-to-share").val("Ops. Something went wrong");
                         if (URL.length >= 5000) {
                             operation_alert({
@@ -2927,7 +2928,7 @@ function createURL() {
                     }
                 },
                 error: function (err) {
-                    console.log(err);
+                    console.error(err);
                     $("#link-to-share").val("Ops. Something went wrong");
                 },
             });
@@ -2941,15 +2942,17 @@ function createURL() {
  * Get the param value of a param in a URL
  * @param {string} name - name of the param to get the value
  * @param {string} url - URL where to find the param
+ * @returns {(string | null)}
  */
 function getParameterByName(name, url) {
-    if (!url) url = window.location.href;
-    name = name.replace(/[\[\]]/g, "\\$&");
-    let regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
-        results = regex.exec(url);
-    if (!results) return null;
-    if (!results[2]) return "";
-    return results[2];
+    let searchParam = new URLSearchParams(new URL(url).search);
+
+    if (searchParam.has(name)) {
+        let value = searchParam.get(name);
+        return value;
+    }
+
+    return null;
 }
 
 /**
@@ -2957,8 +2960,12 @@ function getParameterByName(name, url) {
  */
 function loadFromURL() {
     let thisURL = window.location.href;
-
-    let projectParam = getParameterByName("project", thisURL);
+    let projectParam = null;
+    try {
+        projectParam = getParameterByName("project", thisURL);
+    } catch (error) {
+        operation_alert({ reason: "Cannot load the project from the URL." });
+    }
     if (projectParam != null) {
         let projectjson = decodeURIComponent(projectParam);
         if (projectjson != undefined && isJSON(projectjson)) {
