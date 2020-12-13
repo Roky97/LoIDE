@@ -2505,24 +2505,32 @@ function initializeSnippets() {
     let completer;
 
     switch (languageChosen) {
-    	case "datalog":
-            switch(solverChosen) {
+        case "datalog":
+            switch (solverChosen) {
                 case "idlv":
                     completer = {
-                        identifierRegexps: [/[a-zA-Z_0-9\#\$\-\u00A2-\uFFFF]/],
-                        getCompletions: function (editor, session, pos, prefix, callback) {
+                        identifierRegexps: [
+                            /[a-zA-Z_0-9\#\:\$\-\u00A2-\uFFFF]/,
+                        ],
+                        getCompletions: function (
+                            editor,
+                            session,
+                            pos,
+                            prefix,
+                            callback
+                        ) {
                             var completions = [
                                 {
-                                    caption: ':-',
+                                    caption: ":-",
                                     snippet: ":- ${1:literals}.",
-                                    meta: "body/constraint"
-                                }
+                                    meta: "body/constraint",
+                                },
                             ];
                             callback(null, completions);
-                        }
-                    }
+                        },
+                    };
                     langTools.addCompleter(completer);
-                    break;   
+                    break;
             }
         case "asp":
             switch (solverChosen) {
@@ -3336,7 +3344,7 @@ function setAceMode() {
             }
             break;
         }
-        case 'datalog': {
+        case "datalog": {
             let length = $(".nav-tabs").children().length;
             for (let index = 1; index <= length - 1; index++) {
                 let idE = "editor" + index;
