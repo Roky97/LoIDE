@@ -32,8 +32,7 @@ const setGetLanguagesListener = (callbackLanguages) => {
     if (socket) {
         socket.off(APIWSEvents.on.languages);
         socket.on(APIWSEvents.on.languages, (response) => {
-            let data = Array.from(JSON.parse(response));
-
+            let data = JSON.parse(response);
             callbackLanguages(data);
         });
     }

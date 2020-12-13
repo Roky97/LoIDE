@@ -131,7 +131,6 @@ const defaultDarkTheme = "ace/theme/idle_fingers";
  * Set up ace editors into object
  */
 var editors = {};
-setUpAce(idEditor, "");
 
 /**
  * @global
@@ -415,6 +414,17 @@ function initializeRunSettings() {
  * Initialize the LoIDE application
  */
 function initializeLoide() {
+    // initialize the first ace editor in the first tab
+    setUpAce(idEditor, "");
+
+    // throw Error("hatta");
+    setNewVhSize();
+
+    // Resize the window when the user rotates the screen
+    window.addEventListener("orientationchange", function () {
+        $(window).trigger("resize"); // it has to set the new Vh screen size!
+    });
+
     checkScreenType();
 
     initializeToastNotifications();
@@ -499,6 +509,22 @@ function initializeLoide() {
 
 // Initialize the connection to the LoIDE WebSocket Server API and the application
 $(document).ready(function () {
+    try {
+        setupAPI();
+        initializeLoide();
+    } catch (error) {
+        $("#spinner-loading").remove();
+        $("#splashscreen-error-message").show();
+
+        // if (error.message.length > 0)
+        //     $("#log-problem").text("Error description: " + error.message);
+    }
+});
+
+/**
+ * Setup the APIs connections to the LoIDE API Server
+ */
+function setupAPI() {
     API.createSocket((problem) => {
         operation_alert(problem);
         $("#output-model").text("");
@@ -579,16 +605,7 @@ $(document).ready(function () {
     );
 
     API.emitGetLanguages();
-
-    setNewVhSize();
-
-    // Resize the window when the user rotates the screen
-    window.addEventListener("orientationchange", function () {
-        $(window).trigger("resize"); // it has to set the new Vh screen size!
-    });
-
-    initializeLoide();
-});
+}
 
 /**
  * Check the screen size and set if the screen is small or medium or large

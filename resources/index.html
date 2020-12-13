@@ -116,9 +116,26 @@
                     />
                     <span class="classic info">Classic</span>
                 </div>
-                <div class="d-flex justify-content-center">
-                    <div class="spinner-border" role="status">
-                        <span class="sr-only">Loading...</span>
+                <div class="splashscreen-content">
+                    <div
+                        id="spinner-loading"
+                        class="d-flex justify-content-center"
+                    >
+                        <div class="spinner-border" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                    </div>
+                    <div
+                        id="splashscreen-error-message"
+                        class="text-center"
+                        style="display: none"
+                    >
+                        <h5>There was a problem to load LoIDE!</h5>
+                        <h5>
+                            Try it later or open LoIDE in a different browser
+                        </h5>
+
+                        <h5 id="log-problem"></h5>
                     </div>
                 </div>
             </div>
@@ -391,7 +408,7 @@
 
                             <div class="option-container mt-2">
                                 <label class="col-sm-12 mb-1 text-center"
-                                    >Options</label
+                                    >Solver Options</label
                                 >
                                 <div id="solver-options"></div>
                                 <span class="input-group-btn">
@@ -1365,7 +1382,6 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.6.1/jquery.mark.min.js"></script>
 
         <!-- socket.io -->
-        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.slim.js"></script> -->
         <script
             src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.3/socket.io.min.js"
             integrity="sha512-uElffqRAo44n9cqo42itgRMY0L0zNZWEj3RGTQwyQsITiz4CB6rALOu1/S4O5iy/vFTMNs8gmTpDXB8mfQpjOg=="

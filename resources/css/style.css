@@ -203,6 +203,10 @@
     width: 150px;
 }
 
+#splashscreen-error-message {
+    color: red;
+}
+
 .ace {
     width: 100%;
     height: 100%;
