@@ -475,6 +475,11 @@ a[for="btn-download"] {
 
 #change-name-tab {
     border-radius: 0px 4px 4px 0px;
+    margin-left: -1px;
+}
+
+#change-name-tab,
+#btn-copy-link {
     border-color: #ced4da;
 }
 
@@ -962,4 +967,9 @@ body.dark .left-panel-title {
 
 body.dark #output-model {
     color: white;
+}
+
+body.dark #change-name-tab,
+body.dark #btn-copy-link {
+    border-color: #343a40;
 }

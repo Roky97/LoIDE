@@ -149,29 +149,47 @@ var display = {
 };
 
 /**
- * Returns the DOM element for the solver's option
+ * Returns the the solver's option jQuery element based on the current language and solver
+ * @returns {jQuery}
  */
 function getSolverOptionDOMElement() {
-    return (
-        "" +
-        '<div class="row row-option">' +
-        '<div class="col-sm-12 form-group">' +
-        '<div class="badge-option mb-1">' +
-        '<span class=" text-center badge badge-info option-number"></span>' +
-        '<span class=" text-center badge badge-danger btn-del-option ml-1"> <i class="fa fa-trash-o"></i></span>' +
-        "</div>" +
-        '<div class="input-group opname">' +
-        '<select name="option[0][name]" class="form-control form-control-option custom-select not-alone">' +
-        getHTMLFromJQueryElement(
-            getSolverOptions($("#inputLanguage").val(), $("#inputengine").val())
-        ) +
-        "</select>" +
-        "</div>" +
-        '<div class="option-values">' +
-        "</div>" +
-        "</div>" +
-        "</div>"
+    let $rowOption = $("<div>", { class: "row row-option" });
+
+    let $colForm = $("<div>", { class: "col-sm-12 form-group" });
+    $rowOption.append($colForm);
+
+    let $divBadge = $("<div>", { class: "badge-option mb-1" });
+    $divBadge.append(
+        $("<span>", {
+            class: "text-center badge badge-info option-number",
+        })
     );
+    $divBadge.append(
+        $("<span>", {
+            class: "text-center badge badge-danger btn-del-option ml-1",
+        }).append($("<i>", { class: "fa fa-trash-o" }))
+    );
+
+    $colForm.append($divBadge);
+
+    let optionList = getHTMLFromJQueryElement(
+        getSolverOptions($("#inputLanguage").val(), $("#inputengine").val())
+    );
+
+    let $divInputGroupOpname = $("<div>", {
+        class: "input-group opname",
+    }).append(
+        $("<select>", {
+            class: "form-control form-control-option custom-select not-alone",
+            name: "option[0][name]",
+        }).append($(optionList))
+    );
+
+    $colForm.append($divInputGroupOpname);
+
+    $colForm.append($("<div>", { class: "option-values" }));
+
+    return $rowOption;
 }
 
 /**
@@ -537,39 +555,44 @@ function setupAPI() {
         let servicesContainer = $("#servicesContainer");
         servicesContainer.empty();
         for (let lang of data) {
-            let langOption = $(
-                `<option value="${lang.value}">${lang.name}</option>`
+            let langOption = $("<option>", { value: lang.value }).text(
+                lang.name
             );
             servicesContainer.append(langOption);
-            let langDiv = $(`<div name="solvers" value="${lang.value}">`);
+            let langDiv = $("<div>", { name: "solvers", value: lang.value });
+
             servicesContainer.append(langDiv);
 
             for (let solver of lang.solvers) {
-                let solverOption = $(
-                    `<option value="${solver.value}">${solver.name}</option>`
+                let solverOption = $("<option>", { value: solver.value }).text(
+                    solver.name
                 );
-                let solverDiv = $(
-                    `<div name="executors" value="${solver.value}">`
-                );
+                let solverDiv = $("<div>", {
+                    name: "executors",
+                    value: solver.value,
+                });
                 langDiv.append(solverOption);
                 langDiv.append(solverDiv);
 
                 for (let executor of solver.executors) {
-                    let executorOption = $(
-                        `<option value="${executor.value}">${executor.name}</option>`
-                    );
+                    let executorOption = $("<option>", {
+                        value: executor.value,
+                    }).text(executor.name);
                     solverDiv.append(executorOption);
                 }
 
-                let optionDiv = $(
-                    `<div name="options" value="${solver.value}">`
-                );
+                let optionDiv = $("<div>", {
+                    name: "options",
+                    value: solver.value,
+                });
                 langDiv.append(optionDiv);
 
                 for (let option of solver.options) {
-                    let optionOption = $(
-                        `<option value="${option.value}" word_argument="${option.word_argument}" title="${option.description}">${option.name}</option>`
-                    );
+                    let optionOption = $("<option>", {
+                        value: option.value,
+                        word_argument: option.word_argument,
+                        title: option.description,
+                    }).text(option.name);
                     optionDiv.append(optionOption);
                 }
             }
@@ -864,10 +887,14 @@ function initializeTabContextmenu() {
                 name: "Run",
                 icon: function (opt, $itemElement, itemKey, item) {
                     // Set the content to the menu trigger selector and add an bootstrap icon to the item.
-                    $itemElement.html(
-                        '<i class="fa fa-play context-menu-item-icon" aria-hidden="true"></i>' +
-                            item.name
+                    $itemElement.empty();
+                    $itemElement.append(
+                        $("<i>", {
+                            class: "fa fa-play context-menu-item-icon",
+                            "aria-hidden": "true",
+                        })
                     );
+                    $itemElement.append(item.name);
 
                     // Add the context-menu-icon-updated class to the item
                     return "context-menu-icon-updated";
@@ -880,10 +907,14 @@ function initializeTabContextmenu() {
                 name: "Rename",
                 icon: function (opt, $itemElement, itemKey, item) {
                     // Set the content to the menu trigger selector and add an bootstrap icon to the item.
-                    $itemElement.html(
-                        '<i class="fa fa-pencil context-menu-item-icon" aria-hidden="true"></i>' +
-                            item.name
+                    $itemElement.empty();
+                    $itemElement.append(
+                        $("<i>", {
+                            class: "fa fa-pencil context-menu-item-icon",
+                            "aria-hidden": "true",
+                        })
                     );
+                    $itemElement.append(item.name);
 
                     // Add the context-menu-icon-updated class to the item
                     return "context-menu-icon-updated";
@@ -897,10 +928,14 @@ function initializeTabContextmenu() {
                 name: "Duplicate",
                 icon: function (opt, $itemElement, itemKey, item) {
                     // Set the content to the menu trigger selector and add an bootstrap icon to the item.
-                    $itemElement.html(
-                        '<i class="fa fa-clone context-menu-item-icon" aria-hidden="true"></i>' +
-                            item.name
+                    $itemElement.empty();
+                    $itemElement.append(
+                        $("<i>", {
+                            class: "fa fa-clone context-menu-item-icon",
+                            "aria-hidden": "true",
+                        })
                     );
+                    $itemElement.append(item.name);
 
                     // Add the context-menu-icon-updated class to the item
                     return "context-menu-icon-updated";
@@ -915,10 +950,14 @@ function initializeTabContextmenu() {
                 name: "Clear content",
                 icon: function (opt, $itemElement, itemKey, item) {
                     // Set the content to the menu trigger selector and add an bootstrap icon to the item.
-                    $itemElement.html(
-                        '<i class="fa fa-eraser context-menu-item-icon" aria-hidden="true"></i>' +
-                            item.name
+                    $itemElement.empty();
+                    $itemElement.append(
+                        $("<i>", {
+                            class: "fa fa-eraser context-menu-item-icon",
+                            "aria-hidden": "true",
+                        })
                     );
+                    $itemElement.append(item.name);
 
                     // Add the context-menu-icon-updated class to the item
                     return "context-menu-icon-updated";
@@ -931,10 +970,14 @@ function initializeTabContextmenu() {
                 name: "Save content",
                 icon: function (opt, $itemElement, itemKey, item) {
                     // Set the content to the menu trigger selector and add an bootstrap icon to the item.
-                    $itemElement.html(
-                        '<i class="fa fa-download context-menu-item-icon" aria-hidden="true"></i>' +
-                            item.name
+                    $itemElement.empty();
+                    $itemElement.append(
+                        $("<i>", {
+                            class: "fa fa-download context-menu-item-icon",
+                            "aria-hidden": "true",
+                        })
                     );
+                    $itemElement.append(item.name);
 
                     // Add the context-menu-icon-updated class to the item
                     return "context-menu-icon-updated";
@@ -947,10 +990,14 @@ function initializeTabContextmenu() {
                 name: "Delete",
                 icon: function (opt, $itemElement, itemKey, item) {
                     // Set the content to the menu trigger selector and add an bootstrap icon to the item.
-                    $itemElement.html(
-                        '<i class="fa fa-times context-menu-item-icon" aria-hidden="true"></i>' +
-                            item.name
+                    $itemElement.empty();
+                    $itemElement.append(
+                        $("<i>", {
+                            class: "fa fa-times context-menu-item-icon",
+                            "aria-hidden": "true",
+                        })
                     );
+                    $itemElement.append(item.name);
 
                     // Add the context-menu-icon-updated class to the item
                     return "context-menu-icon-updated";
@@ -985,16 +1032,25 @@ function initializeTabContextmenu() {
     // initialize change tab name popopver
     $(".btn-tab").off("inserted.bs.popover");
     $(".btn-tab").on("inserted.bs.popover", function () {
-        $(".popover-body")
-            .last()
-            .html(
-                '<div class="input-group">\n' +
-                    '      <input type="text" class="form-control" id="change-name-tab-textbox" placeholder="Type a name">\n' +
-                    '      <span class="input-group-btn">\n' +
-                    '        <button class="btn btn-light" type="button" id="change-name-tab"><i class="fa fa-chevron-right"></i></button>\n' +
-                    "      </span>\n" +
-                    "    </div>"
-            );
+        let $renameTab = $("<div>", { class: "input-group" });
+        $renameTab.append(
+            $("<input>", {
+                type: "text",
+                class: "form-control",
+                id: "change-name-tab-textbox",
+                placeholder: "Enter a name",
+            })
+        );
+        $renameTab.append(
+            $("<span>", { class: "input-group-btn" }).append(
+                $("<button>", {
+                    class: "btn btn-light",
+                    type: "button",
+                    id: "change-name-tab",
+                }).append($("<i>", { class: "fa fa-chevron-right" }))
+            )
+        );
+        $(".popover-body").last().html($renameTab);
 
         // set the color of buttons if the darkmode is on
         if (localStorage.getItem("mode") === "dark") {
@@ -1009,7 +1065,9 @@ function initializeTabContextmenu() {
         $("#change-name-tab-textbox").focus();
         let thisTab = $(this);
         let idTabEditor = $(this).attr("data-target");
-        let idEditorToChangeTabName = $(idTabEditor).children().attr("id");
+        let idEditorToChangeTabName = $($.find(idTabEditor))
+            .children()
+            .attr("id");
 
         // disable the enter button
         $("#change-name-tab").prop("disabled", true);
@@ -1057,7 +1115,7 @@ function initializeTabContextmenu() {
 /**
  * Highlight the words on the output pane of the model output.
  */
-$(document).on("mousedown", "#output-model", function () {
+$(document).on("mouseup", "#output-model", function () {
     $("#output-model").unmark();
     let start, end;
     let text = $("#output-model").text();
@@ -1096,7 +1154,7 @@ $(document).on("shown.bs.tab", 'a[data-toggle="tab"]', function (e) {
     let currentTab = e.target;
     if ($(this).hasClass("btn-tab")) {
         let idTab = $(currentTab).attr("data-target");
-        idEditor = $(idTab).find(".ace").attr("id");
+        idEditor = $($.find(idTab)).find(".ace").attr("id");
         editors[idEditor].focus();
     }
 });
@@ -1293,8 +1351,7 @@ $(document).on("change", ".form-control-option", function () {
                 .find(".option-values")
                 .find(".option-value").length <= 0
         ) {
-            addInputValue($(this).parent());
-            $(this).addClass("not-alone");
+            if (addInputValue($(this).parent())) $(this).addClass("not-alone");
         }
         setElementsColorMode();
     } else {
@@ -1451,31 +1508,52 @@ function deleteInputValue(deleteButton) {
 /**
  * Add an input textbox for the option solver
  * @param {jQuery} buttonAddValue - jQuery object of the clicked button
+ * @returns {boolean}
  */
 function addInputValue(buttonAddValue) {
     let currentName = $(buttonAddValue)
         .closest(".row-option")
         .find(".form-control-option")
         .attr("name");
+
+    if (!/option\[\d\]\[name\]/i.test(currentName)) {
+        return false;
+    }
     /**
      * replace 'name' in 'value' for correct json format
      * @example currentName=option[0][name] , replaceName=option[0][value][]
      */
     let replaceName = currentName.replace("name", "value");
     replaceName += "[]";
+
+    let $inputGroup = $("<div>", { class: "input-group" });
+    $inputGroup.append(
+        $("<input>", {
+            type: "text",
+            class: "form-control form-control-value option-value",
+            name: replaceName,
+        })
+    );
+    $inputGroup.append(
+        $("<span>", { class: "btn-del-value" }).append(
+            $("<i>", { class: "fa fa-trash" })
+        )
+    );
+
     buttonAddValue
         .closest(".row-option")
         .find(".option-values")
-        .append(
-            '<div class="input-group"><input type="text" class="form-control form-control-value option-value" name=' +
-                replaceName +
-                '><span class="btn-del-value"><i class="fa fa-trash"></i></span></div>'
-        );
-    $(buttonAddValue)
-        .siblings(".option-values")
-        .after(
-            '<button type="button" class="btn btn-light btn-add btn-block"> <i class="fa fa-plus"></i> Add value</button>'
-        );
+        .append($inputGroup);
+
+    let $addValueButton = $("<button>", {
+        type: "button",
+        class: "btn btn-light btn-add btn-block",
+    }).append($("<i>", { class: "fa fa-plus" }));
+    $addValueButton.append("&nbsp;Add value");
+
+    $(buttonAddValue).siblings(".option-values").after($addValueButton);
+
+    return true;
 }
 
 /**
@@ -1585,15 +1663,74 @@ function isJSON(str) {
 }
 
 /**
+ * Create and returns the output div jQuery element
+ * @returns {jQuery}
+ */
+function getOutputElement() {
+    let $outputContainer = $("<div>", { class: "output-container" });
+
+    let $settingOutput = $("<div>", { id: "setting-output" });
+    $settingOutput.append("Output");
+
+    let $roleGroup = $("<div>", { class: "float-right", role: "group" });
+    $roleGroup.append(
+        $("<button>", {
+            type: "button",
+            id: "dwn-output",
+            class: "btn btn-light btn-sm mr-1",
+            "data-toggle": "tooltip",
+            "data-placement": "bottom",
+            title: "Save output",
+            "data-delay": '{"show":"700", "hide":"0"}',
+        }).append($("<i>", { class: "fa fa-download", "aria-hidden": "true" }))
+    );
+    $roleGroup.append(
+        $("<button>", {
+            type: "button",
+            id: "clear-output",
+            class: "btn btn-light btn-sm mr-1",
+            "data-toggle": "tooltip",
+            "data-placement": "bottom",
+            title: "Clear output",
+            "data-delay": '{"show":"700", "hide":"0"}',
+        }).append($("<i>", { class: "fa fa-eraser", "aria-hidden": "true" }))
+    );
+    $roleGroup.append(
+        $("<button>", {
+            type: "button",
+            id: "split",
+            class: "btn btn-light btn-sm",
+            title: "Split",
+        }).append(
+            $("<i>", { class: "fa fa-chevron-down", "aria-hidden": "true" })
+        )
+    );
+
+    let $output = $("<div>", {
+        id: "output",
+        class: "output",
+        "data-simplebar": "",
+    });
+    $output.append($("<div>", { id: "output-model", class: "pb-2" }));
+    $output.append($("<div>", { id: "output-error" }));
+
+    $settingOutput.append($roleGroup);
+
+    $outputContainer.append($settingOutput);
+    $outputContainer.append($output);
+
+    return $outputContainer;
+}
+
+/**
  * Create the output area in the specific pane layout
  * @param {string} layout - specific pane layout
  */
 function createOutputArea(layout) {
     $("#setting-output").remove();
     $(".output-container").remove();
-    $(layout).append(
-        '<div class="output-container"><div id="setting-output"> Output <div role="group" class="float-right"> <button type="button" id="dwn-output" class="btn btn-light btn-sm" data-toggle="tooltip" data-placement="bottom" title="Save output" data-delay=\'{"show":"700", "hide":"0"}\'><i class="fa fa-download" aria-hidden="true"></i></button> <button type="button" id="clear-output" class="btn btn-light btn-sm" data-toggle="tooltip" data-placement="bottom" title="Clear output" data-delay=\'{"show":"700", "hide":"0"}\'><i class="fa fa-eraser" aria-hidden="true"></i></button> <button type="button" id="split" class="btn btn-light btn-sm" title="Split"> <i class="fa fa-chevron-down" aria-hidden="true"></i> </button></div></div> <div data-simplebar id="output" class="output"> <div id="output-model" class="pb-2"></div><div id="output-error"></div></div> </div>'
-    );
+    let $output = getOutputElement();
+    $(layout).append($output);
     setLoideStyleMode();
     $("#dwn-output").tooltip();
 }
@@ -1888,13 +2025,13 @@ function addMorePrograms() {
         check = true;
         let p = editors[$(this).val()].getValue();
         $(".layout").prepend(
-            "<input type='hidden' name='program[" +
-                index +
-                "]' id='program" +
-                $(this).val() +
-                "' value='" +
-                p +
-                "' class='programs'>"
+            $("<input>", {
+                type: "hidden",
+                name: `program[${index}]`,
+                id: `program${$(this).val()}`,
+                value: `${p}`,
+                class: "programs",
+            })
         );
     });
 
@@ -1913,13 +2050,13 @@ function addProgramsToDownload() {
         let id = $(this).find(".ace").attr("id");
         let value = editors[id].getValue();
         $(".layout").prepend(
-            "<input type='hidden' name='program[" +
-                index +
-                "]' id='program" +
-                index +
-                "' value='" +
-                value +
-                "' class='programs'>"
+            $("<input>", {
+                type: "hidden",
+                name: `program[${index}]`,
+                id: `program${index}`,
+                value: `${value}`,
+                class: "programs",
+            })
         );
     });
 }
@@ -1931,7 +2068,13 @@ function destroyPrograms() {
         $(this).remove();
     });
     $(".layout").prepend(
-        '<input type="hidden" name="program[0]" id="program" class="programs" value="">'
+        $("<input>", {
+            type: "hidden",
+            name: "program[0]",
+            id: `program`,
+            value: " ",
+            class: "programs",
+        })
     );
 }
 
@@ -2045,6 +2188,85 @@ function setOptions(config) {
 }
 
 /**
+ * Create and returns the tab pill jQuery element
+ * @param {string} tabId - ID of the new tab
+ * @param {string} tabName - tab name to put
+ * @returns {jQuery}
+ */
+function getTabPillElement(tabId, tabName) {
+    let $li = $("<li>", { class: "nav-item" });
+    let $aBtnTab = $("<a>", {
+        class: "btn-tab nav-link",
+        role: "tab",
+        "data-toggle": "tab",
+        "data-target": `#${tabId}`,
+    });
+
+    $aBtnTab.append(
+        $("<button>", {
+            type: "button",
+            class: "btn btn-light btn-sm btn-context-tab mr-1",
+        }).append(
+            $("<i>", { class: "fa fa-ellipsis-v", "aria-hidden": "true" })
+        )
+    );
+    $aBtnTab.append(
+        $("<span>", { class: "name-tab unselectable mr-1" }).text(tabName)
+    );
+    $aBtnTab.append(
+        $("<span>", { class: "delete-tab" }).append(
+            $("<i>", { class: "fa fa-times", "aria-hidden": "true" })
+        )
+    );
+
+    $li.append($aBtnTab);
+
+    return $li;
+}
+
+/**
+ * Create and returns the tab content jQuery element
+ * @param tabId - ID of the new tab
+ * @param editorId - ID of the new editor
+ * @returns {jQuery}
+ */
+function getTabContentElement(tabId, editorId) {
+    let $tabContent = $("<div>", {
+        role: "tabpanel",
+        class: "tab-pane fade",
+        id: tabId,
+    }).append($("<div>", { id: editorId, class: "ace" }));
+
+    return $tabContent;
+}
+
+/**
+ * Create and returns the button element of the tab to execute
+ * @param tabId - ID of the new tab
+ * @param editorId - ID of the new editor
+ */
+function getTabButtonToExecuteElement(editorId, tabName) {
+    let $button = $("<button>", {
+        type: "button",
+        class: "list-group-item list-group-item-action check-run-tab",
+        value: editorId,
+    });
+
+    $button.append(
+        $("<div>", { class: "check-box" }).append(
+            $("<i>", {
+                class: "fa fa-check check-icon invisible",
+                "aria-hidden": "true",
+            })
+        )
+    );
+
+    $button.append($("<span>", { class: "check-tab-name" }).text(tabName));
+
+    return $button;
+}
+
+/**
  * Create and Adds new editor tab
  * @param {string} text - set value of the new editor tab
  * @param {string} name - set name of the new editor tab
@@ -2055,29 +2277,17 @@ function addEditorTab(text, name) {
     let tabId = generateIDTab();
     let editorId = "editor" + id;
     let tabName = name == null ? "L P " + id : name;
-    $(
-        '<li class="nav-item"><a data-target="#' +
-            tabId +
-            '" role="tab" data-toggle="tab" class="btn-tab nav-link"> <button type="button" class="btn btn-light btn-sm btn-context-tab"><i class="fa fa-ellipsis-v" aria-hidden="true"></i></button> <span class="name-tab unselectable">' +
-            tabName +
-            '</span> <span class="delete-tab"> <i class="fa fa-times"></i> </span> </a> </li>'
-    ).insertBefore($(".add-tab").parent());
-    $(".tab-content").append(
-        '<div role="tabpanel" class="tab-pane fade" id="' +
-            tabId +
-            '"><div id="' +
-            editorId +
-            '" class="ace"></div></div>'
-    );
+
+    let $tabPill = getTabPillElement(tabId, tabName);
+    let $tabContent = getTabContentElement(tabId, editorId);
+    let $buttonTabToExecute = getTabButtonToExecuteElement(editorId, tabName);
+
+    $($tabPill).insertBefore($(".add-tab").parent());
+    $(".tab-content").append($tabContent);
+
     setUpAce(editorId, text);
 
-    $("#tab-execute-new").append(
-        '<button type="button" class="list-group-item list-group-item-action check-run-tab" value="' +
-            editorId +
-            '"> <div class="check-box"><i class="fa fa-check check-icon invisible" aria-hidden="true"></i></div>  <span class="check-tab-name"> ' +
-            tabName +
-            "</span> </button>"
-    );
+    $("#tab-execute-content").append($buttonTabToExecute);
 
     initializeTabContextmenu();
     initializeCheckTabToRun();
@@ -2124,6 +2334,67 @@ function closeAllPopovers(iam) {
 }
 
 /**
+ * Create and returns the jQuery element of the save popover body
+ * @returns {jQuery}
+ */
+function getSavePopoverBodyElement() {
+    let $popoverBody = $("<div>", { class: "save-content" });
+    $popoverBody.append(
+        $("<h6>", { class: "mb-2" }).text("Save the project to:")
+    );
+    $popoverBody.append(
+        $("<div>", { class: "save-btn text-center" }).append(
+            $("<button>", {
+                id: "local-download",
+                class: "btn btn-outline-dark btn-saver btn-block",
+            }).text("Local")
+        )
+    );
+
+    return $popoverBody;
+}
+
+/**
+ * Create and returns the jQuery element of the share popover body
+ * @returns {jQuery}
+ */
+function getSharePopoverBodyElement() {
+    let $popoverBody = $("<div>", { class: "popover-share-content" });
+    $popoverBody.append(
+        $("<h6>", { class: "mb-2" }).text("Share the project:")
+    );
+
+    let $inputGroup = $("<div>", { class: "input-group" });
+    $inputGroup.append(
+        $("<input>", {
+            id: "link-to-share",
+            type: "text",
+            class: "form-control",
+            readonly: "",
+        })
+    );
+    $inputGroup.append(
+        $("<div>", { class: "input-group-append" }).append(
+            $("<button>", {
+                id: "btn-copy-link",
+                class: "btn btn-light",
+                type: "button",
+                "data-clipboard-target": "#link-to-share",
+            }).append(
+                $("<i>", {
+                    class: "fa fa-clipboard",
+                    "aria-hidden": "true",
+                })
+            )
+        )
+    );
+
+    $popoverBody.append($inputGroup);
+
+    return $popoverBody;
+}
+
+/**
  * @global
  * Popover type
  */
@@ -2161,38 +2432,23 @@ function initializePopovers() {
 
     $(".popover-download").on("inserted.bs.popover", function () {
         // set what happens when user clicks on the button
-        $(".popover-header").last().html("");
-        $(".popover-body")
-            .last()
-            .html(
-                '<div class="save-content">\n' +
-                    '<h6 class="mb-2"> Save the project to:\n </h6>' +
-                    '<div class="save-btn text-center">\n' +
-                    '<button id="local-download" class="btn btn-outline-dark btn-saver btn-block">Local</button>\n' +
-                    // '<button id="cloud-download" class="btn btn-outline-dark btn-saver btn-block" disabled>Cloud</button>\n' +
-                    "</div>\n" +
-                    "</div>"
-            );
+        $(".popover-header").last().empty();
+
+        let $popoverBody = getSavePopoverBodyElement();
+
+        $(".popover-body").last().append($popoverBody);
 
         if (localStorage.getItem("mode") === "dark") {
             $("#local-download").removeClass("btn-outline-dark");
             $("#local-download").addClass("btn-outline-light");
-            // $('#cloud-download').removeClass('btn-outline-dark');
-            // $('#cloud-download').addClass('btn-outline-light');
         } else {
             $("#local-download").removeClass("btn-outline-light");
             $("#local-download").addClass("btn-outline-dark");
-            // $('#cloud-download').removeClass('btn-outline-light');
-            // $('#cloud-download').addClass('btn-outline-dark');
         }
 
         $("#local-download").on("click", function () {
             downloadLoDIEProject();
         });
-
-        /* $("#cloud-download").on('click', function () {
-           console.log('Save on cloud');
-         }); */
     });
 
     $(".popover-download").on("hidden.bs.popover", function () {
@@ -2217,31 +2473,18 @@ function initializePopovers() {
         });
 
     $(".popover-share").on("inserted.bs.popover", function () {
-        $(".popover-header").last().html("");
-        $(".popover-body")
-            .last()
-            .html(
-                "" +
-                    '<div class="popover-share-content">\n' +
-                    '<h6 class="mb-2"> Share the project:\n </h6>' +
-                    '<div class="input-group">' +
-                    '<input id="link-to-share" type="text" class="form-control" readonly>' +
-                    '<div class="input-group-append">' +
-                    '<button class="btn btn-outline-dark" type="button" id="btn-copy-link" data-clipboard-target="#link-to-share"><i class="fa fa-clipboard"></i></button>' +
-                    "</div>" +
-                    "</div>" +
-                    // '<div class="text-center mt-2 mb-2"> or </div>' +
-                    // '<button id="share-btn-download" type="button" class="btn btn-outline-dark btn-block">Download</button>\n' +
-                    // '<button id="share-btn-save-on-cloud" type="button" class="btn btn-outline-dark btn-block" disabled>Save on cloud</button>\n' +
-                    "</div>"
-            );
+        $(".popover-header").last().empty();
+
+        let $popoverBody = getSharePopoverBodyElement();
+
+        $(".popover-body").last().html($popoverBody);
 
         if (localStorage.getItem("mode") === "dark") {
-            $("#btn-copy-link").removeClass("btn-outline-dark");
-            $("#btn-copy-link").addClass("btn-outline-light");
+            $("#btn-copy-link").removeClass("btn-light");
+            $("#btn-copy-link").addClass("btn-dark");
         } else {
-            $("#btn-copy-link").removeClass("btn-outline-light");
-            $("#btn-copy-link").addClass("btn-outline-dark");
+            $("#btn-copy-link").removeClass("btn-dark");
+            $("#btn-copy-link").addClass("btn-light");
         }
 
         $("#link-to-share").val("Loading...");
@@ -2384,27 +2627,28 @@ function deleteTab(deleteTabButton, skipConfirm) {
         if ($(".nav-tabs").children().length === 1) {
             // add a new tab if we delete the last
             let parent = $(".add-tab").parent();
-            idEditor = "editor1";
-            ideditor = "editor1";
-            $(
-                '<li class="nav-item"> <a data-target="#tab1" role="tab" data-toggle="tab" class="btn-tab nav-link"> <button type="button" class="btn btn-light btn-sm btn-context-tab"><i class="fa fa-ellipsis-v" aria-hidden="true"></i></button> <span class="name-tab unselectable">L P 1</span> <span class="delete-tab"> <i class="fa fa-times"></i> </span> </a> </li>'
-            ).insertBefore(parent);
-            $(".tab-content").append(
-                '<div role="tabpanel" class="tab-pane fade" id="tab1"><div id="editor1" class="ace"></div></div>'
-            );
-            editors[ideditor] = new ace.edit(ideditor);
-            setUpAce(ideditor, "");
-            $("#tab-execute-new").append(
-                '<button type="button" class="list-group-item list-group-item-action check-run-tab" value="' +
-                    ideditor +
-                    '">  <div class="check-box"><i class="fa fa-check check-icon invisible" aria-hidden="true"></i></div>  <span class="check-tab-name"> L P 1 </span> </button>'
-            );
-            $("[data-target='#tab1']").trigger("click");
+            idEditor = "editor1"; // set the global idEdtior
 
-            initializeTabContextmenu();
-            initializeCheckTabToRun();
-            setAceMode();
-            setElementsColorMode();
+            let newTabID = "tab1";
+            let newTabName = "L P 1";
+
+            let $newTabPill = getTabPillElement(newTabID, newTabName);
+            $($newTabPill).insertBefore(parent);
+
+            let $newTabContent = getTabContentElement(newTabID, idEditor);
+            $(".tab-content").append($newTabContent);
+
+            editors[idEditor] = new ace.edit(idEditor);
+            setUpAce(idEditor, "");
+
+            let $newButtonTabToExecute = getTabButtonToExecuteElement(
+                idEditor,
+                newTabName
+            );
+            $("#tab-execute-content").append($newButtonTabToExecute);
+
+            // Select and active the first tab
+            $("#editor-tabs li:first-child a").tab("show");
         } else if (ids !== parse) {
             // renumber tabs if you delete the previous tab instead of the current one
             // $('.nav-tabs').find('li:not(:last)').each(function (index) {
@@ -2433,11 +2677,21 @@ function deleteTab(deleteTabButton, skipConfirm) {
                         }
                         currentCheck.empty();
                         currentCheck.attr("value", ideditor);
+
                         currentCheck.append(
-                            '<div class="check-box"><i class="fa fa-check check-icon invisible" aria-hidden="true"></i></div>  <span class="check-tab-name">L P ' +
-                                (index + 1) +
-                                "</span>"
+                            $("<div>", { class: "check-box" }).append(
+                                $("<i>", {
+                                    class: "fa fa-check check-icon invisible",
+                                    "aria-hidden": "true",
+                                })
+                            )
                         );
+                        currentCheck.append(
+                            $("<span>", { class: "check-tab-name" }).text(
+                                `L P ${index + 1}`
+                            )
+                        );
+
                         if (!wasInvisible) {
                             currentCheck
                                 .find("check-icon")
@@ -2464,6 +2718,11 @@ function deleteTab(deleteTabButton, skipConfirm) {
         if ($(".nav-tabs").children().length === 2) {
             idEditor = "editor1";
         }
+
+        initializeTabContextmenu();
+        initializeCheckTabToRun();
+        setAceMode();
+        setElementsColorMode();
     }
 }
 
@@ -3201,15 +3460,14 @@ function loadProjectFromLocalStorage() {
  */
 function addTabsNameToDownload() {
     $(".name-tab").each(function (index) {
-        $(".layout").prepend(
-            "<input type='hidden' name='tabname[" +
-                index +
-                "]' id='tabname" +
-                index +
-                "' value='" +
-                $(this).text() +
-                "' class='tabsname'>"
-        );
+        let $input = $("<input>", {
+            type: "hidden",
+            name: `tabname[${index}]`,
+            id: `tabname${index}`,
+            value: $(this).text(),
+            class: "tabsname",
+        });
+        $(".layout").prepend($input);
     });
 }
 
