@@ -275,10 +275,8 @@ function resizeWindow() {
  * Resize editors dimensions of all Ace editor istances
  */
 function resizeAllEditors() {
-    let length = $(".nav-tabs").children().length;
-    for (let index = 1; index <= length - 1; index++) {
-        let idE = "editor" + index;
-        editors[idE].resize();
+    for (const editor in editors) {
+        editors[editor].resize();
     }
 }
 
@@ -338,10 +336,8 @@ function getRunSettingsData() {
 function initializeLayout() {
     layout = $("#layout").layout({
         onresize_end: function () {
-            let length = $(".nav-tabs").children().length;
-            for (let index = 1; index <= length - 1; index++) {
-                let idE = "editor" + index;
-                editors[idE].resize();
+            for (const editor in editors) {
+                editors[editor].resize();
             }
         },
         south__minSize: 125,
@@ -685,7 +681,7 @@ function initializeAppearanceSettings() {
 
     $("#theme").change(function (e) {
         let theme = $(this).val();
-        setTheme(theme);
+        setEditorTheme(theme);
         if (!saveOption("theme", theme)) {
             alert("Sorry, this options will not save in your browser");
         }
@@ -714,12 +710,12 @@ function initializeAppearanceSettings() {
                 : localStorage.getItem("theme");
         if (actualTheme.length === 0) {
             if (localStorage.getItem("mode") === "dark")
-                setThemeEditors(defaultDarkTheme);
+                setEditorTheme(defaultDarkTheme);
             else {
-                setThemeEditors(defaultTheme);
+                setEditorTheme(defaultTheme);
             }
         } else {
-            setThemeEditors(actualTheme);
+            setEditorTheme(actualTheme);
         }
     } else {
         $("#font-editor-range").val(defaultFontSize).change();
@@ -943,7 +939,7 @@ function initializeTabContextmenu() {
                 callback: function (itemKey, opt, e) {
                     let textToDuplicate = editors[idEditor].getValue();
                     let tabID = addEditorTab(textToDuplicate);
-                    $("[data-target='#" + tabID + "']").trigger("click"); //active last tab inserted
+                    $("[data-target='#" + tabID + "']").tab("show"); //active last tab inserted
                 },
             },
             Clear: {
@@ -1366,7 +1362,7 @@ $(document).on("change", ".form-control-option", function () {
  */
 $(document).on("click", ".add-tab", function () {
     let tabID = addEditorTab("");
-    $("[data-target='#" + tabID + "']").trigger("click"); //active last tab inserted
+    $("[data-target='#" + tabID + "']").tab("show"); //active last tab inserted
 
     let actualTheme =
         localStorage.getItem("theme") == null
@@ -1374,12 +1370,12 @@ $(document).on("click", ".add-tab", function () {
             : localStorage.getItem("theme");
     if (actualTheme.length == 0) {
         if (localStorage.getItem("mode") === "dark")
-            setThemeEditors(defaultDarkTheme);
+            setEditorTheme(defaultDarkTheme);
         else {
-            setThemeEditors(defaultTheme);
+            setEditorTheme(defaultTheme);
         }
     } else {
-        setThemeEditors(actualTheme);
+        setEditorTheme(actualTheme);
     }
 });
 
@@ -1588,7 +1584,6 @@ function setJSONInput(config) {
             let id = $(this).find("a").attr("data-target");
             $(this).remove();
             $(id).remove();
-            // console.log('remove', (index + 1));
             $('.check-run-tab[value="editor' + (index + 1) + '"]').remove();
         });
         let tabID;
@@ -1838,9 +1833,9 @@ function createEditorTabs(data) {
         }
     }
     if (tabOpened == 1) {
-        $("a[data-target='#tab1']").trigger("click");
+        $("a[data-target='#tab1']").tab("show");
     } else {
-        $("[data-target='#" + tabID + "']").trigger("click"); // active last tab inserted
+        $("a[data-target='#" + tabID + "']").tab("show"); // active last tab inserted
     }
 
     $(".name-tab").each(function (index) {
@@ -2079,29 +2074,25 @@ function destroyPrograms() {
 }
 
 /**
- * Generate unique id for the new tab
- * @returns {string}
+ * Generate unique id for the new tab and for the editor
+ * @returns {number}
  */
-function generateIDTab() {
+function generateID() {
     let id = $(".nav-tabs").children().length;
-    let tabid = "tab" + id;
 
-    while ($("#" + tabid).length !== 0) {
+    while ($(`#tab${id}`).length !== 0 && $(`#editor${id}`).length !== 0) {
         id += 1;
-        tabid = "tab" + id;
     }
-    return tabid;
+    return id;
 }
 
 /**
  * Sets the theme to all the editors
  * @param {string} theme - value of the theme chosen
  */
-function setTheme(theme) {
-    let length = $(".nav-tabs").children().length;
-    for (let index = 1; index <= length - 1; index++) {
-        let idE = "editor" + index;
-        editors[idE].setTheme(theme);
+function setEditorTheme(theme) {
+    for (const editor in editors) {
+        editors[editor].setTheme(theme);
     }
 }
 
@@ -2110,22 +2101,8 @@ function setTheme(theme) {
  * @param {number} size - font's size
  */
 function setFontSizeEditors(size) {
-    let length = $(".nav-tabs").children().length;
-    for (let index = 1; index <= length - 1; index++) {
-        let idE = "editor" + index;
-        editors[idE].setFontSize(size + "px");
-    }
-}
-
-/**
- * Sets the theme to all the editors
- * @param {number} theme - theme
- */
-function setThemeEditors(theme) {
-    let length = $(".nav-tabs").children().length;
-    for (let index = 1; index <= length - 1; index++) {
-        let idE = "editor" + index;
-        editors[idE].setTheme(theme);
+    for (const editor in editors) {
+        editors[editor].setFontSize(size + "px");
     }
 }
 
@@ -2273,10 +2250,10 @@ function getTabButtonToExecuteElement(editorId, tabName) {
  * @returns {string} new editor ID
  */
 function addEditorTab(text, name) {
-    let id = $(".nav-tabs").children().length;
-    let tabId = generateIDTab();
-    let editorId = "editor" + id;
-    let tabName = name == null ? "L P " + id : name;
+    let newID = generateID();
+    let tabId = "tab" + newID;
+    let editorId = "editor" + newID;
+    let tabName = name == null ? "L P " + newID : name;
 
     let $tabPill = getTabPillElement(tabId, tabName);
     let $tabContent = getTabContentElement(tabId, editorId);
@@ -2306,7 +2283,7 @@ function addEditorTab(text, name) {
 function resetAppearanceSettings() {
     $("#theme").val(defaultTheme);
     saveOption("theme", defaultTheme);
-    setTheme(defaultTheme);
+    setEditorTheme(defaultTheme);
     $("#font-editor-range").val(defaultFontSize).change();
     $("#font-output-range").val(defaultFontSize).change();
     setLoideStyleMode("light");
@@ -2605,27 +2582,23 @@ function deleteTab(deleteTabButton, skipConfirm) {
             "Are you sure you want to delete this file? This cannot be undone."
         );
     }
-    let ids = $(".nav-tabs").children().length - 1;
-    let t = deleteTabButton.parent().attr("data-target");
-    let currentids = $(t).find(".ace").attr("id").substr(6);
-    let parse = parseInt(currentids);
     if (deleteAlertConfirm || skipConfirm) {
         let prevEditor = deleteTabButton.parent().parent().prev();
         if (prevEditor.length === 0) {
             prevEditor = deleteTabButton.parent().parent().next();
         }
         let currentID = deleteTabButton.closest("a").attr("data-target");
-        deleteTabButton.parent().parent().remove();
+        deleteTabButton.parent().parent().remove(); // delete the li element
         let ideditor = $(currentID).find(".ace").attr("id");
-        $(currentID).remove();
-        delete editors[ideditor];
+        $(currentID).remove(); // remove the tabpanel containing the editor
+        delete editors[ideditor]; // remove the editor from the array
         $(
             "[data-target='" + prevEditor.find("a").attr("data-target") + "']"
-        ).trigger("click");
-        $('.check-run-tab[value="' + ideditor + '"]').remove();
-
+        ).tab("show");
+        $('.check-run-tab[value="' + ideditor + '"]').remove(); // delete the tab on the tab to execute list
         if ($(".nav-tabs").children().length === 1) {
-            // add a new tab if we delete the last
+            // add a new tab if the user deletes the last
+
             let parent = $(".add-tab").parent();
             idEditor = "editor1"; // set the global idEdtior
 
@@ -2649,74 +2622,6 @@ function deleteTab(deleteTabButton, skipConfirm) {
 
             // Select and active the first tab
             $("#editor-tabs li:first-child a").tab("show");
-        } else if (ids !== parse) {
-            // renumber tabs if you delete the previous tab instead of the current one
-            // $('.nav-tabs').find('li:not(:last)').each(function (index) {
-            //     tab.find('a').text('L P ' + (index + 1));
-            //     tab.find('a').append('<span class="delete-tab"> <i class="fa fa-times"></i> </span>');
-            // });
-            $(".tab-content")
-                .find("[role='tabpanel']")
-                .each(function (index) {
-                    ideditor = "editor" + (index + 1);
-                    let currentEditor = deleteTabButton.find(".ace").attr("id");
-                    if (ideditor !== currentEditor) {
-                        deleteTabButton.find(".ace").attr("id", ideditor);
-                        editors[ideditor] = editors[currentEditor];
-                        delete editors[currentEditor];
-                        let currentCheck = $(
-                            '.check-run-tab[value="' + currentEditor + '"]'
-                        );
-                        let wasInvisible = false;
-                        if (
-                            currentCheck
-                                .find("check-icon")
-                                .hasClass("invisible")
-                        ) {
-                            wasInvisible = true;
-                        }
-                        currentCheck.empty();
-                        currentCheck.attr("value", ideditor);
-
-                        currentCheck.append(
-                            $("<div>", { class: "check-box" }).append(
-                                $("<i>", {
-                                    class: "fa fa-check check-icon invisible",
-                                    "aria-hidden": "true",
-                                })
-                            )
-                        );
-                        currentCheck.append(
-                            $("<span>", { class: "check-tab-name" }).text(
-                                `L P ${index + 1}`
-                            )
-                        );
-
-                        if (!wasInvisible) {
-                            currentCheck
-                                .find("check-icon")
-                                .removeClass("invisible");
-                        }
-                    }
-                    $(".btn-tab").each(function (index) {
-                        let thisTab = deleteTabButton;
-                        let idTabEditor = deleteTabButton.attr("data-target");
-                        let idEditorToChangeTabName = $(idTabEditor)
-                            .children()
-                            .attr("id");
-                        let nameValue = thisTab.children(".name-tab").text();
-                        $(
-                            '.check-run-tab[value="' +
-                                idEditorToChangeTabName +
-                                '"]'
-                        )
-                            .find(".check-tab-name")
-                            .text(nameValue);
-                    });
-                });
-        }
-        if ($(".nav-tabs").children().length === 2) {
-            idEditor = "editor1";
         }
 
         initializeTabContextmenu();
@@ -3366,8 +3271,6 @@ function setElementsColorMode() {
  * Change the HTML element color style in the light mode
  */
 function setLightStyleToUIElements() {
-    let length = $(".nav-tabs").children().length;
-
     $("#dark-light-mode").text("Dark");
     $("#theme").val(defaultTheme);
     $(".btn-dark").each(function () {
@@ -3380,17 +3283,13 @@ function setLightStyleToUIElements() {
     });
     $("#dark-light-mode").addClass("btn-outline-dark");
     $("#dark-light-mode").removeClass("btn-outline-light");
-    for (let index = 1; index <= length - 1; index++) {
-        let idE = "editor" + index;
-        editors[idE].setTheme(defaultTheme);
-    }
+    setEditorTheme(defaultTheme);
 }
 
 /**
  * Change the HTML element color style in the dark mode
  */
 function setDarkStyleToUIElements() {
-    let length = $(".nav-tabs").children().length;
     $("#dark-light-mode").text("Light");
     $("#theme").val(defaultDarkTheme);
     $(".btn-light").each(function () {
@@ -3403,11 +3302,7 @@ function setDarkStyleToUIElements() {
     });
     $("#dark-light-mode").removeClass("btn-outline-dark");
     $("#dark-light-mode").addClass("btn-outline-light");
-
-    for (let index = 1; index <= length - 1; index++) {
-        let idE = "editor" + index;
-        editors[idE].setTheme(defaultDarkTheme);
-    }
+    setEditorTheme(defaultDarkTheme);
 }
 
 /**
@@ -3602,26 +3497,20 @@ function getHTMLFromJQueryElement(jQueryElement) {
 function setAceMode() {
     switch ($("#inputLanguage").val()) {
         case "asp": {
-            let length = $(".nav-tabs").children().length;
-            for (let index = 1; index <= length - 1; index++) {
-                let idE = "editor" + index;
-                editors[idE].session.setMode("ace/mode/asp");
+            for (const editor in editors) {
+                editors[editor].session.setMode("ace/mode/asp");
             }
             break;
         }
         case "datalog": {
-            let length = $(".nav-tabs").children().length;
-            for (let index = 1; index <= length - 1; index++) {
-                let idE = "editor" + index;
-                editors[idE].session.setMode("ace/mode/datalog");
+            for (const editor in editors) {
+                editors[editor].session.setMode("ace/mode/datalog");
             }
             break;
         }
         default: {
-            let length = $(".nav-tabs").children().length;
-            for (let index = 1; index <= length - 1; index++) {
-                let idE = "editor" + index;
-                editors[idE].session.setMode("ace/mode/text");
+            for (const editor in editors) {
+                editors[editor].session.setMode("ace/mode/text");
             }
         }
     }
