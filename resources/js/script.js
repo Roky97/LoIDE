@@ -98,7 +98,7 @@ function copyStringToClipboard(str) {
  * @param {json} message.reason - message text
  */
 function operation_alert(message) {
-    $("#notidication-body").html("<strong>" + message.reason + "</strong>");
+    $("#notification-body").html("<strong>" + message.reason + "</strong>");
     $("#notification").toast("show");
 }
 
@@ -2600,7 +2600,6 @@ function deleteTab(deleteTabButton, skipConfirm) {
             // add a new tab if the user deletes the last
 
             let parent = $(".add-tab").parent();
-            idEditor = "editor1"; // set the global idEdtior
 
             let newTabID = "tab1";
             let newTabName = "L P 1";
