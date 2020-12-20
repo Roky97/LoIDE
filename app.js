@@ -63,6 +63,7 @@ app.use(
         hsts: {
             maxAge: maxAge,
         },
+        contentSecurityPolicy: false,
     })
 );
 
