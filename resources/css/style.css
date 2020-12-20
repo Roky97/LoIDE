@@ -562,11 +562,16 @@ label[for="btn-download"] {
         border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
+.btn-tab:hover {
+    color: black;
+}
+
 .btn-tab {
     cursor: pointer;
     padding: 0.35rem 0.4rem;
     margin: 0.3rem 0.1rem;
     background-color: #f8f9fa;
+    color: black;
     border: 1px solid #dee2e6;
     transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
         border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
@@ -581,7 +586,7 @@ label[for="btn-download"] {
 
 .nav-tabs .nav-item.show .nav-link,
 .nav-tabs .nav-link.active {
-    color: #495057;
+    color: black;
     background-color: #fff;
     border-color: #dee2e6 #dee2e6 #fff;
     border-bottom-color: #dee2e6;
@@ -805,6 +810,12 @@ label[for="run-dot"] {
     -webkit-backdrop-filter: blur(3px);
 }
 
+.popover {
+    background-color: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+}
+
 /*DARK-MODE SECTION*/
 
 body.dark {
@@ -873,7 +884,7 @@ body.dark .pull-right {
 }
 
 body.dark .popover {
-    background-color: rgb(83, 83, 83);
+    background-color: rgba(83, 83, 83, 0.85);
     color: white;
 }
 
@@ -887,12 +898,12 @@ body.dark .popover-header {
 }
 
 body.dark .toast {
-    background-color: rgba(136, 136, 136, 0.85);
+    background-color: rgba(66, 66, 66, 0.85);
 }
 
 body.dark .toast-header {
     color: #f9f9f9;
-    background-color: rgba(144, 144, 144, 0.85);
+    background-color: rgba(83, 83, 83, 0.85);
 }
 
 body.dark .navbar-brand,

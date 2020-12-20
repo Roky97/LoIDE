@@ -1028,8 +1028,9 @@ function initializeTabContextmenu() {
     // initialize change tab name popopver
     $(".btn-tab").off("inserted.bs.popover");
     $(".btn-tab").on("inserted.bs.popover", function () {
-        let $renameTab = $("<div>", { class: "input-group" });
-        $renameTab.append(
+        let $renameTabBody = $("<div>", { class: "input-group" });
+
+        $renameTabBody.append(
             $("<input>", {
                 type: "text",
                 class: "form-control",
@@ -1037,7 +1038,7 @@ function initializeTabContextmenu() {
                 placeholder: "Enter a name",
             })
         );
-        $renameTab.append(
+        $renameTabBody.append(
             $("<span>", { class: "input-group-btn" }).append(
                 $("<button>", {
                     class: "btn btn-light",
@@ -1046,7 +1047,12 @@ function initializeTabContextmenu() {
                 }).append($("<i>", { class: "fa fa-chevron-right" }))
             )
         );
-        $(".popover-body").last().html($renameTab);
+
+        $(".popover-header").remove();
+        $(".popover-body")
+            .last()
+            .append($("<h6>", { class: "mb-2" }).text("Rename"));
+        $(".popover-body").last().append($renameTabBody);
 
         // set the color of buttons if the darkmode is on
         if (localStorage.getItem("mode") === "dark") {
