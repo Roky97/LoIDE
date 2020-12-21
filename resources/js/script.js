@@ -116,6 +116,12 @@ var idEditor = "editor1";
 
 /**
  * @global
+ * Project name
+ */
+var projectName = "LoIDE_Project";
+
+/**
+ * @global
  * Default font size editor
  */
 const defaultFontSize = 15;
@@ -1035,7 +1041,7 @@ function initializeTabContextmenu() {
                 type: "text",
                 class: "form-control",
                 id: "change-name-tab-textbox",
-                placeholder: "Enter a name",
+                placeholder: "Type a name",
             })
         );
         $renameTabBody.append(
@@ -2322,15 +2328,25 @@ function closeAllPopovers(iam) {
  */
 function getSavePopoverBodyElement() {
     let $popoverBody = $("<div>", { class: "save-content" });
-    $popoverBody.append(
-        $("<h6>", { class: "mb-2" }).text("Save the project to:")
-    );
+
+    $popoverBody.append($("<h6>", { class: "mb-2" }).text("Save the project"));
+
+    let $inputText = $("<input>", {
+        type: "text",
+        class: "form-control mb-2",
+        id: "project-name-textbox",
+        placeholder: "Type a name",
+        value: projectName,
+    });
+
+    $popoverBody.append($inputText);
+
     $popoverBody.append(
         $("<div>", { class: "save-btn text-center" }).append(
             $("<button>", {
                 id: "local-download",
                 class: "btn btn-outline-dark btn-saver btn-block",
-            }).text("Local")
+            }).text("Save")
         )
     );
 
@@ -2392,7 +2408,6 @@ const popoverType = {
 function initializePopovers() {
     // Prevent to not close the popover when the user clicks inside of the popover
     $("body").on("mousedown", ".popover", function (e) {
-        e.preventDefault();
         e.stopPropagation();
     });
 
@@ -2421,6 +2436,9 @@ function initializePopovers() {
 
         $(".popover-body").last().append($popoverBody);
 
+        // focus the input text box
+        $("#project-name-textbox").focus();
+
         if (localStorage.getItem("mode") === "dark") {
             $("#local-download").removeClass("btn-outline-dark");
             $("#local-download").addClass("btn-outline-light");
@@ -2430,7 +2448,9 @@ function initializePopovers() {
         }
 
         $("#local-download").on("click", function () {
-            downloadLoDIEProject();
+            let inputProjectName = $("#project-name-textbox").val();
+            if (inputProjectName.length > 0) projectName = inputProjectName; // Update the project name
+            downloadLoDIEProject(inputProjectName);
         });
     });
 
@@ -3432,11 +3452,16 @@ function createLoideProjectConfig() {
 
 /**
  * Create and download in a text file of the project configuration converted in JSON format
+ * @param name - name of the project file
  */
-function downloadLoDIEProject() {
+function downloadLoDIEProject(name) {
     let project = createLoideProjectConfig();
     let stringify = JSON.stringify(project);
-    createFileToDownload(stringify, "local", "LoIDE_Project", "json");
+    let fileName =
+        name == undefined || typeof name !== "string" || name.length === 0
+            ? projectName
+            : name;
+    createFileToDownload(stringify, "local", fileName, "json");
 }
 
 /**
