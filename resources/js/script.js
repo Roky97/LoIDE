@@ -499,13 +499,17 @@ function resizeWindow() {
             setOuputPaneSize();
         }
     }
-    resizeAllEditors();
+
+    setTimeout(function () {
+        resizeAllEditorsAndLayout();
+    }, 900);
 }
 
 /**
  * Resize editors dimensions of all Ace editor istances
  */
-function resizeAllEditors() {
+function resizeAllEditorsAndLayout() {
+    layout.resizeAll();
     for (const editor in editors) {
         editors[editor].resize();
     }
@@ -3516,7 +3520,7 @@ function toggleRunSettings() {
     $(".left-panel-show, .left-panel").one(
         "transitionend webkitTransitionEnd oTransitionEnd otransitionend MSTransitionEnd",
         function () {
-            layout.resizeAll();
+            resizeAllEditorsAndLayout();
         }
     );
 }
