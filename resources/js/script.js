@@ -1711,7 +1711,6 @@ function getOutputElement() {
     let $output = $("<div>", {
         id: "output",
         class: "output",
-        "data-simplebar": "",
     });
     $output.append($("<div>", { id: "output-model", class: "pb-2" }));
     $output.append($("<div>", { id: "output-error" }));
