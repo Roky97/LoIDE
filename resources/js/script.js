@@ -274,8 +274,8 @@ function initializeLoide() {
     }, 500);
 }
 
+// Initialize the connection to the LoIDE WebSocket Server API and the application
 try {
-    // Initialize the connection to the LoIDE WebSocket Server API and the application
     $(document).ready(function () {
         try {
             addFunctionsTojQuery();
@@ -3308,7 +3308,6 @@ function setElementsColorMode() {
  */
 function setLightStyleToUIElements() {
     $("#dark-light-mode").text("Dark");
-    $("#theme").val(defaultTheme);
     $(".btn-dark").each(function () {
         $(this).removeClass("btn-dark");
         $(this).addClass("btn-light");
@@ -3319,7 +3318,9 @@ function setLightStyleToUIElements() {
     });
     $("#dark-light-mode").addClass("btn-outline-dark");
     $("#dark-light-mode").removeClass("btn-outline-light");
-    setEditorTheme(defaultTheme);
+
+    let actualTheme = $("#theme").val();
+    if (actualTheme == defaultDarkTheme) $("#theme").val(defaultTheme).change();
 }
 
 /**
@@ -3327,7 +3328,6 @@ function setLightStyleToUIElements() {
  */
 function setDarkStyleToUIElements() {
     $("#dark-light-mode").text("Light");
-    $("#theme").val(defaultDarkTheme);
     $(".btn-light").each(function () {
         $(this).removeClass("btn-light");
         $(this).addClass("btn-dark");
@@ -3338,7 +3338,9 @@ function setDarkStyleToUIElements() {
     });
     $("#dark-light-mode").removeClass("btn-outline-dark");
     $("#dark-light-mode").addClass("btn-outline-light");
-    setEditorTheme(defaultDarkTheme);
+
+    let actualTheme = $("#theme").val();
+    if (actualTheme == defaultTheme) $("#theme").val(defaultDarkTheme).change();
 }
 
 /**
