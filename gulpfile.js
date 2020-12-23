@@ -7,7 +7,7 @@ const nodemon = require("gulp-nodemon");
 var browserSync = require("browser-sync").create();
 var babel = require("gulp-babel");
 const inject = require("gulp-inject-string");
-const htmlmin = require("gulp-htmlmin");
+const htmlmin = require("gulp-html-minifier-terser");
 
 const path = {
     dist: "dist/",
